@@ -384,23 +384,20 @@ export function load(
   if (workingDirectoryPath === "") {
     return new YdsResult(false, null, EMPTY_WORKINGDIR_PATH_ERROR);
   } else {
-    let elementPathObj = getElementPathInfo(
-      workingDirectoryPath,
-      elementPath
-    );
-    switch (elementPathObj.type) {
+    let elementPathInfo = getElementPathInfo(workingDirectoryPath, elementPath);
+    switch (elementPathInfo.type) {
       case ElementPathType.empty:
       case ElementPathType.simpleToObject:
       case ElementPathType.simpleToList:
       case ElementPathType.complexToObject:
       case ElementPathType.complexToList:
-        return loadYaml(elementPathObj.data, elementPath, depth);
+        return loadYaml(elementPathInfo.data, elementPath, depth);
       case ElementPathType.simpleToSimple:
       case ElementPathType.complexToSimple:
-        return new YdsResult(true, elementPathObj.data, elementPath);
+        return new YdsResult(true, elementPathInfo.data, elementPath);
       case ElementPathType.simpleToComplexString:
       case ElementPathType.complexToComplexString:
-        const elementContent = fs.readFileSync(elementPathObj.data, "utf-8");
+        const elementContent = fs.readFileSync(elementPathInfo.data, "utf-8");
         return new YdsResult(true, elementContent, elementPath);
       case ElementPathType.invalid:
         break;

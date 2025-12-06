@@ -23,25 +23,25 @@ export function clear(
       elementPath
     );
     const parentElementPath = parentElementInfo.parentElementPath;
-    const elementPathObj = getElementPathInfo(
+    const elementPathInfo = getElementPathInfo(
       workingDirectoryPath,
       elementPath
     );
     const parentElementFilePath = parentElementInfo.parentElementFilePath;
     let parentElement = load(workingDirectoryPath, parentElementPath).element;
-    switch (elementPathObj.type) {
+    switch (elementPathInfo.type) {
       case ElementPathType.empty:
       case ElementPathType.simpleToObject:
       case ElementPathType.complexToObject:
-        fs.rmSync(path.parse(elementPathObj.data).dir, { recursive: true });
+        fs.rmSync(path.parse(elementPathInfo.data).dir, { recursive: true });
         parentElement[parentElementInfo.indexOfChild] = {};
         fs.writeFileSync(parentElementFilePath, yaml.dump(parentElement));
         return new YdsResult(true, parentElement, parentElementPath);
       case ElementPathType.simpleToList:
       case ElementPathType.complexToList:
-        const listFilePath = path.parse(elementPathObj.data);
+        const listFilePath = path.parse(elementPathInfo.data);
         const directoryContents = fs.readdirSync(
-          path.parse(elementPathObj.data).dir
+          path.parse(elementPathInfo.data).dir
         );
         for (const item of directoryContents) {
           if (
@@ -51,7 +51,7 @@ export function clear(
             )
           ) {
             const fileToDelete = path.join(
-              path.parse(elementPathObj.data).dir,
+              path.parse(elementPathInfo.data).dir,
               item
             );
             fs.rmSync(fileToDelete, {
@@ -59,7 +59,7 @@ export function clear(
             });
           }
         }
-        fs.rmSync(elementPathObj.data);
+        fs.rmSync(elementPathInfo.data);
         const listMetadataFilePath = path.join(
           listFilePath.dir,
           "." + listFilePath.base
@@ -94,7 +94,7 @@ export function clear(
         }
       case ElementPathType.simpleToComplexString:
       case ElementPathType.complexToComplexString:
-        fs.rmSync(elementPathObj.data);
+        fs.rmSync(elementPathInfo.data);
         parentElement[parentElementInfo.indexOfChild] = "";
         fs.writeFileSync(parentElementFilePath, yaml.dump(parentElement));
         return new YdsResult(true, parentElement, parentElementPath);
