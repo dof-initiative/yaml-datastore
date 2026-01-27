@@ -23,24 +23,27 @@ YAML Datastore is a lightweight library that stores and manages data with struct
 1.1\. [What is YAML Datastore?](#what-is-yaml-datastore) <br>
 1.2\. [Purpose of YAML Datastore](#purpose-of-yaml-datastore) <br>
 2\. [Installation](#installation) <br>
-3\. [Usage](#usage) <br>
-3.0.1\. [How it works](#how-it-works) <br>
-3.0.2\. [Supported Data Types](#supported-data-types) <br>
-3.1\. [On Disk Representation Use Cases](#on-disk-representation-use-cases) <br>
-3.1.1\. [Object with Simple Data Types](#object-with-simple-data-types) <br>
-3.1.2\. [Object with Complex String](#object-with-complex-string) <br>
-3.1.3\. [Object with Object of Simple Data Types](#object-with-object-of-simple-data-types) <br>
-3.1.4\. [Object with Object of Complex Data Types](#object-with-object-of-complex-data-types) <br>
-3.1.5\. [Object with List of Simple Data Type](#object-with-list-of-simple-data-type) <br>
-3.1.6\. [Object with List of Simple Data Types](#object-with-list-of-simple-data-types) <br>
-3.1.7\. [Object with List of Complex Strings](#object-with-list-of-complex-strings) <br>
-3.1.8\. [Object with List of Objects of Simple Data Types](#object-with-list-of-objects-of-simple-data-types) <br>
-3.1.9\. [Object with List of List of Simple Data Type](#object-with-list-of-list-of-simple-data-type) <br>
-4\. [API v0.0.0](#api-v000) <br>
-4.1\. [Classes](#classes) <br>
-4.2\. [Functions](#functions) <br>
-5\. [License](#license) <br>
-6\. [Contributions](#contributions) <br>
+3\. [How it Works](#how-it-works) <br>
+3.1\. [Supported Data Types](#supported-data-types) <br>
+3.2\. [Mapping Types to Files](#mapping-types-to-files) <br>
+3.3\. [References to Subfiles](#references-to-subfiles) <br>
+3.4\. [List Element IDs](#list-element-ids) <br>
+4\. [About the CRUD Operations](#about-the-crud-operations) <br>
+4.1\. [Store Use Cases](#store-use-cases) <br>
+4.1.1\. [Object with Simple Data Types](#object-with-simple-data-types) <br>
+4.1.2\. [Object with Complex String](#object-with-complex-string) <br>
+4.1.3\. [Object with Object of Simple Data Types](#object-with-object-of-simple-data-types) <br>
+4.1.4\. [Object with Object of Complex Data Types](#object-with-object-of-complex-data-types) <br>
+4.1.5\. [Object with List of Simple Data Type](#object-with-list-of-simple-data-type) <br>
+4.1.6\. [Object with List of Simple Data Types](#object-with-list-of-simple-data-types) <br>
+4.1.7\. [Object with List of Complex Strings](#object-with-list-of-complex-strings) <br>
+4.1.8\. [Object with List of Objects of Simple Data Types](#object-with-list-of-objects-of-simple-data-types) <br>
+4.1.9\. [Object with List of List of Simple Data Type](#object-with-list-of-list-of-simple-data-type) <br>
+5\. [API v0.0.0](#api-v000) <br>
+5.1\. [Classes](#classes) <br>
+5.2\. [Functions](#functions) <br>
+6\. [License](#license) <br>
+7\. [Contributions](#contributions) <br>
 
 <!-- toc! -->
 
@@ -59,17 +62,16 @@ Install the library in the root directory of your project using npm or yarn.
 
   `yarn add yaml-datastore` 
 
-# Usage
+# How it Works
 This section provides comprehensive details about how the YAML Datastore library organizes and stores data on disk, the algorithm used to transform in-memory objects and lists into a collection of YAML files, the data types supported, and the conventions followed for file layout.
 
 TO DO: link to Use Cases
 
-### How it works
 YAML Datastore implements the standard CRUD operations for transforming in-memory objects and lists into structured YAML files and back.
 
 The results helper class captures operation outcomes, including status and content.
 
-### Supported Data Types
+## Supported Data Types
 YAML Datastore supports any data types that are supported in YAML (and JSON). YAML Datastore categorizes these data types as simple or complex. 
 
 Simple data is data that can be stored in a single line in a YAML file. This includes all scalar types; scalar types in YAML are strings without newlines, numbers, booleans, or nulls. It also includes empty lists and empty objects. 
@@ -83,12 +85,34 @@ Nested objects and lists are split into their own files for modularity and clari
 | Number: `3.14`, `42`  | List |
 | Boolean: `true`, `false` | Object|
 | Null: `null` | |
+| Empty String: `''` | |
 | Empty List: `[]` | |
 | Empty Object: `{}` | |
 
-TODO: Explain (( )) file references , explain IDs, explain model/_this.yaml and listname.yaml (references), add empty string to simple data types
+## Mapping Types to Files
+model/_this.yaml
+listname.yaml
 
-## On Disk Representation Use Cases
+## References to Subfiles
+(())
+
+## List Element IDs
+TODO
+
+# About the CRUD Operations
+First we will discuss how each CRUD operation maps onto the library functions, then we will discuss use cases by function.
+
+* Create 
+  * Store
+* Read 
+  * Load
+* Update  
+  * TBD
+* Delete
+  * Delete
+  * Clear
+
+## Store Use Cases
 
 This section provides an explanation for each identified use case in the YAML Datastore specification. For each use case we provide an example data structure along with its representation on disk and an explanation of why that is the representation. All of these use cases are of a element (an object or a list) named model.
 
@@ -154,7 +178,7 @@ model
 ```
 #### Generated Files
 ##### `model/_this.yaml`
-In this file, we use the convention of the filename enclosed in double parentheses, `((lyrics.txt))` to reference the file storing the data.
+In this file, we use the convention of enclosing the filename in double parentheses, `((lyrics.txt))` to reference the file storing the data.
 ```yaml
 songTitle: Mary Had a Little Lamb
 album: Classic Childrens Songs 2
@@ -218,7 +242,9 @@ This yaml file stores the object, and because the object only has simple data ty
 
 <!-- include (test/spec/1.2.3_object_with_object_of_complex_data_types/README.md) -->
 ### Object with Object of Complex Data Types
+This use case demonstrates storing an object that contains an object with complex data.
 #### The Model to Store
+In this case, the model contains both multi-line strings and other objects.
 ```json
 {
   "myObj": {
@@ -241,6 +267,7 @@ This yaml file stores the object, and because the object only has simple data ty
 }
 ```
 #### Generated Directory Structure
+As with all objects, the generated data structure for this example starts with a directory named `model` and the file `_this.yaml`. Because this object contains an object, there is now a sub-directory named `myObj` named after the object and contains its own `_this.yaml` file. Because the object contains complex data, this directory also includes additional files and directories.
 ```txt
 model
 ├── myObj
