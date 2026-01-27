@@ -1,5 +1,7 @@
 ### Object with Object of Complex Data Types
+This use case demonstrates storing an object that contains an object with complex data.
 #### The Model to Store
+In this case, the model contains both multi-line strings and other objects.
 ```json
 {
   "myObj": {
@@ -22,6 +24,7 @@
 }
 ```
 #### Generated Directory Structure
+As with all objects, the generated data structure for this example starts with a directory named `model` and the file `_this.yaml`. Because this object contains an object, there is now a sub-directory named `myObj` named after the object and contains its own `_this.yaml` file. Because the object contains complex data, this directory also includes additional files and directories.
 ```txt
 model
 ├── myObj
