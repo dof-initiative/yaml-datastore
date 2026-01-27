@@ -19,7 +19,7 @@ model
 ```
 #### Generated Files
 ##### `model/_this.yaml`
-In this file, we use the convention of the filename enclosed in double parentheses, `((lyrics.txt))` to reference the file storing the data.
+In this file, we use the convention of enclosing the filename in double parentheses, `((lyrics.txt))` to reference the file storing the data.
 ```yaml
 songTitle: Mary Had a Little Lamb
 album: Classic Childrens Songs 2
