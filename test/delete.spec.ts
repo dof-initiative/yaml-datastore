@@ -1,6 +1,7 @@
 import { deleteElement, load, store } from "../src/index";
 import { getElementPathInfo } from "../src/load";
 import { toJsonString, toSpecCasePath } from "./load.spec";
+import { DEFAULT_SPEC_CASE_FOLDER } from "./spec_constants";
 import { StoreTestResult } from "./store.spec";
 import { expect } from "chai";
 import fs from "node:fs";
@@ -9,6 +10,7 @@ import { hashElement } from "folder-hash";
 
 const TMP_WORKING_DIR_PATH = "/tmp/my-project";
 const TMP_SPEC_DIR_AFTER_OPERATION_PATH = "/tmp/spec-project";
+const DEFAULT_SPEC_CASE_PATH = "../" + DEFAULT_SPEC_CASE_FOLDER;
 
 // options for files/folders to ignore for hashElement
 const options = {
@@ -19,51 +21,21 @@ const options = {
  *
  * @param specCaseName folder name of spec to test
  * @param elementPathToDelete element path to element to be deleted from working directory of spec case
- * @param expectedRootElementSpec root element name in spec case directory used to test expected element after delete operation
  * @returns StoreTestResult where specCasePath is path to expected parent element after delete operation and storePath is path to parent element contained deleted element
  */
-function runBasicDeleteTest(
-  specCaseName: string,
-  elementPathToDelete: string,
-  expectedRootElementSpec: string
-) {
+function runBasicDeleteTest(specCaseName: string, elementPathToDelete: string) {
   // 1. select spec case
   const specCasePath = toSpecCasePath(specCaseName);
 
-  // 2.1 load and store (before operation state) spec case files into TMP_WORKING_DIR_PATH
-  const elementName = "model";
-  const loadResultOfModelBeforOperation = load(specCasePath, elementName);
-  const modelBeforeOperation = loadResultOfModelBeforOperation.element;
-  const storeResultOfBeforeOperation = store(
-    modelBeforeOperation,
-    TMP_WORKING_DIR_PATH,
-    elementName
-  );
-  expect(loadResultOfModelBeforOperation.success).to.equal(true);
-  expect(loadResultOfModelBeforOperation.message).to.equal(elementName);
-  expect(storeResultOfBeforeOperation.success).to.equal(true);
-  expect(storeResultOfBeforeOperation.message).to.equal(elementName);
+  // 2.1 copy (before operation state) spec case files into TMP_WORKING_DIR_PATH
+  const defaultCasePath = path.join(specCasePath, DEFAULT_SPEC_CASE_PATH);
 
-  // 2.2 load and store (after operation state) spec case files into TMP_SPEC_DIR_AFTER_OPERATION_PATH
-  const loadResultOfExpectedModelAfterOperation = load(
-    specCasePath,
-    expectedRootElementSpec
-  );
-  const expectedModelAfterOperation =
-    loadResultOfExpectedModelAfterOperation.element;
-  const storeResultOfExpectedModelAfterOperation = store(
-    expectedModelAfterOperation,
-    TMP_SPEC_DIR_AFTER_OPERATION_PATH,
-    elementName
-  );
-  expect(loadResultOfExpectedModelAfterOperation.success).to.equal(true);
-  expect(loadResultOfExpectedModelAfterOperation.message).to.equal(
-    expectedRootElementSpec
-  );
-  expect(storeResultOfExpectedModelAfterOperation.success).to.equal(true);
-  expect(storeResultOfExpectedModelAfterOperation.message).to.equal(
-    elementName
-  );
+  fs.cpSync(defaultCasePath, TMP_WORKING_DIR_PATH, { recursive: true });
+
+  // 2.2 copy (after operation state) spec case files into TMP_SPEC_DIR_AFTER_OPERATION_PATH
+  fs.cpSync(specCasePath, TMP_SPEC_DIR_AFTER_OPERATION_PATH, {
+    recursive: true,
+  });
 
   // 3. delete element, given working directory path and element path
   const result = deleteElement(TMP_WORKING_DIR_PATH, elementPathToDelete);
@@ -112,9 +84,8 @@ describe("Test basic delete function", () => {
   });
   it("should delete simple string from object", async () => {
     const result = runBasicDeleteTest(
-      "1.1_object_with_simple_data_types",
-      "model.name",
-      "modelDeleteName"
+      "1.1_object_with_simple_data_types/deleteName",
+      "model.name"
     );
 
     const specCasePathHash = await hashElement(result.specCasePath, options);
@@ -137,14 +108,12 @@ describe("Test basic delete function", () => {
     for (const elementPath of elementPaths) {
       const elementPathAsSplitString = elementPath.split(".");
       const expectedRootElementSpec =
-        elementPathAsSplitString[0] +
-        "Delete" +
+        "delete" +
         elementPathAsSplitString[1].charAt(0).toUpperCase() +
         elementPathAsSplitString[1].slice(1);
       const result = runBasicDeleteTest(
-        "1.1_object_with_simple_data_types",
-        elementPath,
-        expectedRootElementSpec
+        "1.1_object_with_simple_data_types/" + expectedRootElementSpec,
+        elementPath
       );
 
       const specCasePathHash = await hashElement(result.specCasePath, options);
@@ -160,9 +129,8 @@ describe("Test basic delete function", () => {
   });
   it("should delete complex string from object", async () => {
     const result = runBasicDeleteTest(
-      "1.2.1_object_with_complex_string",
-      "model.lyrics_txt",
-      "modelDeleteLyrics_txt"
+      "1.2.1_object_with_complex_string/deleteLyrics_txt",
+      "model.lyrics_txt"
     );
 
     const specCasePathHash = await hashElement(result.specCasePath, options);
@@ -175,9 +143,8 @@ describe("Test basic delete function", () => {
   });
   it("should delete object of simple data types from object", async () => {
     const result = runBasicDeleteTest(
-      "1.2.2_object_with_object_of_simple_data_types",
-      "model.address",
-      "modelDeleteAddress"
+      "1.2.2_object_with_object_of_simple_data_types/deleteAddress",
+      "model.address"
     );
 
     const specCasePathHash = await hashElement(result.specCasePath, options);
@@ -190,9 +157,8 @@ describe("Test basic delete function", () => {
   });
   it("should delete list of complex strings from object", async () => {
     const result = runBasicDeleteTest(
-      "1.2.6_object_with_list_of_complex_strings",
-      "model.verses_txt",
-      "modelDeleteVerses_txt"
+      "1.2.6_object_with_list_of_complex_strings/deleteVerses_txt",
+      "model.verses_txt"
     );
 
     const specCasePathHash = await hashElement(result.specCasePath, options);
@@ -205,9 +171,8 @@ describe("Test basic delete function", () => {
   });
   it("should delete list of object of simple data types from object", async () => {
     const result = runBasicDeleteTest(
-      "1.3.7.1_object_with_two_lists_of_objects_of_simple_data_types",
-      "model.ncc1701dCommanders",
-      "modelDeleteNcc1701dCommanders"
+      "1.3.7.1_object_with_two_lists_of_objects_of_simple_data_types/deleteNcc1701dCommanders",
+      "model.ncc1701dCommanders"
     );
 
     const specCasePathHash = await hashElement(result.specCasePath, options);
@@ -220,9 +185,8 @@ describe("Test basic delete function", () => {
   });
   it("should delete list of list of simple data type from object", async () => {
     const result = runBasicDeleteTest(
-      "1.3.7.2_object_with_two_lists_of_list_of_simple_data_type",
-      "model.second4Primes",
-      "modelDeleteSecond4Primes"
+      "1.3.7.2_object_with_two_lists_of_list_of_simple_data_type/deleteSecond4Primes",
+      "model.second4Primes"
     );
 
     const specCasePathHash = await hashElement(result.specCasePath, options);
@@ -235,9 +199,36 @@ describe("Test basic delete function", () => {
   });
   it("should delete simple string from list", async () => {
     const result = runBasicDeleteTest(
-      "2.1_list_of_simple_data_types",
-      "model[4]",
-      "modelDeleteItem4"
+      "2.1_list_of_simple_data_types/deleteItem4",
+      "model[4]"
+    );
+
+    const specCasePathHash = await hashElement(result.specCasePath, options);
+    const storePathHash = await hashElement(result.storePath, options);
+
+    // verify that checksums of on-disk representation from spec case versus serialized content are identical
+    expect(toJsonString(storePathHash["children"])).to.equal(
+      toJsonString(specCasePathHash["children"])
+    );
+  });
+  it("should delete middle complex string entry from list", async () => {
+    const result = runBasicDeleteTest(
+      "2.2.1_list_of_complex_string/deleteItem1",
+      "model[1]"
+    );
+
+    const specCasePathHash = await hashElement(result.specCasePath, options);
+    const storePathHash = await hashElement(result.storePath, options);
+
+    // verify that checksums of on-disk representation from spec case versus serialized content are identical
+    expect(toJsonString(storePathHash["children"])).to.equal(
+      toJsonString(specCasePathHash["children"])
+    );
+  });
+  it("should delete last complex string entry from list", async () => {
+    const result = runBasicDeleteTest(
+      "2.2.1_list_of_complex_string/deleteItem2",
+      "model[2]"
     );
 
     const specCasePathHash = await hashElement(result.specCasePath, options);
@@ -264,9 +255,8 @@ describe("Test delete function with nested elements", () => {
   });
   it("should delete simple data type list item from object of list", async () => {
     const result = runBasicDeleteTest(
-      "1.2.4_object_with_list_of_simple_data_type",
-      "model.employees[2]",
-      "modelDeleteEmployee2"
+      "1.2.4_object_with_list_of_simple_data_type/deleteEmployee2",
+      "model.employees[2]"
     );
 
     const specCasePathHash = await hashElement(result.specCasePath, options);

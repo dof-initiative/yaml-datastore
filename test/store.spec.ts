@@ -10,6 +10,7 @@ import { expect } from "chai";
 import fs from "node:fs";
 import path from "path";
 import { hashElement } from "folder-hash";
+import { DEFAULT_SPEC_CASE_FOLDER } from "./spec_constants";
 
 const TMP_WORKING_DIR_PATH = "/tmp/my-project";
 let workingDir = "";
@@ -47,11 +48,13 @@ export class StoreTestResult {
 
 function runBasicStoreTest(specCaseName: string): StoreTestResult {
   // 1. select spec case
-  const specCasePath = toSpecCasePath(specCaseName);
+  const specCasePath = toSpecCasePath(
+    path.join(specCaseName, DEFAULT_SPEC_CASE_FOLDER)
+  );
 
   // 2. load model.json from spec case into memory
   const element = JSON.parse(
-    fs.readFileSync(path.resolve(specCasePath, "model.json"), "utf8")
+    fs.readFileSync(path.resolve(specCasePath, "..", "model.json"), "utf8")
   );
   const elementName = "model";
   let specCaseDir = "";

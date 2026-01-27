@@ -1,6 +1,7 @@
 import { clear } from "../src/index";
 import { getElementPathInfo, load } from "../src/load";
 import { toJsonString, toSpecCasePath } from "./load.spec";
+import { DEFAULT_SPEC_CASE_FOLDER } from "./spec_constants";
 import { StoreTestResult } from "./store.spec";
 import { expect } from "chai";
 import fs from "node:fs";
@@ -8,7 +9,8 @@ import path from "path";
 import { hashElement } from "folder-hash";
 
 const TMP_WORKING_DIR_PATH = "/tmp/my-project";
-let workingDir = "";
+const TMP_SPEC_DIR_AFTER_OPERATION_PATH = "/tmp/spec-project";
+const DEFAULT_SPEC_CASE_PATH = "../" + DEFAULT_SPEC_CASE_FOLDER;
 
 // options for files/folders to ignore for hashElement
 const options = {
@@ -18,67 +20,69 @@ const options = {
 /**
  *
  * @param specCaseName folder name of spec to test
- * @param elementPath element path to element to be cleared from working directory of spec case
- * @param expectedParentElementPath element path to expected parent element after clear operation
+ * @param elementPathToClear element path to element to be cleared from working directory of spec case
  * @returns StoreTestResult where specCasePath is path to expected parent element after clear operation and storePath is path to parent element contained cleared element
  */
-function runBasicClearTest(
-  specCaseName: string,
-  elementPath: string,
-  expectedParentElementPath: string
-) {
+function runBasicClearTest(specCaseName: string, elementPathToClear: string) {
   // 1. select spec case
   const specCasePath = toSpecCasePath(specCaseName);
 
-  // 2. copy spec case files into TMP_WORKING_DIR_PATH
-  fs.cpSync(specCasePath, TMP_WORKING_DIR_PATH, { recursive: true });
+  // 2.1 copy (before operation state) spec case files into TMP_WORKING_DIR_PATH
+  const defaultCasePath = path.join(specCasePath, DEFAULT_SPEC_CASE_PATH);
+
+  fs.cpSync(defaultCasePath, TMP_WORKING_DIR_PATH, { recursive: true });
+
+  // 2.2 copy (after operation state) spec case files into TMP_SPEC_DIR_AFTER_OPERATION_PATH
+  fs.cpSync(specCasePath, TMP_SPEC_DIR_AFTER_OPERATION_PATH, {
+    recursive: true,
+  });
 
   // 3. clear element, given working directory path and element path
-  const result = clear(TMP_WORKING_DIR_PATH, elementPath);
-
-  const pathToExpectedParentElement = getElementPathInfo(
-    specCasePath,
-    expectedParentElementPath
-  ).data;
-
-  const expectedParentElement = load(
-    specCasePath,
-    expectedParentElementPath
-  ).element;
+  const result = clear(TMP_WORKING_DIR_PATH, elementPathToClear);
 
   // 4. verify results of clear operation
+  const expectedParentElement = load(specCasePath, result.message).element;
+
   expect(result.success).to.equal(true);
   expect(toJsonString(result.element)).to.equal(
     toJsonString(expectedParentElement)
   );
 
-  const pathToExpectedParentElementDirectory = path.parse(
-    pathToExpectedParentElement
+  // 5. return test results
+  const filePathToExpectedParentElement = getElementPathInfo(
+    TMP_SPEC_DIR_AFTER_OPERATION_PATH,
+    result.message
+  ).data;
+
+  const directoryPathToExpectedParentElement = path.parse(
+    filePathToExpectedParentElement
   ).dir;
-  const pathToResultParentElementDirectory = path.parse(
+  const directoryPathToResultParentElement = path.parse(
     getElementPathInfo(TMP_WORKING_DIR_PATH, result.message).data
   ).dir;
 
-  // 5. return test results
   return new StoreTestResult(
-    pathToExpectedParentElementDirectory,
-    pathToResultParentElementDirectory
+    directoryPathToExpectedParentElement,
+    directoryPathToResultParentElement
   );
 }
 
 describe("Test basic clear function", () => {
   beforeEach(function () {
-    workingDir = TMP_WORKING_DIR_PATH;
-    fs.mkdirSync(workingDir);
+    fs.mkdirSync(TMP_WORKING_DIR_PATH);
+    fs.mkdirSync(TMP_SPEC_DIR_AFTER_OPERATION_PATH);
   });
   afterEach(function () {
     fs.rmSync(TMP_WORKING_DIR_PATH, { recursive: true, force: true });
+    fs.rmSync(TMP_SPEC_DIR_AFTER_OPERATION_PATH, {
+      recursive: true,
+      force: true,
+    });
   });
   it("should clear simple string from object", async () => {
     const result = runBasicClearTest(
-      "1.1_object_with_simple_data_types",
-      "model.name",
-      "modelClearName"
+      "1.1_object_with_simple_data_types/clearName",
+      "model.name"
     );
 
     const specCasePathHash = await hashElement(result.specCasePath, options);
@@ -99,17 +103,18 @@ describe("Test basic clear function", () => {
       "model.notes",
     ];
 
-    for (const elementPath of elementPaths) {
-      const elementPathAsSplitString = elementPath.split(".");
+    for (const elementPathToClear of elementPaths) {
+      const elementPathAsSplitString = elementPathToClear.split(".");
       const expectedParentElementPath =
-        elementPathAsSplitString[0] +
-        "Clear" +
+        "clear" +
         elementPathAsSplitString[1].charAt(0).toUpperCase() +
         elementPathAsSplitString[1].slice(1);
       const result = runBasicClearTest(
-        "1.1_object_with_simple_data_types",
-        elementPath,
-        expectedParentElementPath
+        path.join(
+          "1.1_object_with_simple_data_types",
+          expectedParentElementPath
+        ),
+        elementPathToClear
       );
 
       const specCasePathHash = await hashElement(result.specCasePath, options);
@@ -123,9 +128,8 @@ describe("Test basic clear function", () => {
   });
   it("should clear complex string from object", async () => {
     const result = runBasicClearTest(
-      "1.2.1_object_with_complex_string",
-      "model.lyrics_txt",
-      "modelClearLyrics_txt"
+      "1.2.1_object_with_complex_string/clearLyrics_txt",
+      "model.lyrics_txt"
     );
 
     const specCasePathHash = await hashElement(result.specCasePath, options);
@@ -138,9 +142,8 @@ describe("Test basic clear function", () => {
   });
   it("should clear object of simple data types from object", async () => {
     const result = runBasicClearTest(
-      "1.2.2_object_with_object_of_simple_data_types",
-      "model.address",
-      "modelClearAddress"
+      "1.2.2_object_with_object_of_simple_data_types/clearAddress",
+      "model.address"
     );
 
     const specCasePathHash = await hashElement(result.specCasePath, options);
@@ -153,9 +156,8 @@ describe("Test basic clear function", () => {
   });
   it("should clear list of complex strings from object", async () => {
     const result = runBasicClearTest(
-      "1.2.6_object_with_list_of_complex_strings",
-      "model.verses_txt",
-      "modelClearVerses_txt"
+      "1.2.6_object_with_list_of_complex_strings/clearVerses_txt",
+      "model.verses_txt"
     );
 
     const specCasePathHash = await hashElement(result.specCasePath, options);
@@ -168,9 +170,8 @@ describe("Test basic clear function", () => {
   });
   it("should clear list of object of simple data types from object", async () => {
     const result = runBasicClearTest(
-      "1.3.7.1_object_with_two_lists_of_objects_of_simple_data_types",
-      "model.ncc1701dCommanders",
-      "modelClearNcc1701dCommanders"
+      "1.3.7.1_object_with_two_lists_of_objects_of_simple_data_types/clearNcc1701dCommanders",
+      "model.ncc1701dCommanders"
     );
 
     const specCasePathHash = await hashElement(result.specCasePath, options);
@@ -183,9 +184,8 @@ describe("Test basic clear function", () => {
   });
   it("should clear list of list of simple data type from object", async () => {
     const result = runBasicClearTest(
-      "1.3.7.2_object_with_two_lists_of_list_of_simple_data_type",
-      "model.second4Primes",
-      "modelClearSecond4Primes"
+      "1.3.7.2_object_with_two_lists_of_list_of_simple_data_type/clearSecond4Primes",
+      "model.second4Primes"
     );
 
     const specCasePathHash = await hashElement(result.specCasePath, options);
