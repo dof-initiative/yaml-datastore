@@ -9,7 +9,8 @@ YAML Datastore is a lightweight library that stores and manages data with struct
 
 * New to YAML Data Store? Get [introduced](#introduction)
 * Ready to install? Follow the [installation steps](#installation)
-* Want to learn how YAML Datastore stores information based on data types? Read the [Usage](#usage) section
+* Want to learn how YAML Datastore stores information based on data types? Read the [Overview](#overview) section
+* Curious about use cases? Read about the [CRUD Operations](#crud-operations)
 * Want to use the API? See [the API documentation](#api-v000)
 
 <br>
@@ -23,12 +24,15 @@ YAML Datastore is a lightweight library that stores and manages data with struct
 1.1\. [What is YAML Datastore?](#what-is-yaml-datastore) <br>
 1.2\. [Purpose of YAML Datastore](#purpose-of-yaml-datastore) <br>
 2\. [Installation](#installation) <br>
-3\. [How it Works](#how-it-works) <br>
+3\. [Overview](#overview) <br>
 3.1\. [Supported Data Types](#supported-data-types) <br>
-3.2\. [Mapping Types to Files](#mapping-types-to-files) <br>
+3.2\. [Mapping Complex Data Types to Files](#mapping-complex-data-types-to-files) <br>
+3.2.1\. [Multi-line Strings](#multi-line-strings) <br>
+3.2.2\. [Lists](#lists) <br>
+3.2.3\. [Objects](#objects) <br>
 3.3\. [References to Subfiles](#references-to-subfiles) <br>
 3.4\. [List Element IDs](#list-element-ids) <br>
-4\. [About the CRUD Operations](#about-the-crud-operations) <br>
+4\. [CRUD Operations](#crud-operations) <br>
 4.1\. [Store Use Cases](#store-use-cases) <br>
 4.1.1\. [Object with Simple Data Types](#object-with-simple-data-types) <br>
 4.1.2\. [Object with Complex String](#object-with-complex-string) <br>
@@ -62,7 +66,7 @@ Install the library in the root directory of your project using npm or yarn.
 
   `yarn add yaml-datastore` 
 
-# How it Works
+# Overview
 This section provides comprehensive details about how the YAML Datastore library organizes and stores data on disk, the algorithm used to transform in-memory objects and lists into a collection of YAML files, the data types supported, and the conventions followed for file layout.
 
 TO DO: link to Use Cases
@@ -89,9 +93,16 @@ Nested objects and lists are split into their own files for modularity and clari
 | Empty List: `[]` | |
 | Empty Object: `{}` | |
 
-## Mapping Types to Files
-model/_this.yaml
+## Mapping Complex Data Types to Files
+
+### Multi-line Strings
+TODO
+
+### Lists
 listname.yaml
+
+### Objects
+model/_this.yaml
 
 ## References to Subfiles
 (())
@@ -99,7 +110,7 @@ listname.yaml
 ## List Element IDs
 TODO
 
-# About the CRUD Operations
+# CRUD Operations
 First we will discuss how each CRUD operation maps onto the library functions, then we will discuss use cases by function.
 
 * Create 
