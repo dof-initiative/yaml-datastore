@@ -120,9 +120,21 @@ export function deleteElement(
       case ElementPathType.simpleToObject:
       case ElementPathType.complexToObject:
         fs.rmSync(path.parse(elementPathInfo.data).dir, { recursive: true });
-        delete (parentElement as any)[parentElementInfo.indexOfChild];
+        if (Array.isArray(parentElement)) {
+          parentElement.splice(parentElementInfo.indexOfChild, 1);
+        } else {
+          delete (parentElement as any)[parentElementInfo.indexOfChild];
+        }
         fs.writeFileSync(parentElementFilePath, yaml.dump(parentElement));
-        return new YdsResult(true, parentElement, parentElementPath);
+        const parentElementOfObjectStoredToDisk = load(
+          workingDirectoryPath,
+          parentElementPath
+        ).element;
+        return new YdsResult(
+          true,
+          parentElementOfObjectStoredToDisk,
+          parentElementPath
+        );
       case ElementPathType.simpleToList:
       case ElementPathType.complexToList:
         const listFilePath = path.parse(elementPathInfo.data);
