@@ -21,9 +21,14 @@ const options = {
  *
  * @param specCaseName folder name of spec to test
  * @param elementPathToDelete element path to element to be deleted from working directory of spec case
+ * @param depth depth of element to be returned in YdsResult object
  * @returns StoreTestResult where specCasePath is path to expected parent element after delete operation and storePath is path to parent element contained deleted element
  */
-function runBasicDeleteTest(specCaseName: string, elementPathToDelete: string) {
+function runBasicDeleteTest(
+  specCaseName: string,
+  elementPathToDelete: string,
+  depth: number = -1
+) {
   // 1. select spec case
   const specCasePath = toSpecCasePath(specCaseName);
 
@@ -38,12 +43,17 @@ function runBasicDeleteTest(specCaseName: string, elementPathToDelete: string) {
   });
 
   // 3. delete element, given working directory path and element path
-  const result = deleteElement(TMP_WORKING_DIR_PATH, elementPathToDelete);
+  const result = deleteElement(
+    TMP_WORKING_DIR_PATH,
+    elementPathToDelete,
+    depth
+  );
 
   // 4. verify results of deleteElement operation
   const expectedParentElement = load(
     TMP_SPEC_DIR_AFTER_OPERATION_PATH,
-    result.message
+    result.message,
+    depth
   ).element;
 
   expect(result.success).to.equal(true);
