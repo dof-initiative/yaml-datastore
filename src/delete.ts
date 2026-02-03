@@ -95,7 +95,8 @@ export function testListItemFileName(
 
 export function deleteElement(
   workingDirectoryPath: string,
-  elementPath: string
+  elementPath: string,
+  depth: number = 0
 ): YdsResult {
   if (workingDirectoryPath === "") {
     return new YdsResult(false, null, EMPTY_WORKINGDIR_PATH_ERROR);
@@ -128,7 +129,8 @@ export function deleteElement(
         fs.writeFileSync(parentElementFilePath, yaml.dump(parentElement));
         const parentElementOfObjectStoredToDisk = load(
           workingDirectoryPath,
-          parentElementPath
+          parentElementPath,
+          depth
         ).element;
         return new YdsResult(
           true,
@@ -174,7 +176,8 @@ export function deleteElement(
         );
         const parentElementOfListStoredToDisk = load(
           workingDirectoryPath,
-          parentElementPath
+          parentElementPath,
+          depth
         ).element;
         return new YdsResult(
           true,
@@ -207,7 +210,8 @@ export function deleteElement(
         );
         const parentElementOfComplexStringStoredToDisk = load(
           workingDirectoryPath,
-          parentElementPath
+          parentElementPath,
+          depth
         ).element;
         return new YdsResult(
           true,
