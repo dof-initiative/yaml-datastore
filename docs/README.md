@@ -67,21 +67,16 @@ Install the library in the root directory of your project using npm or yarn.
   `yarn add yaml-datastore` 
 
 # Overview
-This section provides comprehensive details about how the YAML Datastore library organizes and stores data on disk, the algorithm used to transform in-memory objects and lists into a collection of YAML files, the data types supported, and the conventions followed for file layout.
+This section provides comprehensive details about how the YAML Datastore library organizes and stores data on disk.
 
-TO DO: link to Use Cases
-
-YAML Datastore implements the standard CRUD operations for transforming in-memory objects and lists into structured YAML files and back.
-
-The results helper class captures operation outcomes, including status and content.
+YAML Datastore implements the standard CRUD operations for transforming in-memory objects and lists into structured YAML files and back. We will describe the supported data types, how they map onto the file system, and provide a comprehensive list of example use cases. 
 
 ## Supported Data Types
-YAML Datastore supports any data types that are supported in YAML (and JSON). YAML Datastore categorizes these data types as simple or complex. 
+YAML Datastore supports any data types that are supported in YAML (and JSON). YAML Datastore categorizes these data types as simple or complex based upon their representation inside of a YAML file containing that data before serialization. The element that this YAML file represents is referred to as the root element. A root element can either be an object (root object) or a list (root list). 
 
-Simple data is data that can be stored in a single line in a YAML file. This includes all scalar types; scalar types in YAML are strings without newlines, numbers, booleans, or nulls. It also includes empty lists and empty objects. 
+Simple data types can be represented as a single line in a YAML file. This includes all scalar types; scalar types in YAML are strings without newlines, numbers, booleans, or nulls. Empty lists and empty objects are also simple data types. 
 
-Complex data is data that requires more than one line to be stored in YAML file. This includes multi-line strings, (non-empty) lists and objects. This is implemented by storing the data in separate files, referenced from their parent list or object. This enables these complex types to be accessed in individual files instead of having to use more complex YAML formatting.
-Nested objects and lists are split into their own files for modularity and clarity.
+Complex data types require more than one line to be represented as a YAML file. This includes multi-line strings and (non-empty) lists and objects. Complex data types are serialized into individual files. Lists and objects may have child elements that are simple or complex data types. How parent lists and objects reference complex data types will be covered in [Mapping Complex Data Types to Files](#mapping-complex-data-types-to-files).
 
 | Simple Data Types  | Complex Data Types |
 | ------------------ | ------------------ |
@@ -94,21 +89,26 @@ Nested objects and lists are split into their own files for modularity and clari
 | Empty Object: `{}` | |
 
 ## Mapping Complex Data Types to Files
+This section describes each of the complex data types and the method used to serialize them to disk. 
 
 ### Multi-line Strings
-TODO
+Multi-line strings are serialized to disk as text files. Multi-line strings will either have an object or list as a parent. For objects, the text files are a sibling of the parent element's `_this.yaml` file. For lists, the text files are a sibling of the parent element's yaml file. The parent file [references](#references-to-subfiles) such files using a convention described in the next section. 
 
 ### Lists
-listname.yaml
+Lists are serialized to disk as yaml files. A root list file  lives directly in the working directory. If list is the child of a parent list or object, the list will require its own file which will be [referenced](#references-to-subfiles) in the parent using a convention described in the next section. If the parent is an object, the list will be named after the key*. If the parent is a list, list elements require unique names which are generated using a process described in [List Element IDs](#list-element-ids).
+
+* If key name includes an underscore `_`, this will be changed to a dot separator `.`.  
 
 ### Objects
-model/_this.yaml
+Objects are serialized to disk with a directory and a file `_this.yaml` containing the information. The root object's directory and file contents lives in the working directory. If the object is a child of a parent list or object, the object will require its own directory containing its own `_this.yaml` file, and the parent will [reference](#references-to-subfiles) the object using the convention described in the next section. When the object is the child of an object, the directory is nested in its parent object's directory and be named after the key*. When the object is the child of a list, the object's directory will require a unique name which is generated using a process described in [List Element IDs](#list-element-ids).
 
 ## References to Subfiles
-(())
+To point to the files storing complex data, we use the convention of enclosing the relative filepath in double parentheses `((` `))`. For objects, any underscores `_` are replaced with dot separator `.`. For example `stringname_txt` becomes `((stringname.txt))`. 
 
 ## List Element IDs
-TODO
+To properly handle the multiple files and directories representing lists, we need these files and directories to be named using unique, but deterministic IDs.
+
+This datastore uses an Xorshift Random Number Generator (RNG), configured with a seed, that provides gives everyone who uses the datastore the same sequence of "random" numbers every time. 
 
 # CRUD Operations
 First we will discuss how each CRUD operation maps onto the library functions, then we will discuss use cases by function.
@@ -171,7 +171,7 @@ notes: ''
 ### Object with Complex String
 This use case demonstrates storing an object that contains a complex string.
 #### The Model to Store
-In this case, `lyrics_txt` contains a multi-line string. Because the key will reference a text file, the convention `_txt` to represents `.txt`.
+In this case, `lyrics_txt` contains a multi-line string. Because the key will reference a text file, the convention `_txt` maps to `.txt`.
 ```json
 {
   "songTitle": "Mary Had a Little Lamb",
@@ -180,16 +180,16 @@ In this case, `lyrics_txt` contains a multi-line string. Because the key will re
   "lyrics_txt": "Mary had a little lamb,\nIt's fleece was white as snow;\nAnd everywhere that Mary went\nThe lamb was sure to go."
 }
 ```
-#### Generated Directory Structure
-As with all objects, the generated data structure for this example starts with a directory named `model` and the file `_this.yaml`.
+#### Resulting Directory Structure
+As with all objects, this example has a directory named after the object, in this case `model`. Since this directory represents an object, it contains a file named `_this.yaml` to store the object's properties.
 ```txt
 model
 ├── lyrics.txt
 └── _this.yaml
 ```
-#### Generated Files
+#### Contents of the Files
 ##### `model/_this.yaml`
-In this file, we use the convention of enclosing the filename in double parentheses, `((lyrics.txt))` to reference the file storing the data.
+The first three properties in this file are simple data, and thus in one line. The fourth property, `lyrics_txt`, is a complex string, therefore we use the convention of enclosing the filename where the string contents will be stored in double parentheses, `((lyrics.txt))`.
 ```yaml
 songTitle: Mary Had a Little Lamb
 album: Classic Childrens Songs 2
@@ -197,7 +197,7 @@ track: 17
 lyrics_txt: ((lyrics.txt))
 ```
 ##### `model/lyrics.txt`
-This text file stores the data for the multi-line string. 
+This text file stores the data for the multi-line string that was stored in `lyrics_txt`.
 ```txt
 Mary had a little lamb,
 It's fleece was white as snow;

@@ -2,7 +2,7 @@
 
 # Class: LoadResult
 
-Defined in: [load.ts:104](https://github.com/dof-initiative/yaml-datastore/blob/bb418cb03e870cdf28157040ab30bb03da20c315/src/load.ts#L104)
+Defined in: [load.ts:104](https://github.com/dof-initiative/yaml-datastore/blob/1cf8687cf5c8c83d19f0109ffcd744722ae7a336/src/load.ts#L104)
 
 Represents results of a call to the load function
 
@@ -17,7 +17,7 @@ new LoadResult(
    message: string): LoadResult;
 ```
 
-Defined in: [load.ts:117](https://github.com/dof-initiative/yaml-datastore/blob/bb418cb03e870cdf28157040ab30bb03da20c315/src/load.ts#L117)
+Defined in: [load.ts:117](https://github.com/dof-initiative/yaml-datastore/blob/1cf8687cf5c8c83d19f0109ffcd744722ae7a336/src/load.ts#L117)
 
 Default constructor for LoadResult
 
@@ -57,7 +57,7 @@ new LoadResult object
 get element(): any;
 ```
 
-Defined in: [load.ts:131](https://github.com/dof-initiative/yaml-datastore/blob/bb418cb03e870cdf28157040ab30bb03da20c315/src/load.ts#L131)
+Defined in: [load.ts:131](https://github.com/dof-initiative/yaml-datastore/blob/1cf8687cf5c8c83d19f0109ffcd744722ae7a336/src/load.ts#L131)
 
 ##### Returns
 
@@ -75,7 +75,7 @@ element read into memory on success or null on failure.
 get message(): string;
 ```
 
-Defined in: [load.ts:135](https://github.com/dof-initiative/yaml-datastore/blob/bb418cb03e870cdf28157040ab30bb03da20c315/src/load.ts#L135)
+Defined in: [load.ts:135](https://github.com/dof-initiative/yaml-datastore/blob/1cf8687cf5c8c83d19f0109ffcd744722ae7a336/src/load.ts#L135)
 
 ##### Returns
 
@@ -93,7 +93,7 @@ element path on success or an explanation of the failure.
 get success(): boolean;
 ```
 
-Defined in: [load.ts:127](https://github.com/dof-initiative/yaml-datastore/blob/bb418cb03e870cdf28157040ab30bb03da20c315/src/load.ts#L127)
+Defined in: [load.ts:127](https://github.com/dof-initiative/yaml-datastore/blob/1cf8687cf5c8c83d19f0109ffcd744722ae7a336/src/load.ts#L127)
 
 ##### Returns
 
