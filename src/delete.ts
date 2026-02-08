@@ -93,6 +93,13 @@ export function testListItemFileName(
   return false;
 }
 
+/**
+ *
+ * @param workingDirectoryPath relative or absolute path to working directory containing yaml-datastore serialized content
+ * @param elementPath element path to element to be deleted from working directory
+ * @param depth depth of element to be returned in YdsResult object
+ * @returns a YdsResult containing the status of the call to deleteElement function
+ */
 export function deleteElement(
   workingDirectoryPath: string,
   elementPath: string,
@@ -115,12 +122,16 @@ export function deleteElement(
       parentElementFilePath,
       "utf-8"
     );
+
+    // direct load of parent element from which to delete child element before storing back to disk
     let parentElement = yaml.load(parentElementFileContents);
+
     switch (elementPathInfo.type) {
       case ElementPathType.empty:
       case ElementPathType.simpleToObject:
       case ElementPathType.complexToObject:
         fs.rmSync(path.parse(elementPathInfo.data).dir, { recursive: true });
+        //TODO: dry up code for checking if parentElement is Array for deletion and writing to disk
         if (Array.isArray(parentElement)) {
           parentElement.splice(parentElementInfo.indexOfChild, 1);
         } else {
