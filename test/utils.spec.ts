@@ -22,7 +22,6 @@ describe("Test file name to complex string key name mapping function", () => {
 });
 
 
-// TODO: test to replace single underscores with dots
 describe("Test complex string key name to file name mapping function", () => {
   it("shall ignore leading underscore", () => {
     const keyName = "_3mTape";
@@ -74,7 +73,6 @@ describe("Test complex string key name to file name mapping function", () => {
     expect(fileName).to.equal(expectedFileName);
   });
   it("shall replace single underscores with dots", () => {
-    //TODO
     const keyName = "_my__View_md_njk_";
     const expectedFileName = "_my__View.md.njk_";
     const fileName = complexStringKeyToFileName(keyName);
