@@ -10,7 +10,8 @@
  * @returns String of file name mapped from key name
  */
 export function complexStringKeyToFileName(keyName: string): string {
-  return keyName;
+  const regex = new RegExp("(?<!_|^)_(?!_|$)", "g");
+  return keyName.replaceAll(regex, ".");
 }
 
 /**

@@ -21,14 +21,65 @@ describe("Test file name to complex string key name mapping function", () => {
   });
 });
 
-// TODO: test to ignore leading underscores
-// TODO: test to ignore trailing underscores
-// TODO: test to ignore leading and trailing underscores when both present
-// TODO: test to ignore non-single underscores
+
 // TODO: test to replace single underscores with dots
 describe("Test complex string key name to file name mapping function", () => {
-  it("should do a thing", () => {
+  it("shall ignore leading underscore", () => {
+    const keyName = "_3mTape";
+    const expectedFileName = keyName;
+    const fileName = complexStringKeyToFileName(keyName);
+
+    expect(fileName).to.equal(expectedFileName);
+  });
+  it("shall ignore trailing underscore", () => {
+    const keyName = "3mTape_";
+    const expectedFileName = keyName;
+    const fileName = complexStringKeyToFileName(keyName);
+
+    expect(fileName).to.equal(expectedFileName);
+  });
+  it("shall ignore leading underscores", () => {
+    const keyName = "__3mTape";
+    const expectedFileName = keyName;
+    const fileName = complexStringKeyToFileName(keyName);
+
+    expect(fileName).to.equal(expectedFileName);
+  });
+  it("shall ignore trailing underscores", () => {
+    const keyName = "3mTape__";
+    const expectedFileName = keyName;
+    const fileName = complexStringKeyToFileName(keyName);
+
+    expect(fileName).to.equal(expectedFileName);
+  });
+  it("shall ignore leading and trailing underscore when both are present", () => {
+    const keyName = "_3mTape_";
+    const expectedFileName = keyName;
+    const fileName = complexStringKeyToFileName(keyName);
+
+    expect(fileName).to.equal(expectedFileName);
+  });
+  it("shall ignore leading and trailing underscores when both are present", () => {
+    const keyName = "__3mTape__";
+    const expectedFileName = keyName;
+    const fileName = complexStringKeyToFileName(keyName);
+
+    expect(fileName).to.equal(expectedFileName);
+  });
+  it("shall ignore non-single underscores", () => {
+    const keyName = "3m__Tape";
+    const expectedFileName = keyName;
+    const fileName = complexStringKeyToFileName(keyName);
+
+    expect(fileName).to.equal(expectedFileName);
+  });
+  it("shall replace single underscores with dots", () => {
     //TODO
+    const keyName = "_my__View_md_njk_";
+    const expectedFileName = "_my__View.md.njk_";
+    const fileName = complexStringKeyToFileName(keyName);
+
+    expect(fileName).to.equal(expectedFileName);
   });
 });
 
