@@ -384,7 +384,7 @@ Solution 1 implemented as property, `idCounter`, of type number in a . (dot) fil
   - set key to `null`
 - clear complex string from object:
   - delete contents from disk
-  - set key to empty string, `""`
+  - set key to string with newline, `'\n'`
 - clear object from object:
   - delete contents from disk
   - set key to empty object: `{}` in owning object on-disk in `_this.yaml`
@@ -402,7 +402,7 @@ Solution 1 implemented as property, `idCounter`, of type number in a . (dot) fil
   - set item at specified index to `null`
 - clear complex string from list:
   - delete contents from disk
-  - set item at specified index to empty string, `""`
+  - set item at specified index to string with newline, `'\n'`
 - clear object from list:
   - delete contents from disk
   - set item at specified index to empty object: `{}` in owning list on-disk in `<list-name>.yaml`
