@@ -11,7 +11,7 @@ In this case, `lyrics_txt` contains a multi-line string. Because the key will re
 }
 ```
 #### Resulting Directory Structure
-As with all objects, this example has a directory named after the object, in this case `model`. Since this directory represents an object, it contains a file named `_this.yaml` to store the object's properties.
+Because it is an object, the data structure for this example has a directory named `model` to represent the object above named "model" that contains a `_this.yaml` file to store the object's properties.
 ```txt
 model
 ├── lyrics.txt

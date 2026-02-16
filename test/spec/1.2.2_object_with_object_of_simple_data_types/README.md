@@ -15,15 +15,15 @@ In this case, `address` references an object that contains only simple data.
   }
 }
 ```
-#### Generated Directory Structure
-As with all objects, the generated data structure for this example starts with a directory named `model` and the file `_this.yaml`. Because this object contains an object, there is now a sub-directory named `address` named after the object and contains its own `_this.yaml` file.
+#### Resulting Directory Structure
+Like the previous example, the data structure for this example has a directory named `model` to represent the object above named "model" that contains a `_this.yaml` file to store the object's properties. Because this object contains an object, it also has a sub-directory named `address` named after the key that contains `address`'s properties in its own `_this.yaml` file.
 ```txt
 model
 ├── address
 │   └── _this.yaml
 └── _this.yaml
 ```
-#### Generated Files
+#### Contents of the Files
 ##### `model/_this.yaml`
 ```yaml
 firstName: Tony

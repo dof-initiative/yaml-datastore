@@ -146,13 +146,13 @@ In this case, all the supported simple data types are present in the model.
   "notes": ""
 }
 ```
-#### Generated Directory Structure
-The generated data structure for this example starts with a directory named `model` to represent the object above named "model". All objects will contain `_this.yaml` file in this directory. For this case, that is the only file present because we can store all of the properties in a single line. 
+#### Resulting Directory Structure
+Because it is an object, the data structure for this example has a directory named `model` to represent the object above named "model" and contains a `_this.yaml` file to store the object's properties. For this case, that is the only file present because we can store all of the properties in a single line. 
 ```txt
 model
 └── _this.yaml
 ```
-#### Generated Files
+#### Contents of the Files
 ##### `model/_this.yaml`
 Since this is all simple data types, the on disk representation in YAML is a direct translation of the JSON representation to YAML representation. 
 ```yaml
@@ -181,7 +181,7 @@ In this case, `lyrics_txt` contains a multi-line string. Because the key will re
 }
 ```
 #### Resulting Directory Structure
-As with all objects, this example has a directory named after the object, in this case `model`. Since this directory represents an object, it contains a file named `_this.yaml` to store the object's properties.
+Because it is an object, the data structure for this example has a directory named `model` to represent the object above named "model" that contains a `_this.yaml` file to store the object's properties.
 ```txt
 model
 ├── lyrics.txt
@@ -224,15 +224,15 @@ In this case, `address` references an object that contains only simple data.
   }
 }
 ```
-#### Generated Directory Structure
-As with all objects, the generated data structure for this example starts with a directory named `model` and the file `_this.yaml`. Because this object contains an object, there is now a sub-directory named `address` named after the object and contains its own `_this.yaml` file.
+#### Resulting Directory Structure
+Like the previous example, the data structure for this example has a directory named `model` to represent the object above named "model" that contains a `_this.yaml` file to store the object's properties. Because this object contains an object, it also has a sub-directory named `address` named after the key that contains `address`'s properties in its own `_this.yaml` file.
 ```txt
 model
 ├── address
 │   └── _this.yaml
 └── _this.yaml
 ```
-#### Generated Files
+#### Contents of the Files
 ##### `model/_this.yaml`
 ```yaml
 firstName: Tony
@@ -255,7 +255,7 @@ This yaml file stores the object, and because the object only has simple data ty
 ### Object with Object of Complex Data Types
 This use case demonstrates storing an object that contains an object with complex data.
 #### The Model to Store
-In this case, the model contains both multi-line strings and other objects.
+In this case, the model contains an object `myObj` with a nested object `personInfo`, a multi-line string `lyrics_txt`, and a list `primeNumbers`. 
 ```json
 {
   "myObj": {
@@ -277,8 +277,12 @@ In this case, the model contains both multi-line strings and other objects.
   }
 }
 ```
-#### Generated Directory Structure
-As with all objects, the generated data structure for this example starts with a directory named `model` and the file `_this.yaml`. Because this object contains an object, there is now a sub-directory named `myObj` named after the object and contains its own `_this.yaml` file. Because the object contains complex data, this directory also includes additional files and directories.
+#### Resulting Directory Structure
+Like the previous examples, the data structure for this example has a directory named `model` to represent the object above named "model" that contains a `_this.yaml` file to store the object's properties. The `model/_this.yaml` contains the key `myObj` and the relative filepath using the double parentheses convention `((myObj/_this.yaml))` because this object contains complex data.
+Because `myObj` contains complex data, it needs its own directory also includes additional files and directories. The `myObj/_this.yaml` file references the relative filepaths using the double parentheses convention: `((lyrics.txt))`, `((personInfo/_this.yaml))`, and `((primeNumbers.yaml))`. 
+* The nested object results in a sub-directory named `personInfo` containing its properties in a `_this.yaml` file. 
+* The multi-line string results in a text file named `lyrics.txt` containing the string content in the `myObj` directory. 
+* The list results in a yaml file named `primeNumbers.yaml` in the `myObj` directory.
 ```txt
 model
 ├── myObj
@@ -289,7 +293,7 @@ model
 │   └── _this.yaml
 └── _this.yaml
 ```
-#### Generated Files
+#### Contents of the Files
 ##### `model/_this.yaml`
 ```yaml
 myObj: ((myObj/_this.yaml))
@@ -328,6 +332,7 @@ state: WA
 <!-- include (test/spec/1.2.4_object_with_list_of_simple_data_type/README.md) -->
 ### Object with List of Simple Data Type
 #### The Model to Store
+In this case, an object contains some simple data `companyName` and `foundedYear` and a list `employees` containing simple data. 
 ```json
 {
   "companyName": "ACME, Inc",
@@ -339,13 +344,14 @@ state: WA
   "foundedYear": 1949
 }
 ```
-#### Generated Directory Structure
+#### Resulting Directory Structure
+Like the previous examples, the data structure for this example has a directory named `model` to represent the object above named "model" that contains a `_this.yaml` file to store the object's properties. The `model/_this.yaml` directly contains the simple data `companyName` and `foundedYear`, but the list `employees` requires creating the `employees.yaml` file. So the relative filepath is referenced using the double parentheses convention `((employees.yaml))`. Since this list contains only simple data types, all its properties can be stored directly in yaml file. 
 ```txt
 model
 ├── employees.yaml
 └── _this.yaml
 ```
-#### Generated Files
+#### Contents of the Files
 ##### `model/_this.yaml`
 ```yaml
 companyName: ACME, Inc
@@ -363,6 +369,7 @@ foundedYear: 1949
 <!-- include (test/spec/1.2.5_object_with_list_of_simple_data_types/README.md) -->
 ### Object with List of Simple Data Types
 #### The Model to Store
+In this case an object contains an object `personInfo` with a list of simple data. 
 ```json
 {
   "personInfo": [
@@ -374,13 +381,14 @@ foundedYear: 1949
   ]
 }
 ```
-#### Generated Directory Structure
+#### Resulting Directory Structure
+Because it is an object, the data structure for this example has a directory named `model` to represent the object above named "model" that contains a `_this.yaml` file to store the object's properties. Because this property is a list, `model/_this.yaml` references the relative filepath of the list using the double-parentheses convention `((personInfo.yaml))`. Since this list contains only simple data types, all its properties can be stored directly in that yaml file. 
 ```txt
 model
 ├── personInfo.yaml
 └── _this.yaml
 ```
-#### Generated Files
+#### Contents of the Files
 ##### `model/_this.yaml`
 ```yaml
 personInfo: ((personInfo.yaml))
@@ -398,6 +406,7 @@ personInfo: ((personInfo.yaml))
 <!-- include (test/spec/1.2.6_object_with_list_of_complex_strings/README.md) -->
 ### Object with List of Complex Strings
 #### The Model to Store
+In this case we have an object that contains a list `verses_txt` containing one string and three multi-line strings.
 ```json
 {
   "songTitle": "Mary Had a Little Lamb",
@@ -412,6 +421,8 @@ personInfo: ((personInfo.yaml))
 }
 ```
 #### Generated Directory Structure
+Because it is an object, the data structure for this example has a directory named `model` to represent the object above named "model" that contains a `_this.yaml` file to store the object's properties. Because this property is a list, `model/_this.yaml` references the relative filepath of the list using the double-parentheses convention `((verses_txt.yaml))`. 
+Because the list contains simple data and multi-line strings, the simple data can be included directly, but text files must be generated for each of multi-line strings To ensure proper storage, each text file receives a unique 6 digit ID. The relative filepath to these text files is stored in the yaml file using the double parentheses convention `((verses_E16F4F.txt))`, `((verses_506E59.txt))`, and `((verses_A28836.txt))`.
 ```txt
 model
 ├── _this.yaml

@@ -1,5 +1,6 @@
 ### Object with List of Complex Strings
 #### The Model to Store
+In this case we have an object that contains a list `verses_txt` containing one string and three multi-line strings.
 ```json
 {
   "songTitle": "Mary Had a Little Lamb",
@@ -14,6 +15,8 @@
 }
 ```
 #### Generated Directory Structure
+Because it is an object, the data structure for this example has a directory named `model` to represent the object above named "model" that contains a `_this.yaml` file to store the object's properties. Because this property is a list, `model/_this.yaml` references the relative filepath of the list using the double-parentheses convention `((verses_txt.yaml))`. 
+Because the list contains simple data and multi-line strings, the simple data can be included directly, but text files must be generated for each of multi-line strings To ensure proper storage, each text file receives a unique 6 digit ID. The relative filepath to these text files is stored in the yaml file using the double parentheses convention `((verses_E16F4F.txt))`, `((verses_506E59.txt))`, and `((verses_A28836.txt))`.
 ```txt
 model
 ├── _this.yaml
