@@ -263,6 +263,20 @@ describe("Test basic delete function", () => {
       toJsonString(specCasePathHash["children"])
     );
   });
+  it("should delete list from list", async () => {
+    const result = runBasicDeleteTest(
+      "2.2.4_list_of_list_of_simple_data_type/deleteFirst5Primes",
+      "model[0]"
+    );
+
+    const specCasePathHash = await hashElement(result.specCasePath, options);
+    const storePathHash = await hashElement(result.storePath, options);
+
+    // verify that checksums of on-disk representation from spec case versus serialized content are identical
+    expect(toJsonString(storePathHash["children"])).to.equal(
+      toJsonString(specCasePathHash["children"])
+    );
+  });
 });
 
 describe("Test delete function with nested elements", () => {
