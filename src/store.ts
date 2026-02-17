@@ -2,6 +2,7 @@ import path from "path";
 import fs from "node:fs";
 import yaml from "js-yaml";
 import { generateIDs } from "./index.js";
+import { complexStringKeyToFileName } from "../src/utils.js";
 
 export const INVALID_ELEMENT_NAME = "Error: Invalid element name";
 export const INVALID_PATH_ERROR = "Error: Invalid path";
@@ -161,7 +162,7 @@ function generateComplexStringFilename(
       complexStringFilename = elementName + "_" + id;
     }
   } else {
-    complexStringFilename = elementName.split("_").join(".");
+    complexStringFilename = complexStringKeyToFileName(elementName);
   }
   return complexStringFilename;
 }
