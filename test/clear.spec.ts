@@ -205,4 +205,18 @@ describe("Test basic clear function", () => {
       toJsonString(specCasePathHash["children"])
     );
   });
+  it("shall clear simple string from list", async () => {
+    const result = runBasicClearTest(
+      "2.1_list_of_simple_data_types/clearItem4",
+      "model[4]"
+    );
+
+    const specCasePathHash = await hashElement(result.specCasePath, options);
+    const storePathHash = await hashElement(result.storePath, options);
+
+    // verify that checksums of on-disk representation from spec case versus serialized content are identical
+    expect(toJsonString(storePathHash["children"])).to.equal(
+      toJsonString(specCasePathHash["children"])
+    );
+  });
 });
