@@ -92,7 +92,7 @@ describe("Test basic delete function", () => {
       force: true,
     });
   });
-  it("should delete simple string from object", async () => {
+  it("shall delete simple string from object", async () => {
     const result = runBasicDeleteTest(
       "1.1_object_with_simple_data_types/deleteName",
       "model.name"
@@ -106,7 +106,7 @@ describe("Test basic delete function", () => {
       toJsonString(specCasePathHash["children"])
     );
   });
-  it("should delete other simple data types from object", async () => {
+  it("shall delete other simple data types from object", async () => {
     const elementPaths = [
       "model.age",
       "model.attending",
@@ -137,7 +137,7 @@ describe("Test basic delete function", () => {
       fs.rmSync(result.storePath, { recursive: true, force: true });
     }
   });
-  it("should delete complex string from object", async () => {
+  it("shall delete complex string from object", async () => {
     const result = runBasicDeleteTest(
       "1.2.1_object_with_complex_string/deleteLyrics_txt",
       "model.lyrics_txt"
@@ -151,7 +151,7 @@ describe("Test basic delete function", () => {
       toJsonString(specCasePathHash["children"])
     );
   });
-  it("should delete object of simple data types from object", async () => {
+  it("shall delete object of simple data types from object", async () => {
     const result = runBasicDeleteTest(
       "1.2.2_object_with_object_of_simple_data_types/deleteAddress",
       "model.address"
@@ -165,7 +165,7 @@ describe("Test basic delete function", () => {
       toJsonString(specCasePathHash["children"])
     );
   });
-  it("should delete list of complex strings from object", async () => {
+  it("shall delete list of complex strings from object", async () => {
     const result = runBasicDeleteTest(
       "1.2.6_object_with_list_of_complex_strings/deleteVerses_txt",
       "model.verses_txt"
@@ -179,7 +179,7 @@ describe("Test basic delete function", () => {
       toJsonString(specCasePathHash["children"])
     );
   });
-  it("should delete list of object of simple data types from object", async () => {
+  it("shall delete list of object of simple data types from object", async () => {
     const result = runBasicDeleteTest(
       "1.3.7.1_object_with_two_lists_of_objects_of_simple_data_types/deleteNcc1701dCommanders",
       "model.ncc1701dCommanders"
@@ -193,7 +193,7 @@ describe("Test basic delete function", () => {
       toJsonString(specCasePathHash["children"])
     );
   });
-  it("should delete list of list of simple data type from object", async () => {
+  it("shall delete list of list of simple data type from object", async () => {
     const result = runBasicDeleteTest(
       "1.3.7.2_object_with_two_lists_of_list_of_simple_data_type/deleteSecond4Primes",
       "model.second4Primes"
@@ -207,7 +207,7 @@ describe("Test basic delete function", () => {
       toJsonString(specCasePathHash["children"])
     );
   });
-  it("should delete simple string from list", async () => {
+  it("shall delete simple string from list", async () => {
     const result = runBasicDeleteTest(
       "2.1_list_of_simple_data_types/deleteItem4",
       "model[4]"
@@ -221,7 +221,7 @@ describe("Test basic delete function", () => {
       toJsonString(specCasePathHash["children"])
     );
   });
-  it("should delete middle complex string entry from list", async () => {
+  it("shall delete middle complex string entry from list", async () => {
     const result = runBasicDeleteTest(
       "2.2.1_list_of_complex_string/deleteItem1",
       "model[1]"
@@ -235,7 +235,7 @@ describe("Test basic delete function", () => {
       toJsonString(specCasePathHash["children"])
     );
   });
-  it("should delete last complex string entry from list", async () => {
+  it("shall delete last complex string entry from list", async () => {
     const result = runBasicDeleteTest(
       "2.2.1_list_of_complex_string/deleteItem2",
       "model[2]"
@@ -249,7 +249,7 @@ describe("Test basic delete function", () => {
       toJsonString(specCasePathHash["children"])
     );
   });
-  it("should delete object from list", async () => {
+  it("shall delete object from list", async () => {
     const result = runBasicDeleteTest(
       "2.2.2_list_of_objects_of_simple_data_types/deleteItem0",
       "model[0]"
@@ -263,7 +263,7 @@ describe("Test basic delete function", () => {
       toJsonString(specCasePathHash["children"])
     );
   });
-  it("should delete list from list", async () => {
+  it("shall delete list from list", async () => {
     const result = runBasicDeleteTest(
       "2.2.4_list_of_list_of_simple_data_type/deleteFirst5Primes",
       "model[0]"
@@ -291,7 +291,7 @@ describe("Test delete function with nested elements", () => {
       force: true,
     });
   });
-  it("should delete simple data type list item from object of list", async () => {
+  it("shall delete simple data type list item from object of list", async () => {
     const result = runBasicDeleteTest(
       "1.2.4_object_with_list_of_simple_data_type/deleteEmployee2",
       "model.employees[2]"
@@ -305,7 +305,7 @@ describe("Test delete function with nested elements", () => {
       toJsonString(specCasePathHash["children"])
     );
   });
-  it("should delete list of object of simple data types from object with two lists of objects of simple data types, for depth = 0", async () => {
+  it("shall delete list of object of simple data types from object with two lists of objects of simple data types, for depth = 0", async () => {
     const result = runBasicDeleteTest(
       "1.3.7.1_object_with_two_lists_of_objects_of_simple_data_types/deleteNcc1701dCommanders",
       "model.ncc1701dCommanders",
@@ -320,7 +320,7 @@ describe("Test delete function with nested elements", () => {
       toJsonString(specCasePathHash["children"])
     );
   });
-  it("should delete list of object of simple data types from object with two lists of objects of simple data types, for depth = 1", async () => {
+  it("shall delete list of object of simple data types from object with two lists of objects of simple data types, for depth = 1", async () => {
     const result = runBasicDeleteTest(
       "1.3.7.1_object_with_two_lists_of_objects_of_simple_data_types/deleteNcc1701dCommanders",
       "model.ncc1701dCommanders",

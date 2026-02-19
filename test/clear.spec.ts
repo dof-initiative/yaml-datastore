@@ -88,7 +88,7 @@ describe("Test basic clear function", () => {
       force: true,
     });
   });
-  it("should clear simple string from object", async () => {
+  it("shall clear simple string from object", async () => {
     const result = runBasicClearTest(
       "1.1_object_with_simple_data_types/clearName",
       "model.name"
@@ -102,7 +102,7 @@ describe("Test basic clear function", () => {
       toJsonString(specCasePathHash["children"])
     );
   });
-  it("should clear other simple data types from object", async () => {
+  it("shall clear other simple data types from object", async () => {
     const elementPaths = [
       "model.age",
       "model.attending",
@@ -135,7 +135,7 @@ describe("Test basic clear function", () => {
       );
     }
   });
-  it("should clear complex string from object", async () => {
+  it("shall clear complex string from object", async () => {
     const result = runBasicClearTest(
       "1.2.1_object_with_complex_string/clearLyrics_txt",
       "model.lyrics_txt"
@@ -149,7 +149,7 @@ describe("Test basic clear function", () => {
       toJsonString(specCasePathHash["children"])
     );
   });
-  it("should clear object of simple data types from object", async () => {
+  it("shall clear object of simple data types from object", async () => {
     const result = runBasicClearTest(
       "1.2.2_object_with_object_of_simple_data_types/clearAddress",
       "model.address"
@@ -163,7 +163,7 @@ describe("Test basic clear function", () => {
       toJsonString(specCasePathHash["children"])
     );
   });
-  it("should clear list of complex strings from object", async () => {
+  it("shall clear list of complex strings from object", async () => {
     const result = runBasicClearTest(
       "1.2.6_object_with_list_of_complex_strings/clearVerses_txt",
       "model.verses_txt"
@@ -177,7 +177,7 @@ describe("Test basic clear function", () => {
       toJsonString(specCasePathHash["children"])
     );
   });
-  it("should clear list of object of simple data types from object", async () => {
+  it("shall clear list of object of simple data types from object", async () => {
     const result = runBasicClearTest(
       "1.3.7.1_object_with_two_lists_of_objects_of_simple_data_types/clearNcc1701dCommanders",
       "model.ncc1701dCommanders"
@@ -191,7 +191,7 @@ describe("Test basic clear function", () => {
       toJsonString(specCasePathHash["children"])
     );
   });
-  it("should clear list of list of simple data type from object", async () => {
+  it("shall clear list of list of simple data type from object", async () => {
     const result = runBasicClearTest(
       "1.3.7.2_object_with_two_lists_of_list_of_simple_data_type/clearSecond4Primes",
       "model.second4Primes"
