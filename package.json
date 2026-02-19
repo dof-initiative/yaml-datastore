@@ -49,10 +49,10 @@
     "eslint": "^9.22.0",
     "eslint-config-prettier": "^10.1.1",
     "folder-hash": "^4.1.1",
-    "mocha": "^11.1.0",
+    "mocha": "^11.7.5",
     "prettier": "^3.5.3",
     "shelljs": "^0.10.0",
-    "tsup": "^8.4.0",
+    "tsup": "^8.5.1",
     "tsx": "^4.19.3",
     "typedoc": "^0.28.1",
     "typedoc-plugin-markdown": "^4.6.0",
@@ -64,5 +64,8 @@
     "@types/js-yaml": "^4.0.9",
     "js-yaml": "^4.1.0",
     "pure-rand": "^7.0.1"
+  },
+  "overrides": {
+    "glob": "^10.5.0"
   }
 }

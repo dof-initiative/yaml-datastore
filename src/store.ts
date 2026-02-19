@@ -3,6 +3,7 @@ import fs from "node:fs";
 import yaml from "js-yaml";
 import { generateIDs } from "./index.js";
 import { YdsResult } from "./index.js";
+import { complexStringKeyToFileName } from "../src/utils.js";
 
 export const INVALID_ELEMENT_NAME = "Error: Invalid element name";
 export const INVALID_PATH_ERROR = "Error: Invalid path";
@@ -134,7 +135,7 @@ function generateComplexStringFilename(
       complexStringFilename = elementName + "_" + id;
     }
   } else {
-    complexStringFilename = elementName.split("_").join(".");
+    complexStringFilename = complexStringKeyToFileName(elementName);
   }
   return complexStringFilename;
 }
@@ -204,8 +205,8 @@ export function storeYaml(
         let complexStringFilename = "";
         // generate complex string file name
         if (container === ContainerType.IsList) {
-          let id = generateIDs(1, idCounter).pop()
-          idCounter++
+          let id = generateIDs(1, idCounter).pop();
+          idCounter++;
           complexStringFilename = generateComplexStringFilename(
             elementName,
             id
@@ -240,8 +241,8 @@ export function storeYaml(
       let elementFileName = "";
       // generate object or list file name
       if (container === ContainerType.IsList) {
-        let id = generateIDs(1, idCounter).pop()
-        idCounter++
+        let id = generateIDs(1, idCounter).pop();
+        idCounter++;
         elementFileName = generateObjectOrListFilename(
           elementName,
           Array.isArray(value),
@@ -280,10 +281,10 @@ export function storeYaml(
 
   // write YAML content do disk
   if (idCounter > 0) {
-    const listMetadataFilePath = path.join(dirPath, "." + filename)
-    const listMetadata = { "idCounter" : idCounter }
-    const listMetadataAsYaml = yaml.dump(listMetadata)
-    fs.writeFileSync(listMetadataFilePath, listMetadataAsYaml, "utf-8")
+    const listMetadataFilePath = path.join(dirPath, "." + filename);
+    const listMetadata = { idCounter: idCounter };
+    const listMetadataAsYaml = yaml.dump(listMetadata);
+    fs.writeFileSync(listMetadataFilePath, listMetadataAsYaml, "utf-8");
   }
   fs.writeFileSync(filePath, yamlContentToSerialize, "utf-8");
 
