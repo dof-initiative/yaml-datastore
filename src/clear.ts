@@ -10,10 +10,7 @@ import {
   doubleParenthesesRegEx,
   trimDoubleParentheses,
 } from "./load.js";
-import {
-  getParentElementInfo,
-  recursivelyDeleteComplexListItem,
-} from "./delete.js";
+import { getParentElementInfo, recursivelyDeleteList } from "./delete.js";
 
 /**
  *
@@ -58,32 +55,20 @@ export function clear(
         return new YdsResult(true, parentElement, parentElementPath);
       case ElementPathType.simpleToList:
       case ElementPathType.complexToList:
-        const listFilePathAsString = elementPathInfo.data;
-        const listFilePath = path.parse(listFilePathAsString);
-        const listParentDir = listFilePath.dir;
+        const listFilePath = elementPathInfo.data;
+        const listPath = path.parse(listFilePath);
+        const listParentDir = listPath.dir;
 
-        // iterate through list elements and (recursively) delete each complex list item from disk
-        const listContents = fs.readFileSync(listFilePathAsString, "utf-8");
-        const listAsJsObj = yaml.load(listContents);
-        for (const listItem of listAsJsObj as any) {
-          if (doubleParenthesesRegEx.test(listItem)) {
-            const listItemFilePath = path.parse(
-              path.join(listParentDir, trimDoubleParentheses(listItem))
-            );
-            recursivelyDeleteComplexListItem(listItemFilePath);
-          }
-        }
-
-        // delete list from disk
-        fs.rmSync(listFilePathAsString);
+        // (recursively) delete list from disk
+        recursivelyDeleteList(listPath);
 
         // delete list metadata file if one exists
         const listMetadataFilePath = path.join(
-          listFilePath.dir,
-          "." + listFilePath.base
+          listPath.dir,
+          "." + listPath.base
         );
         const directoryContents = fs.readdirSync(listParentDir);
-        if (directoryContents.includes("." + listFilePath.base)) {
+        if (directoryContents.includes("." + listPath.base)) {
           fs.rmSync(listMetadataFilePath);
         }
 
