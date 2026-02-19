@@ -167,7 +167,6 @@ export function deleteElement(
       case ElementPathType.simpleToObject:
       case ElementPathType.complexToObject:
         fs.rmSync(path.parse(elementPathInfo.data).dir, { recursive: true });
-        //TODO: dry up code for checking if parentElement is Array for deletion and writing to disk
         deleteChildFromParentElement(
           parentElement,
           parentElementInfo.indexOfChild
