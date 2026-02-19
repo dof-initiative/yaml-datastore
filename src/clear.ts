@@ -55,8 +55,11 @@ export function clear(
         return new YdsResult(true, parentElement, parentElementPath);
       case ElementPathType.simpleToList:
       case ElementPathType.complexToList:
+        // get file path to list
         const listFilePath = elementPathInfo.data;
+        // get parsed path to list
         const listPath = path.parse(listFilePath);
+        // get parent diriectory of list
         const listParentDir = listPath.dir;
 
         // (recursively) delete list from disk

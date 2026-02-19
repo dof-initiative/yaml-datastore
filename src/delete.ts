@@ -75,20 +75,23 @@ export function getParentElementInfo(
 }
 
 /**
- * Recursively deletes complex list item (i.e., objects, lists, or complex strings) from disk
+ * Recursively deletes list including any complex list items (i.e., objects, lists, or complex strings) from disk
  *
- * @param complexlistItemPath path as jsObject of complex list item to (recursively) delete
+ * @param listPath parsed path of list to (recursively) delete
  */
 export function recursivelyDeleteList(listPath: path.ParsedPath) {
+  // get file path to list
   const listFilePath = path.join(listPath.dir, listPath.base);
+  // get contents of list
   const listContents = fs.readFileSync(listFilePath, "utf-8");
+  // load list as jsObject
   const listAsJsObj = yaml.load(listContents);
 
   // iterate through list and recursively delete complex list items
   for (const listItem of listAsJsObj as any) {
     // if list item is complex, delete contents on disk accordingly
     if (doubleParenthesesRegEx.test(listItem)) {
-      // get path as jsObject for list item
+      // get parsed path for list item
       const listItemPath = path.parse(
         path.join(listPath.dir, trimDoubleParentheses(listItem))
       );
@@ -169,8 +172,11 @@ export function deleteElement(
         );
       case ElementPathType.simpleToList:
       case ElementPathType.complexToList:
+        // get file path to list
         const listFilePath = elementPathInfo.data;
+        // get parsed path to list
         const listPath = path.parse(listFilePath);
+        // get parent diriectory of list
         const listParentDir = listPath.dir;
 
         // (recursively) delete list from disk
