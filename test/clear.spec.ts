@@ -21,9 +21,14 @@ const options = {
  *
  * @param specCaseName folder name of spec to test
  * @param elementPathToClear element path to element to be cleared from working directory of spec case
+ * @param depth depth of element to be returned in YdsResult object
  * @returns StoreTestResult where specCasePath is path to expected parent element after clear operation and storePath is path to parent element contained cleared element
  */
-function runBasicClearTest(specCaseName: string, elementPathToClear: string) {
+function runBasicClearTest(
+  specCaseName: string,
+  elementPathToClear: string,
+  depth: number = -1
+) {
   // 1. select spec case
   const specCasePath = toSpecCasePath(specCaseName);
 
@@ -38,10 +43,14 @@ function runBasicClearTest(specCaseName: string, elementPathToClear: string) {
   });
 
   // 3. clear element, given working directory path and element path
-  const result = clear(TMP_WORKING_DIR_PATH, elementPathToClear);
+  const result = clear(TMP_WORKING_DIR_PATH, elementPathToClear, depth);
 
   // 4. verify results of clear operation
-  const expectedParentElement = load(specCasePath, result.message).element;
+  const expectedParentElement = load(
+    specCasePath,
+    result.message,
+    depth
+  ).element;
 
   expect(result.success).to.equal(true);
   expect(toJsonString(result.element)).to.equal(

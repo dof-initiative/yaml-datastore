@@ -7,8 +7,9 @@ import {
   INVALID_PATH_ERROR,
   ElementPathType,
   getElementPathInfo,
+  doubleParenthesesRegEx,
+  trimDoubleParentheses,
 } from "./load.js";
-import { idRegex, storeYaml } from "./store.js";
 
 class ParentElementInfo {
   private _parentElementPath: string;
@@ -73,30 +74,42 @@ export function getParentElementInfo(
   );
 }
 
-export function testListItemFileName(
-  listFilePath: path.ParsedPath,
-  filePathToTest: path.ParsedPath
-): boolean {
-  let listFileName = listFilePath.name;
-  const fileNameToTest = filePathToTest.name;
-  let listItemFileNamePrefix = listFileName;
-  if (listFileName.includes("_")) {
-    listItemFileNamePrefix = listFileName.split("_")[0];
+/**
+ * Recursively deletes complex list item (i.e., objects, lists, or complex strings) from disk
+ *
+ * @param complexlistItemPath path object of complex list item to (recursively) delete
+ */
+export function recursivelyDeleteComplexListItem(
+  listItemPath: path.ParsedPath
+) {
+  const listItemPathAsString = path.join(listItemPath.dir, listItemPath.base);
+  if (listItemPath.base === "_this.yaml") {
+    // if list item is an object, then recursively delete object directory by performing equivalent of `rm -rf <object-directory-name>`
+
+    fs.rmSync(listItemPath.dir, { recursive: true });
+  } else if (listItemPath.ext === ".yaml") {
+    // else if list item is a list, then iterate through list and recursively delete complex list items followed by deleting list itself.
+    const listContents = fs.readFileSync(listItemPathAsString, "utf-8");
+    const listAsJsObj = yaml.load(listContents);
+    for (const listItem of listAsJsObj as any) {
+      if (doubleParenthesesRegEx.test(listItem)) {
+        const listItemFilePath = path.parse(
+          path.join(listItemPath.dir, trimDoubleParentheses(listItem))
+        );
+        recursivelyDeleteComplexListItem(listItemFilePath);
+      }
+    }
+    fs.rmSync(listItemPathAsString);
+  } else {
+    // else assume list item is a complex string and delete file path from disk
+    fs.rmSync(listItemPathAsString);
   }
-  if (
-    fileNameToTest.slice(0, listItemFileNamePrefix.length) ===
-    listItemFileNamePrefix
-  ) {
-    const splitFileNameToTest = fileNameToTest.split("_");
-    return idRegex.test(splitFileNameToTest[1]);
-  }
-  return false;
 }
 
 /**
  *
  * @param workingDirectoryPath relative or absolute path to working directory containing yaml-datastore serialized content
- * @param elementPath element path to element to be deleted from working directory
+ * @param elementPath element path to element to be deleted
  * @param depth depth of element to be returned in YdsResult object
  * @returns a YdsResult containing the status of the call to deleteElement function
  */
@@ -150,35 +163,43 @@ export function deleteElement(
         );
       case ElementPathType.simpleToList:
       case ElementPathType.complexToList:
-        const listFilePath = path.parse(elementPathInfo.data);
-        const directoryContents = fs.readdirSync(
-          path.parse(elementPathInfo.data).dir
-        );
-        for (const item of directoryContents) {
-          if (
-            testListItemFileName(
-              listFilePath,
-              path.parse(path.join(listFilePath.dir, item))
-            )
-          ) {
-            const fileToDelete = path.join(
-              path.parse(elementPathInfo.data).dir,
-              item
+        const listFilePathAsString = elementPathInfo.data;
+        const listFilePath = path.parse(listFilePathAsString);
+        const listParentDir = listFilePath.dir;
+
+        // iterate through list elements and (recursively) delete each complex list item from disk
+        const listContents = fs.readFileSync(listFilePathAsString, "utf-8");
+        const listAsJsObj = yaml.load(listContents);
+        for (const listItem of listAsJsObj as any) {
+          if (doubleParenthesesRegEx.test(listItem)) {
+            const listItemFilePath = path.parse(
+              path.join(listParentDir, trimDoubleParentheses(listItem))
             );
-            fs.rmSync(fileToDelete, {
-              recursive: true,
-            });
+            recursivelyDeleteComplexListItem(listItemFilePath);
           }
         }
-        fs.rmSync(elementPathInfo.data);
+
+        // delete list from disk
+        fs.rmSync(listFilePathAsString);
+
+        // delete list metadata file if one exists
         const listMetadataFilePath = path.join(
           listFilePath.dir,
           "." + listFilePath.base
         );
+        const directoryContents = fs.readdirSync(listParentDir);
         if (directoryContents.includes("." + listFilePath.base)) {
           fs.rmSync(listMetadataFilePath);
         }
-        delete (parentElement as any)[parentElementInfo.indexOfChild];
+
+        // delete list from parent element
+        if (Array.isArray(parentElement)) {
+          parentElement.splice(parentElementInfo.indexOfChild, 1);
+        } else {
+          delete (parentElement as any)[parentElementInfo.indexOfChild];
+        }
+
+        // load parent element into memory for YdsResult object
         const parentElementOfListContentsToStore = yaml.dump(parentElement);
         fs.writeFileSync(
           parentElementFilePath,
@@ -190,6 +211,8 @@ export function deleteElement(
           parentElementPath,
           depth
         ).element;
+
+        // return result of delete list operation
         return new YdsResult(
           true,
           parentElementOfListStoredToDisk,

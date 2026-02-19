@@ -7,13 +7,25 @@ import {
   INVALID_PATH_ERROR,
   ElementPathType,
   getElementPathInfo,
+  doubleParenthesesRegEx,
+  trimDoubleParentheses,
 } from "./load.js";
-import { getParentElementInfo, testListItemFileName } from "./delete.js";
-import { storeYaml } from "./store.js";
+import {
+  getParentElementInfo,
+  recursivelyDeleteComplexListItem,
+} from "./delete.js";
 
+/**
+ *
+ * @param workingDirectoryPath relative or absolute path to working directory containing yaml-datastore serialized content
+ * @param elementPath element path to element to be cleared
+ * @param depth depth of element to be returned in YdsResult object
+ * @returns a YdsResult containing the status of the call to clear function
+ */
 export function clear(
   workingDirectoryPath: string,
-  elementPath: string
+  elementPath: string,
+  depth: number = 0
 ): YdsResult {
   if (workingDirectoryPath === "") {
     return new YdsResult(false, null, EMPTY_WORKINGDIR_PATH_ERROR);
@@ -28,74 +40,105 @@ export function clear(
       elementPath
     );
     const parentElementFilePath = parentElementInfo.parentElementFilePath;
-    let parentElement = load(workingDirectoryPath, parentElementPath).element;
+    const parentElementFileContents = fs.readFileSync(
+      parentElementFilePath,
+      "utf-8"
+    );
+
+    // direct load of parent element from which to delete child element before storing back to disk
+    let parentElement = yaml.load(parentElementFileContents);
+
     switch (elementPathInfo.type) {
       case ElementPathType.empty:
       case ElementPathType.simpleToObject:
       case ElementPathType.complexToObject:
         fs.rmSync(path.parse(elementPathInfo.data).dir, { recursive: true });
-        parentElement[parentElementInfo.indexOfChild] = {};
+        (parentElement as any)[parentElementInfo.indexOfChild] = {};
         fs.writeFileSync(parentElementFilePath, yaml.dump(parentElement));
         return new YdsResult(true, parentElement, parentElementPath);
       case ElementPathType.simpleToList:
       case ElementPathType.complexToList:
-        const listFilePath = path.parse(elementPathInfo.data);
-        const directoryContents = fs.readdirSync(
-          path.parse(elementPathInfo.data).dir
-        );
-        for (const item of directoryContents) {
-          if (
-            testListItemFileName(
-              listFilePath,
-              path.parse(path.join(listFilePath.dir, item))
-            )
-          ) {
-            const fileToDelete = path.join(
-              path.parse(elementPathInfo.data).dir,
-              item
+        const listFilePathAsString = elementPathInfo.data;
+        const listFilePath = path.parse(listFilePathAsString);
+        const listParentDir = listFilePath.dir;
+
+        // iterate through list elements and (recursively) delete each complex list item from disk
+        const listContents = fs.readFileSync(listFilePathAsString, "utf-8");
+        const listAsJsObj = yaml.load(listContents);
+        for (const listItem of listAsJsObj as any) {
+          if (doubleParenthesesRegEx.test(listItem)) {
+            const listItemFilePath = path.parse(
+              path.join(listParentDir, trimDoubleParentheses(listItem))
             );
-            fs.rmSync(fileToDelete, {
-              recursive: true,
-            });
+            recursivelyDeleteComplexListItem(listItemFilePath);
           }
         }
-        fs.rmSync(elementPathInfo.data);
+
+        // delete list from disk
+        fs.rmSync(listFilePathAsString);
+
+        // delete list metadata file if one exists
         const listMetadataFilePath = path.join(
           listFilePath.dir,
           "." + listFilePath.base
         );
+        const directoryContents = fs.readdirSync(listParentDir);
         if (directoryContents.includes("." + listFilePath.base)) {
           fs.rmSync(listMetadataFilePath);
         }
-        parentElement[parentElementInfo.indexOfChild] = [];
-        storeYaml(parentElement, workingDirectoryPath, parentElementPath);
-        return new YdsResult(true, parentElement, parentElementPath);
+
+        // clear list from parent element
+        (parentElement as any)[parentElementInfo.indexOfChild] = [];
+
+        // load parent element into memory for YdsResult object
+        const parentElementOfListContentsToStore = yaml.dump(parentElement);
+        fs.writeFileSync(
+          parentElementFilePath,
+          parentElementOfListContentsToStore,
+          "utf-8"
+        );
+        const parentElementOfListStoredToDisk = load(
+          workingDirectoryPath,
+          parentElementPath,
+          depth
+        ).element;
+
+        // return result of delete list operation
+        return new YdsResult(
+          true,
+          parentElementOfListStoredToDisk,
+          parentElementPath
+        );
       case ElementPathType.simpleToSimple:
       case ElementPathType.complexToSimple:
         if (
-          parentElement[parentElementInfo.indexOfChild] === null ||
-          parentElement[parentElementInfo.indexOfChild] === "" ||
-          typeof parentElement[parentElementInfo.indexOfChild] === "object"
+          (parentElement as any)[parentElementInfo.indexOfChild] === null ||
+          (parentElement as any)[parentElementInfo.indexOfChild] === "" ||
+          typeof (parentElement as any)[parentElementInfo.indexOfChild] ===
+            "object"
         ) {
           return new YdsResult(true, parentElement, parentElementPath);
         } else if (
-          typeof parentElement[parentElementInfo.indexOfChild] === "string"
+          typeof (parentElement as any)[parentElementInfo.indexOfChild] ===
+          "string"
         ) {
-          parentElement[parentElementInfo.indexOfChild] = "";
+          (parentElement as any)[parentElementInfo.indexOfChild] = "";
           fs.writeFileSync(parentElementFilePath, yaml.dump(parentElement));
           return new YdsResult(true, parentElement, parentElementPath);
         } else if (
-          typeof parentElement[parentElementInfo.indexOfChild] === "number" ||
-          typeof parentElement[parentElementInfo.indexOfChild] === "boolean"
+          typeof (parentElement as any)[parentElementInfo.indexOfChild] ===
+            "number" ||
+          typeof (parentElement as any)[parentElementInfo.indexOfChild] ===
+            "boolean"
         ) {
-          parentElement[parentElementInfo.indexOfChild] = null;
+          (parentElement as any)[parentElementInfo.indexOfChild] = null;
           fs.writeFileSync(parentElementFilePath, yaml.dump(parentElement));
           return new YdsResult(true, parentElement, parentElementPath);
         }
       case ElementPathType.simpleToComplexString:
       case ElementPathType.complexToComplexString:
         fs.rmSync(elementPathInfo.data);
-        parentElement[parentElementInfo.indexOfChild] = "";
+        (parentElement as any)[parentElementInfo.indexOfChild] = "";
         fs.writeFileSync(parentElementFilePath, yaml.dump(parentElement));
         return new YdsResult(true, parentElement, parentElementPath);
       case ElementPathType.invalid:

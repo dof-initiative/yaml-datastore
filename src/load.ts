@@ -9,7 +9,7 @@ export const INVALID_PATH_ERROR =
   "Error: Invalid path to element on filesystem";
 
 // Regular expression used for matching element file paths enclosed between double parentheses
-const doubleParenthesesRegEx = new RegExp(/\(\(.*\)\)/);
+export const doubleParenthesesRegEx = new RegExp(/\(\(.*\)\)/);
 
 /**
  * Describes the nature of an element path + filepath combination.
@@ -100,7 +100,7 @@ export class ElementPathResult {
 }
 
 // local function used for parsing strings enclosed between double parentheses
-function trimDoubleParentheses(aString: string): string {
+export function trimDoubleParentheses(aString: string): string {
   return aString.slice(2, -2);
 }
 
