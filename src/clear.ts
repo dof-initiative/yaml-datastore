@@ -7,8 +7,6 @@ import {
   INVALID_PATH_ERROR,
   ElementPathType,
   getElementPathInfo,
-  doubleParenthesesRegEx,
-  trimDoubleParentheses,
 } from "./load.js";
 import { getParentElementInfo, recursivelyDeleteList } from "./delete.js";
 
