@@ -116,6 +116,20 @@ export function recursivelyDeleteList(listPath: path.ParsedPath) {
 }
 
 /**
+ * Helper function for deleting an element from a parent element (list or object)
+ *
+ * @param parentElement list or object containing child element to delete
+ * @param childElement element to be deleted from parent element
+ */
+function deleteChildFromParentElement(parentElement: any, childElement: any) {
+  if (Array.isArray(parentElement)) {
+    parentElement.splice(childElement, 1);
+  } else {
+    delete (parentElement as any)[childElement];
+  }
+}
+
+/**
  *
  * @param workingDirectoryPath relative or absolute path to working directory containing yaml-datastore serialized content
  * @param elementPath element path to element to be deleted
@@ -154,11 +168,10 @@ export function deleteElement(
       case ElementPathType.complexToObject:
         fs.rmSync(path.parse(elementPathInfo.data).dir, { recursive: true });
         //TODO: dry up code for checking if parentElement is Array for deletion and writing to disk
-        if (Array.isArray(parentElement)) {
-          parentElement.splice(parentElementInfo.indexOfChild, 1);
-        } else {
-          delete (parentElement as any)[parentElementInfo.indexOfChild];
-        }
+        deleteChildFromParentElement(
+          parentElement,
+          parentElementInfo.indexOfChild
+        );
         fs.writeFileSync(parentElementFilePath, yaml.dump(parentElement));
         const parentElementOfObjectStoredToDisk = load(
           workingDirectoryPath,
@@ -193,11 +206,10 @@ export function deleteElement(
         }
 
         // delete list from parent element
-        if (Array.isArray(parentElement)) {
-          parentElement.splice(parentElementInfo.indexOfChild, 1);
-        } else {
-          delete (parentElement as any)[parentElementInfo.indexOfChild];
-        }
+        deleteChildFromParentElement(
+          parentElement,
+          parentElementInfo.indexOfChild
+        );
 
         // load parent element into memory for YdsResult object
         const parentElementOfListContentsToStore = yaml.dump(parentElement);
@@ -220,21 +232,19 @@ export function deleteElement(
         );
       case ElementPathType.simpleToSimple:
       case ElementPathType.complexToSimple:
-        if (Array.isArray(parentElement)) {
-          parentElement.splice(parentElementInfo.indexOfChild, 1);
-        } else {
-          delete (parentElement as any)[parentElementInfo.indexOfChild];
-        }
+        deleteChildFromParentElement(
+          parentElement,
+          parentElementInfo.indexOfChild
+        );
         fs.writeFileSync(parentElementFilePath, yaml.dump(parentElement));
         return new YdsResult(true, parentElement, parentElementPath);
       case ElementPathType.simpleToComplexString:
       case ElementPathType.complexToComplexString:
         fs.rmSync(elementPathInfo.data);
-        if (Array.isArray(parentElement)) {
-          parentElement.splice(parentElementInfo.indexOfChild, 1);
-        } else {
-          delete (parentElement as any)[parentElementInfo.indexOfChild];
-        }
+        deleteChildFromParentElement(
+          parentElement,
+          parentElementInfo.indexOfChild
+        );
         const parentElementOfComplexStringContentsToStore =
           yaml.dump(parentElement);
         fs.writeFileSync(
