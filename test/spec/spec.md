@@ -383,8 +383,7 @@ Solution 1 implemented as property, `idCounter`, of type number in a . (dot) fil
 - clear other (simple data types) from object:
   - set key to `null`
 - clear complex string from object:
-  - delete contents from disk
-  - set key to string with newline, `'\n'`
+  - set contents on disk to string with newline, `'\n'`
 - clear object from object:
   - delete contents from disk
   - set key to empty object: `{}` in owning object on-disk in `_this.yaml`
