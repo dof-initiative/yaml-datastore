@@ -239,7 +239,13 @@ export function deleteElement(
         return new YdsResult(true, parentElement, parentElementPath);
       case ElementPathType.simpleToComplexString:
       case ElementPathType.complexToComplexString:
-        fs.rmSync(elementPathInfo.data);
+        // get complex string file path
+        const complexStringFilePath = elementPathInfo.data;
+
+        // delete complex string file path from disk
+        fs.rmSync(complexStringFilePath);
+
+        // delete complex string from parent element
         deleteChildFromParentElement(
           parentElement,
           parentElementInfo.indexOfChild
@@ -251,6 +257,8 @@ export function deleteElement(
           parentElementOfComplexStringContentsToStore,
           "utf-8"
         );
+
+        // return result of delete complex string operation
         const parentElementOfComplexStringStoredToDisk = load(
           workingDirectoryPath,
           parentElementPath,

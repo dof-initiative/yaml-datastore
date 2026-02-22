@@ -138,7 +138,8 @@ describe("Test basic clear function", () => {
   it("shall clear complex string from object", async () => {
     const result = runBasicClearTest(
       "1.2.1_object_with_complex_string/clearLyrics_txt",
-      "model.lyrics_txt"
+      "model.lyrics_txt",
+      0
     );
 
     const specCasePathHash = await hashElement(result.specCasePath, options);

@@ -123,9 +123,18 @@ export function clear(
         }
       case ElementPathType.simpleToComplexString:
       case ElementPathType.complexToComplexString:
-        fs.rmSync(elementPathInfo.data);
-        (parentElement as any)[parentElementInfo.indexOfChild] = "";
-        fs.writeFileSync(parentElementFilePath, yaml.dump(parentElement));
+        // get complex string file path
+        const complexStringFilePath = elementPathInfo.data;
+
+        // clear contents of complex string file on disk
+        const complexStringContentsToStore = "\n";
+        fs.writeFileSync(
+          complexStringFilePath,
+          complexStringContentsToStore,
+          "utf-8"
+        );
+
+        // return result of clear complex string operation
         return new YdsResult(true, parentElement, parentElementPath);
       case ElementPathType.invalid:
         break;
