@@ -281,3 +281,61 @@ describe("Test basic clear function", () => {
     );
   });
 });
+
+describe("Test clear function with nested elements", () => {
+  beforeEach(function () {
+    fs.mkdirSync(TMP_WORKING_DIR_PATH);
+    fs.mkdirSync(TMP_SPEC_DIR_AFTER_OPERATION_PATH);
+  });
+  afterEach(function () {
+    fs.rmSync(TMP_WORKING_DIR_PATH, { recursive: true, force: true });
+    fs.rmSync(TMP_SPEC_DIR_AFTER_OPERATION_PATH, {
+      recursive: true,
+      force: true,
+    });
+  });
+  it("shall clear simple data type list item from object of list", async () => {
+    const result = runBasicClearTest(
+      "1.2.4_object_with_list_of_simple_data_type/clearEmployee2",
+      "model.employees[2]"
+    );
+
+    const specCasePathHash = await hashElement(result.specCasePath, options);
+    const storePathHash = await hashElement(result.storePath, options);
+
+    // verify that checksums of on-disk representation from spec case versus serialized content are identical
+    expect(toJsonString(storePathHash["children"])).to.equal(
+      toJsonString(specCasePathHash["children"])
+    );
+  });
+  it("shall clear list of object of simple data types from object with two lists of objects of simple data types, for depth = 0", async () => {
+    const result = runBasicClearTest(
+      "1.3.7.1_object_with_two_lists_of_objects_of_simple_data_types/clearNcc1701dCommanders",
+      "model.ncc1701dCommanders",
+      0
+    );
+
+    const specCasePathHash = await hashElement(result.specCasePath, options);
+    const storePathHash = await hashElement(result.storePath, options);
+
+    // verify that checksums of on-disk representation from spec case versus serialized content are identical
+    expect(toJsonString(storePathHash["children"])).to.equal(
+      toJsonString(specCasePathHash["children"])
+    );
+  });
+  it("shall clear list of object of simple data types from object with two lists of objects of simple data types, for depth = 1", async () => {
+    const result = runBasicClearTest(
+      "1.3.7.1_object_with_two_lists_of_objects_of_simple_data_types/clearNcc1701dCommanders",
+      "model.ncc1701dCommanders",
+      1
+    );
+
+    const specCasePathHash = await hashElement(result.specCasePath, options);
+    const storePathHash = await hashElement(result.storePath, options);
+
+    // verify that checksums of on-disk representation from spec case versus serialized content are identical
+    expect(toJsonString(storePathHash["children"])).to.equal(
+      toJsonString(specCasePathHash["children"])
+    );
+  });
+});
