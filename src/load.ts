@@ -1,6 +1,7 @@
 import path from "path";
 import fs from "node:fs";
 import yaml from "js-yaml";
+import { YdsResult } from "./index.js";
 
 export const EMPTY_WORKINGDIR_PATH_ERROR =
   "Error: Cannot load from empty working directory path";
@@ -8,12 +9,12 @@ export const INVALID_PATH_ERROR =
   "Error: Invalid path to element on filesystem";
 
 // Regular expression used for matching element file paths enclosed between double parentheses
-const doubleParenthesesRegEx = new RegExp(/\(\(.*\)\)/);
+export const doubleParenthesesRegEx = new RegExp(/\(\(.*\)\)/);
 
 /**
  * Describes the nature of an element path + filepath combination.
  */
-enum ElementPathType {
+export enum ElementPathType {
   /**
    * the combined element Path and filepath do not point at a valid element, returned element will be null
    */
@@ -68,7 +69,7 @@ enum ElementPathType {
 /**
  * Data required to continue loading data from filesystem
  */
-class ElementPathResult {
+export class ElementPathResult {
   private _type: ElementPathType;
   private _data: any;
 
@@ -98,47 +99,8 @@ class ElementPathResult {
   }
 }
 
-/**
- * Represents results of a call to the load function
- */
-export class LoadResult {
-  private _success: boolean;
-  private _element: any;
-  private _message: string;
-
-  /**
-   * Default constructor for LoadResult
-   *
-   * @param success success status of load() operation
-   * @param element element read into memory by load() operation
-   * @param message message describing success status of load() operation
-   * @returns new LoadResult object
-   */
-  constructor(success: boolean, element: any, message: string) {
-    this._success = success;
-    if (this._success) {
-      this._element = element;
-    } else {
-      this._element = null;
-    }
-    this._message = message;
-  }
-  /** @returns success status. */
-  public get success() {
-    return this._success;
-  }
-  /** @returns element read into memory on success or null on failure. */
-  public get element() {
-    return this._element;
-  }
-  /** @returns element path on success or an explanation of the failure. */
-  public get message() {
-    return this._message;
-  }
-}
-
 // local function used for parsing strings enclosed between double parentheses
-function trimDoubleParentheses(aString: string): string {
+export function trimDoubleParentheses(aString: string): string {
   return aString.slice(2, -2);
 }
 
@@ -160,7 +122,7 @@ function loadYaml(
   filePath: string,
   elementPath: string,
   depth: number
-): LoadResult {
+): YdsResult {
   const thisYamlContent = fs.readFileSync(filePath, "utf8");
   let yamlAsJsObj = yaml.load(thisYamlContent);
   // iterate through elements of yamlAsJsObj and replace ((filepath)) with its loaded complex data type
@@ -203,7 +165,7 @@ function loadYaml(
       }
     });
   }
-  return new LoadResult(true, yamlAsJsObj, elementPath);
+  return new YdsResult(true, yamlAsJsObj, elementPath);
 }
 
 function getNextElementPath(elementPath: string): string {
@@ -249,7 +211,7 @@ function getNextElementPath(elementPath: string): string {
   return firstElementEntry;
 }
 
-function convertElementPathToFilePath(
+export function getElementPathInfo(
   workingDirectoryPath: string,
   elementPath: string
 ): ElementPathResult {
@@ -315,7 +277,7 @@ function convertElementPathToFilePath(
     ) {
       return new ElementPathResult(ElementPathType.invalid, null);
     }
-    const firstElementFilePath = convertElementPathToFilePath(
+    const firstElementFilePath = getElementPathInfo(
       workingDirectoryPath,
       firstElementEntry
     );
@@ -382,7 +344,7 @@ function convertElementPathToFilePath(
               } else if (filePath.slice(-5) === ".yaml") {
                 // got a YAML list
                 return new ElementPathResult(
-                  ElementPathType.complexToObject,
+                  ElementPathType.complexToList,
                   filePath
                 );
               } else {
@@ -412,38 +374,35 @@ function convertElementPathToFilePath(
  * @param workingDirectoryPath relative or absolute path to working directory containing yaml-datastore serialized content
  * @param elementPath object path (dot separated, with support for bracketed indexing for list elements or key-value pairs in objects) from working directory to element to be read into memory (e.g., top-element.sub-element.property[3])
  * @param depth integer from -1 to depth of element indicating how deep into element's hierachy to read into memory (-1 = read full depth. Defaults to -1), will not throw error if depth exceeds actual maximum depth of element
- * @returns a LoadResult containing the status and content of the load function
+ * @returns a YdsResult containing the status and content of the load function
  */
 export function load(
   workingDirectoryPath: string,
   elementPath: string,
   depth: number = -1
-): LoadResult {
+): YdsResult {
   if (workingDirectoryPath === "") {
-    return new LoadResult(false, null, EMPTY_WORKINGDIR_PATH_ERROR);
+    return new YdsResult(false, null, EMPTY_WORKINGDIR_PATH_ERROR);
   } else {
-    let elementPathObj = convertElementPathToFilePath(
-      workingDirectoryPath,
-      elementPath
-    );
-    switch (elementPathObj.type) {
+    let elementPathInfo = getElementPathInfo(workingDirectoryPath, elementPath);
+    switch (elementPathInfo.type) {
       case ElementPathType.empty:
       case ElementPathType.simpleToObject:
       case ElementPathType.simpleToList:
       case ElementPathType.complexToObject:
       case ElementPathType.complexToList:
-        return loadYaml(elementPathObj.data, elementPath, depth);
+        return loadYaml(elementPathInfo.data, elementPath, depth);
       case ElementPathType.simpleToSimple:
       case ElementPathType.complexToSimple:
-        return new LoadResult(true, elementPathObj.data, elementPath);
+        return new YdsResult(true, elementPathInfo.data, elementPath);
       case ElementPathType.simpleToComplexString:
       case ElementPathType.complexToComplexString:
-        const elementContent = fs.readFileSync(elementPathObj.data, "utf-8");
-        return new LoadResult(true, elementContent, elementPath);
+        const elementContent = fs.readFileSync(elementPathInfo.data, "utf-8");
+        return new YdsResult(true, elementContent, elementPath);
       case ElementPathType.invalid:
         break;
     }
-    return new LoadResult(
+    return new YdsResult(
       false,
       null,
       INVALID_PATH_ERROR +
