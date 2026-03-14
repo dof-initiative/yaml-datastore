@@ -31,12 +31,12 @@ export enum ElementPathType {
   simpleToObject,
 
   /**
-   * element path contains no heirarchy and filepath points to a directory containing a list to be loaded
+   * element path contains no heirarchy and filepath points to a list in a directory to be loaded
    */
   simpleToList,
 
   /**
-   * element path contains no heirarchy and filepath points to an object containing a complex string to be loaded
+   * element path contains no heirarchy and filepath points to a complex string in a directory that is an object to be loaded
    */
   simpleToComplexString,
 

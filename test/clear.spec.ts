@@ -76,7 +76,8 @@ function runBasicClearTest(
   );
 }
 
-describe("Test basic clear function", () => {
+// see invalid in ElementPathType (enum)
+describe("Test basic clear function for invalid path", () => {
   beforeEach(function () {
     fs.mkdirSync(TMP_WORKING_DIR_PATH);
     fs.mkdirSync(TMP_SPEC_DIR_AFTER_OPERATION_PATH);
@@ -88,67 +89,101 @@ describe("Test basic clear function", () => {
       force: true,
     });
   });
-  it("shall clear simple string from object", async () => {
-    const result = runBasicClearTest(
-      "1.1_object_with_simple_data_types/clearName",
-      "model.name"
-    );
+  //TODO
+});
 
-    const specCasePathHash = await hashElement(result.specCasePath, options);
-    const storePathHash = await hashElement(result.storePath, options);
-
-    // verify that checksums of on-disk representation from spec case versus serialized content are identical
-    expect(toJsonString(storePathHash["children"])).to.equal(
-      toJsonString(specCasePathHash["children"])
-    );
+// see empty in ElementPathType (enum)
+describe("Test basic clear function for empty element path pointing to an object", () => {
+  beforeEach(function () {
+    fs.mkdirSync(TMP_WORKING_DIR_PATH);
+    fs.mkdirSync(TMP_SPEC_DIR_AFTER_OPERATION_PATH);
   });
-  it("shall clear other simple data types from object", async () => {
-    const elementPaths = [
-      "model.age",
-      "model.attending",
-      "model.plusOne",
-      "model.degrees",
-      "model.aliases",
-      "model.notes",
-    ];
-
-    for (const elementPathToClear of elementPaths) {
-      const elementPathAsSplitString = elementPathToClear.split(".");
-      const expectedParentElementPath =
-        "clear" +
-        elementPathAsSplitString[1].charAt(0).toUpperCase() +
-        elementPathAsSplitString[1].slice(1);
-      const result = runBasicClearTest(
-        path.join(
-          "1.1_object_with_simple_data_types",
-          expectedParentElementPath
-        ),
-        elementPathToClear
-      );
-
-      const specCasePathHash = await hashElement(result.specCasePath, options);
-      const storePathHash = await hashElement(result.storePath, options);
-
-      // verify that checksums of on-disk representation from spec case versus serialized content are identical
-      expect(toJsonString(storePathHash["children"])).to.equal(
-        toJsonString(specCasePathHash["children"])
-      );
-    }
+  afterEach(function () {
+    fs.rmSync(TMP_WORKING_DIR_PATH, { recursive: true, force: true });
+    fs.rmSync(TMP_SPEC_DIR_AFTER_OPERATION_PATH, {
+      recursive: true,
+      force: true,
+    });
   });
-  it("shall clear complex string from object", async () => {
-    const result = runBasicClearTest(
-      "1.2.1_object_with_complex_string/clearLyrics_txt",
-      "model.lyrics_txt",
-      0
-    );
+  //TODO
+});
 
-    const specCasePathHash = await hashElement(result.specCasePath, options);
-    const storePathHash = await hashElement(result.storePath, options);
+// see simpleToObject in ElementPathType (enum)
+describe("Test basic clear function for simple element path pointing to object", () => {
+  beforeEach(function () {
+    fs.mkdirSync(TMP_WORKING_DIR_PATH);
+    fs.mkdirSync(TMP_SPEC_DIR_AFTER_OPERATION_PATH);
+  });
+  afterEach(function () {
+    fs.rmSync(TMP_WORKING_DIR_PATH, { recursive: true, force: true });
+    fs.rmSync(TMP_SPEC_DIR_AFTER_OPERATION_PATH, {
+      recursive: true,
+      force: true,
+    });
+  });
+  //TODO
+});
 
-    // verify that checksums of on-disk representation from spec case versus serialized content are identical
-    expect(toJsonString(storePathHash["children"])).to.equal(
-      toJsonString(specCasePathHash["children"])
-    );
+// see simpleToList in ElementPathType (enum)
+describe("Test basic clear function for simple element path pointing to list", () => {
+  beforeEach(function () {
+    fs.mkdirSync(TMP_WORKING_DIR_PATH);
+    fs.mkdirSync(TMP_SPEC_DIR_AFTER_OPERATION_PATH);
+  });
+  afterEach(function () {
+    fs.rmSync(TMP_WORKING_DIR_PATH, { recursive: true, force: true });
+    fs.rmSync(TMP_SPEC_DIR_AFTER_OPERATION_PATH, {
+      recursive: true,
+      force: true,
+    });
+  });
+  //TODO
+});
+
+// see simpleToComplexString in ElementPathType (enum)
+describe("Test basic clear function for simple element path pointing to complex string", () => {
+  beforeEach(function () {
+    fs.mkdirSync(TMP_WORKING_DIR_PATH);
+    fs.mkdirSync(TMP_SPEC_DIR_AFTER_OPERATION_PATH);
+  });
+  afterEach(function () {
+    fs.rmSync(TMP_WORKING_DIR_PATH, { recursive: true, force: true });
+    fs.rmSync(TMP_SPEC_DIR_AFTER_OPERATION_PATH, {
+      recursive: true,
+      force: true,
+    });
+  });
+  //TODO
+});
+
+// see simpleToSimple in ElementPathType (enum)
+describe("Test basic clear function for simple element path pointing to simple data type", () => {
+  beforeEach(function () {
+    fs.mkdirSync(TMP_WORKING_DIR_PATH);
+    fs.mkdirSync(TMP_SPEC_DIR_AFTER_OPERATION_PATH);
+  });
+  afterEach(function () {
+    fs.rmSync(TMP_WORKING_DIR_PATH, { recursive: true, force: true });
+    fs.rmSync(TMP_SPEC_DIR_AFTER_OPERATION_PATH, {
+      recursive: true,
+      force: true,
+    });
+  });
+  //TODO
+});
+
+// see complexToObject in ElementPathType (enum)
+describe("Test basic clear function for complex element path pointing to object", () => {
+  beforeEach(function () {
+    fs.mkdirSync(TMP_WORKING_DIR_PATH);
+    fs.mkdirSync(TMP_SPEC_DIR_AFTER_OPERATION_PATH);
+  });
+  afterEach(function () {
+    fs.rmSync(TMP_WORKING_DIR_PATH, { recursive: true, force: true });
+    fs.rmSync(TMP_SPEC_DIR_AFTER_OPERATION_PATH, {
+      recursive: true,
+      force: true,
+    });
   });
   it("shall clear object of simple data types from object", async () => {
     const result = runBasicClearTest(
@@ -163,6 +198,36 @@ describe("Test basic clear function", () => {
     expect(toJsonString(storePathHash["children"])).to.equal(
       toJsonString(specCasePathHash["children"])
     );
+  });
+  it("shall clear object from list", async () => {
+    const result = runBasicClearTest(
+      "2.2.2_list_of_objects_of_simple_data_types/clearItem0",
+      "model[0]",
+      0
+    );
+
+    const specCasePathHash = await hashElement(result.specCasePath, options);
+    const storePathHash = await hashElement(result.storePath, options);
+
+    // verify that checksums of on-disk representation from spec case versus serialized content are identical
+    expect(toJsonString(storePathHash["children"])).to.equal(
+      toJsonString(specCasePathHash["children"])
+    );
+  });
+});
+
+// see complexToList in ElementPathType (enum)
+describe("Test basic clear function for complex element path pointing to list", () => {
+  beforeEach(function () {
+    fs.mkdirSync(TMP_WORKING_DIR_PATH);
+    fs.mkdirSync(TMP_SPEC_DIR_AFTER_OPERATION_PATH);
+  });
+  afterEach(function () {
+    fs.rmSync(TMP_WORKING_DIR_PATH, { recursive: true, force: true });
+    fs.rmSync(TMP_SPEC_DIR_AFTER_OPERATION_PATH, {
+      recursive: true,
+      force: true,
+    });
   });
   it("shall clear list of complex strings from object", async () => {
     const result = runBasicClearTest(
@@ -192,6 +257,36 @@ describe("Test basic clear function", () => {
       toJsonString(specCasePathHash["children"])
     );
   });
+  it("shall clear list of object of simple data types from object with two lists of objects of simple data types, for depth = 0", async () => {
+    const result = runBasicClearTest(
+      "1.3.7.1_object_with_two_lists_of_objects_of_simple_data_types/clearNcc1701dCommanders",
+      "model.ncc1701dCommanders",
+      0
+    );
+
+    const specCasePathHash = await hashElement(result.specCasePath, options);
+    const storePathHash = await hashElement(result.storePath, options);
+
+    // verify that checksums of on-disk representation from spec case versus serialized content are identical
+    expect(toJsonString(storePathHash["children"])).to.equal(
+      toJsonString(specCasePathHash["children"])
+    );
+  });
+  it("shall clear list of object of simple data types from object with two lists of objects of simple data types, for depth = 1", async () => {
+    const result = runBasicClearTest(
+      "1.3.7.1_object_with_two_lists_of_objects_of_simple_data_types/clearNcc1701dCommanders",
+      "model.ncc1701dCommanders",
+      1
+    );
+
+    const specCasePathHash = await hashElement(result.specCasePath, options);
+    const storePathHash = await hashElement(result.storePath, options);
+
+    // verify that checksums of on-disk representation from spec case versus serialized content are identical
+    expect(toJsonString(storePathHash["children"])).to.equal(
+      toJsonString(specCasePathHash["children"])
+    );
+  });
   it("shall clear list of list of simple data type from object", async () => {
     const result = runBasicClearTest(
       "1.3.7.2_object_with_two_lists_of_list_of_simple_data_type/clearSecond4Primes",
@@ -206,10 +301,41 @@ describe("Test basic clear function", () => {
       toJsonString(specCasePathHash["children"])
     );
   });
-  it("shall clear simple string from list", async () => {
+  it("shall clear list from list", async () => {
     const result = runBasicClearTest(
-      "2.1_list_of_simple_data_types/clearItem4",
-      "model[4]"
+      "2.2.4_list_of_list_of_simple_data_type/clearFirst5Primes",
+      "model[0]",
+      0
+    );
+
+    const specCasePathHash = await hashElement(result.specCasePath, options);
+    const storePathHash = await hashElement(result.storePath, options);
+
+    // verify that checksums of on-disk representation from spec case versus serialized content are identical
+    expect(toJsonString(storePathHash["children"])).to.equal(
+      toJsonString(specCasePathHash["children"])
+    );
+  });
+});
+
+// see complexToComplexString in ElementPathType (enum)
+describe("Test basic clear function for complex element path pointing to complex string", () => {
+  beforeEach(function () {
+    fs.mkdirSync(TMP_WORKING_DIR_PATH);
+    fs.mkdirSync(TMP_SPEC_DIR_AFTER_OPERATION_PATH);
+  });
+  afterEach(function () {
+    fs.rmSync(TMP_WORKING_DIR_PATH, { recursive: true, force: true });
+    fs.rmSync(TMP_SPEC_DIR_AFTER_OPERATION_PATH, {
+      recursive: true,
+      force: true,
+    });
+  });
+  it("shall clear complex string from object", async () => {
+    const result = runBasicClearTest(
+      "1.2.1_object_with_complex_string/clearLyrics_txt",
+      "model.lyrics_txt",
+      0
     );
 
     const specCasePathHash = await hashElement(result.specCasePath, options);
@@ -250,39 +376,10 @@ describe("Test basic clear function", () => {
       toJsonString(specCasePathHash["children"])
     );
   });
-  it("shall clear object from list", async () => {
-    const result = runBasicClearTest(
-      "2.2.2_list_of_objects_of_simple_data_types/clearItem0",
-      "model[0]",
-      0
-    );
-
-    const specCasePathHash = await hashElement(result.specCasePath, options);
-    const storePathHash = await hashElement(result.storePath, options);
-
-    // verify that checksums of on-disk representation from spec case versus serialized content are identical
-    expect(toJsonString(storePathHash["children"])).to.equal(
-      toJsonString(specCasePathHash["children"])
-    );
-  });
-  it("shall clear list from list", async () => {
-    const result = runBasicClearTest(
-      "2.2.4_list_of_list_of_simple_data_type/clearFirst5Primes",
-      "model[0]",
-      0
-    );
-
-    const specCasePathHash = await hashElement(result.specCasePath, options);
-    const storePathHash = await hashElement(result.storePath, options);
-
-    // verify that checksums of on-disk representation from spec case versus serialized content are identical
-    expect(toJsonString(storePathHash["children"])).to.equal(
-      toJsonString(specCasePathHash["children"])
-    );
-  });
 });
 
-describe("Test clear function with nested elements", () => {
+// see complexToSimple in ElementPathType (enum)
+describe("Test basic clear function for complex element path pointing to simple data type", () => {
   beforeEach(function () {
     fs.mkdirSync(TMP_WORKING_DIR_PATH);
     fs.mkdirSync(TMP_SPEC_DIR_AFTER_OPERATION_PATH);
@@ -294,40 +391,61 @@ describe("Test clear function with nested elements", () => {
       force: true,
     });
   });
-  it("shall clear simple data type list item from object of list", async () => {
+  it("shall clear other simple data types from object", async () => {
+    const elementPaths = [
+      "model.name", // test for clearing a non-empty string
+      "model.age", // test for clearing a non-empty string
+      "model.attending", // test for clearing a boolean
+      "model.plusOne", // test for clearing a number
+      "model.degrees", // test for clearing an empty object
+      "model.aliases", // test for clearing an empty list
+      "model.notes", // test for clearing an empty string
+    ];
+
+    for (const elementPathToClear of elementPaths) {
+      const elementPathAsSplitString = elementPathToClear.split(".");
+      const expectedParentElementPath =
+        "clear" +
+        elementPathAsSplitString[1].charAt(0).toUpperCase() +
+        elementPathAsSplitString[1].slice(1);
+      const result = runBasicClearTest(
+        path.join(
+          "1.1_object_with_simple_data_types",
+          expectedParentElementPath
+        ),
+        elementPathToClear
+      );
+
+      const specCasePathHash = await hashElement(result.specCasePath, options);
+      const storePathHash = await hashElement(result.storePath, options);
+
+      // verify that checksums of on-disk representation from spec case versus serialized content are identical
+      expect(toJsonString(storePathHash["children"])).to.equal(
+        toJsonString(specCasePathHash["children"])
+      );
+    }
+  });
+  it("shall clear simple string from list", async () => {
+    const result = runBasicClearTest(
+      "2.1_list_of_simple_data_types/clearItem4",
+      "model[4]"
+    );
+
+    const specCasePathHash = await hashElement(result.specCasePath, options);
+    const storePathHash = await hashElement(result.storePath, options);
+
+    // verify that checksums of on-disk representation from spec case versus serialized content are identical
+    expect(toJsonString(storePathHash["children"])).to.equal(
+      toJsonString(specCasePathHash["children"])
+    );
+  });
+  it("shall delete other simple data types from list", async () => {
+    //TODO
+  });
+  it("shall clear simple data type from list in an object", async () => {
     const result = runBasicClearTest(
       "1.2.4_object_with_list_of_simple_data_type/clearEmployee2",
       "model.employees[2]"
-    );
-
-    const specCasePathHash = await hashElement(result.specCasePath, options);
-    const storePathHash = await hashElement(result.storePath, options);
-
-    // verify that checksums of on-disk representation from spec case versus serialized content are identical
-    expect(toJsonString(storePathHash["children"])).to.equal(
-      toJsonString(specCasePathHash["children"])
-    );
-  });
-  it("shall clear list of object of simple data types from object with two lists of objects of simple data types, for depth = 0", async () => {
-    const result = runBasicClearTest(
-      "1.3.7.1_object_with_two_lists_of_objects_of_simple_data_types/clearNcc1701dCommanders",
-      "model.ncc1701dCommanders",
-      0
-    );
-
-    const specCasePathHash = await hashElement(result.specCasePath, options);
-    const storePathHash = await hashElement(result.storePath, options);
-
-    // verify that checksums of on-disk representation from spec case versus serialized content are identical
-    expect(toJsonString(storePathHash["children"])).to.equal(
-      toJsonString(specCasePathHash["children"])
-    );
-  });
-  it("shall clear list of object of simple data types from object with two lists of objects of simple data types, for depth = 1", async () => {
-    const result = runBasicClearTest(
-      "1.3.7.1_object_with_two_lists_of_objects_of_simple_data_types/clearNcc1701dCommanders",
-      "model.ncc1701dCommanders",
-      1
     );
 
     const specCasePathHash = await hashElement(result.specCasePath, options);
