@@ -2,13 +2,13 @@ import path from "path";
 import fs from "node:fs";
 import yaml from "js-yaml";
 import { load, YdsResult } from "./index.js";
+import { EMPTY_WORKINGDIR_PATH_ERROR, INVALID_PATH_ERROR } from "./load.js";
 import {
-  EMPTY_WORKINGDIR_PATH_ERROR,
-  INVALID_PATH_ERROR,
-  ElementPathType,
+  getParentElementInfo,
   getElementPathInfo,
-} from "./load.js";
-import { getParentElementInfo, recursivelyDeleteList } from "./delete.js";
+  ElementPathType,
+} from "./utils.js";
+import { recursivelyDeleteList } from "./delete.js";
 
 /**
  *

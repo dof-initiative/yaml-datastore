@@ -1,8 +1,8 @@
 import { deleteElement, load, store } from "../src/index";
-import { getElementPathInfo } from "../src/load";
 import { toJsonString, toSpecCasePath } from "./load.spec";
 import { DEFAULT_SPEC_CASE_FOLDER } from "./spec_constants";
 import { StoreTestResult } from "./store.spec";
+import { getElementPathInfo } from "../src/utils";
 import { expect } from "chai";
 import fs from "node:fs";
 import path from "path";

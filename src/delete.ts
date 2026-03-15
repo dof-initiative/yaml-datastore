@@ -2,94 +2,14 @@ import path from "path";
 import fs from "node:fs";
 import yaml from "js-yaml";
 import { load, YdsResult } from "./index.js";
+import { EMPTY_WORKINGDIR_PATH_ERROR, INVALID_PATH_ERROR } from "./load.js";
 import {
-  EMPTY_WORKINGDIR_PATH_ERROR,
-  INVALID_PATH_ERROR,
-  ElementPathType,
-  getElementPathInfo,
   doubleParenthesesRegEx,
   trimDoubleParentheses,
-} from "./load.js";
-
-class ParentElementInfo {
-  private _parentElementPath: string;
-  private _parentElementFilePath: string;
-  private _indexOfChild: any;
-  private _childElementPath: string;
-
-  /**
-   * Default constructor for ParentElementInfo
-   *
-   * @param parentElementPath elementPath of parent
-   * @param parentElementFilePath file path to parent element
-   * @param indexOfChild property in object or index in list
-   * @param childElementPath elementPath to child
-   */
-  constructor(
-    parentElementPath: string,
-    parentElementFilePath: string,
-    indexOfChild: any,
-    childElementPath: string
-  ) {
-    this._parentElementPath = parentElementPath;
-    this._parentElementFilePath = parentElementFilePath;
-    this._indexOfChild = indexOfChild;
-    this._childElementPath = childElementPath;
-  }
-
-  /** @returns elementPath of parent */
-  public get parentElementPath() {
-    return this._parentElementPath;
-  }
-
-  /** @returns file path to parent element*/
-  public get parentElementFilePath() {
-    return this._parentElementFilePath;
-  }
-
-  /** @returns property in object or index in list */
-  public get indexOfChild() {
-    return this._indexOfChild;
-  }
-
-  /** @returns elementPath of child */
-  public get childElementPath() {
-    return this._childElementPath;
-  }
-}
-
-/**
- * Helper function used to get information (s.a., element path, file path, and index) about an element and its relation to its parent element for use in delete and clear operations
- *
- * @param workingDirectoryPath relative or absolute path to working directory containing yaml-datastore serialized content
- * @param elementPath element path to element whose parent element info is to be extracted
- * @returns ParentElementInfo object
- */
-export function getParentElementInfo(
-  workingDirectoryPath: string,
-  elementPath: string
-): ParentElementInfo {
-  let parentElementPath = elementPath;
-  let indexOfChild = null;
-  if (elementPath.slice(-1) === "]") {
-    parentElementPath = elementPath.slice(0, elementPath.lastIndexOf("["));
-    indexOfChild = elementPath.slice(elementPath.lastIndexOf("[") + 1, -1);
-  } else if (elementPath.includes(".")) {
-    parentElementPath = elementPath.slice(0, elementPath.lastIndexOf("."));
-    indexOfChild = elementPath.slice(elementPath.lastIndexOf(".") + 1);
-  }
-  const parentElementPathInfo = getElementPathInfo(
-    workingDirectoryPath,
-    parentElementPath
-  );
-  const parentElementFilePath = parentElementPathInfo.data;
-  return new ParentElementInfo(
-    parentElementPath,
-    parentElementFilePath,
-    indexOfChild,
-    elementPath
-  );
-}
+  getParentElementInfo,
+  getElementPathInfo,
+  ElementPathType,
+} from "./utils.js";
 
 /**
  * Recursively deletes list including any complex list items (i.e., objects, lists, or complex strings) from disk
