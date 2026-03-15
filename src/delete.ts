@@ -49,6 +49,13 @@ class ParentElementInfo {
   }
 }
 
+/**
+ * Helper function used to get information (s.a., element path, file path, and index) about an element and its relation to its parent element for use in delete and clear operations
+ *
+ * @param workingDirectoryPath relative or absolute path to working directory containing yaml-datastore serialized content
+ * @param elementPath element path to element whose parent element info is to be extracted
+ * @returns ParentElementInfo object
+ */
 export function getParentElementInfo(
   workingDirectoryPath: string,
   elementPath: string
