@@ -15,6 +15,7 @@ class ParentElementInfo {
   private _parentElementPath: string;
   private _parentElementFilePath: string;
   private _indexOfChild: any;
+  private _childElementPath: string;
 
   /**
    * Default constructor for ParentElementInfo
@@ -22,15 +23,18 @@ class ParentElementInfo {
    * @param parentElementPath elementPath of parent
    * @param parentElementFilePath file path to parent element
    * @param indexOfChild property in object or index in list
+   * @param childElementPath elementPath to child
    */
   constructor(
     parentElementPath: string,
     parentElementFilePath: string,
-    indexOfChild: any
+    indexOfChild: any,
+    childElementPath: string
   ) {
     this._parentElementPath = parentElementPath;
     this._parentElementFilePath = parentElementFilePath;
     this._indexOfChild = indexOfChild;
+    this._childElementPath = childElementPath;
   }
 
   /** @returns elementPath of parent */
@@ -46,6 +50,11 @@ class ParentElementInfo {
   /** @returns property in object or index in list */
   public get indexOfChild() {
     return this._indexOfChild;
+  }
+
+  /** @returns elementPath of child */
+  public get childElementPath() {
+    return this._childElementPath;
   }
 }
 
@@ -77,7 +86,8 @@ export function getParentElementInfo(
   return new ParentElementInfo(
     parentElementPath,
     parentElementFilePath,
-    indexOfChild
+    indexOfChild,
+    elementPath
   );
 }
 
