@@ -21,7 +21,6 @@ describe("Test file name to complex string key name mapping function", () => {
   });
 });
 
-
 describe("Test complex string key name to file name mapping function", () => {
   it("shall ignore leading underscore", () => {
     const keyName = "_3mTape";
@@ -81,43 +80,52 @@ describe("Test complex string key name to file name mapping function", () => {
   });
 });
 
-// TODO: test fileNameToComplexStringKey(complexStringKeyToFileName('_3mTape_md')) === '_3mTape_md'
-// TODO: test complexStringKeyToFileName(fileNameToComplexStringKey('_3mTape.md')) === '_3mTape.md'
-// TODO: 5 or so test cases of one-to-one and onto mapping
 describe("Test one-to-one and onto mapping", () => {
   it("shall map keyName to keyName", () => {
-    const keyName = '3mTape_md';
-    const result = fileNameToComplexStringKey(complexStringKeyToFileName(keyName))
+    const keyName = "3mTape_md";
+    const result = fileNameToComplexStringKey(
+      complexStringKeyToFileName(keyName)
+    );
 
     expect(result).to.equal(keyName);
   });
   it("shall map fileName to fileName", () => {
-    const fileName = '3mTape.md';
-    const result = complexStringKeyToFileName(fileNameToComplexStringKey(fileName))
+    const fileName = "3mTape.md";
+    const result = complexStringKeyToFileName(
+      fileNameToComplexStringKey(fileName)
+    );
 
     expect(result).to.equal(fileName);
   });
   it("shall map keyName to keyName with leading and muliple underscores", () => {
-    const keyName = '_3m__tape_md';
-    const result = fileNameToComplexStringKey(complexStringKeyToFileName(keyName))
+    const keyName = "_3m__tape_md";
+    const result = fileNameToComplexStringKey(
+      complexStringKeyToFileName(keyName)
+    );
 
     expect(result).to.equal(keyName);
   });
   it("shall map fileName to fileName with leading and multiple underscores", () => {
-    const fileName = '_3m__tape.md';
-    const result = complexStringKeyToFileName(fileNameToComplexStringKey(fileName))
+    const fileName = "_3m__tape.md";
+    const result = complexStringKeyToFileName(
+      fileNameToComplexStringKey(fileName)
+    );
 
     expect(result).to.equal(fileName);
   });
   it("shall map keyName to keyName with multiple single underscores", () => {
-    const keyName = 'myView_md_njk';
-    const result = fileNameToComplexStringKey(complexStringKeyToFileName(keyName))
+    const keyName = "myView_md_njk";
+    const result = fileNameToComplexStringKey(
+      complexStringKeyToFileName(keyName)
+    );
 
     expect(result).to.equal(keyName);
   });
   it("shall map fileName to fileName with multiple single underscores", () => {
-    const fileName = 'myView.md.njk';
-    const result = complexStringKeyToFileName(fileNameToComplexStringKey(fileName))
+    const fileName = "myView.md.njk";
+    const result = complexStringKeyToFileName(
+      fileNameToComplexStringKey(fileName)
+    );
 
     expect(result).to.equal(fileName);
   });
