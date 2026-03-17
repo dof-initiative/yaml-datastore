@@ -1,8 +1,17 @@
+import path from "path";
 import { expect } from "chai";
 import {
   complexStringKeyToFileName,
   fileNameToComplexStringKey,
 } from "../src/utils";
+
+export function toJsonString(o: Object): string {
+  return JSON.stringify(o, null, 2);
+}
+
+export function toSpecCasePath(specCaseName: string): string {
+  return path.join("test/spec", specCaseName);
+}
 
 describe("Test file name to complex string key name mapping function", () => {
   it("shall replace all dots with underscores", () => {

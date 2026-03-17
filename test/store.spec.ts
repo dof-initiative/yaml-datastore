@@ -1,5 +1,6 @@
 import { store } from "../src/index";
-import { toJsonString, toSpecCasePath, runBasicLoadTest } from "./load.spec";
+import { toJsonString, toSpecCasePath } from "./utils.spec";
+import { runBasicLoadTest } from "./load.spec";
 import {
   INVALID_ELEMENT_NAME,
   INVALID_PATH_ERROR,

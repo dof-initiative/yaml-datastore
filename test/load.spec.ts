@@ -1,17 +1,10 @@
+import { toJsonString, toSpecCasePath } from "./utils.spec";
 import { load } from "../src/index";
 import { EMPTY_WORKINGDIR_PATH_ERROR, INVALID_PATH_ERROR } from "../src/load";
 import { DEFAULT_SPEC_CASE_FOLDER } from "./spec_constants";
 import { expect } from "chai";
 import fs from "node:fs";
 import path from "path";
-
-export function toJsonString(o: Object): string {
-  return JSON.stringify(o, null, 2);
-}
-
-export function toSpecCasePath(specCaseName: string): string {
-  return path.join("test/spec", specCaseName);
-}
 
 export function runBasicLoadTest(
   specCaseName: string,
