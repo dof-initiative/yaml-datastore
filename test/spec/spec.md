@@ -84,6 +84,10 @@ temporary list of specs in markdown
 
 ## elementPath meanings
 
+an element path is an object path (dot separated, with support for bracketed indexing for list elements or key-value pairs in objects) from working directory to element to be read into memory (e.g., `top-element.sub-element.property[3]`)
+
+parent FilePath: file path to parent element or directory that contains element of interest
+
 yaml-datastore, from an API perspective, "talks" in terms of element path.
 
 | Case name                                    | elementPath  | object interpretation                      | list interpretation                        | complex string interpretation              | simple value interpretation          | comments                                                  |
