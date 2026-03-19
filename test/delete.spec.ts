@@ -109,7 +109,9 @@ describe("Test basic delete function for empty element path pointing to an objec
       force: true,
     });
   });
-  //TODO
+  it("shall throw an error when attempting to delete an empty element path", async () => {
+    //TODO
+  });
 });
 
 // see simpleToObject in ElementPathType (enum)

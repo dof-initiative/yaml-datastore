@@ -106,7 +106,9 @@ describe("Test basic clear function for empty element path pointing to an object
       force: true,
     });
   });
-  //TODO
+  it("shall throw an error when attempting to clear an empty element path", async () => {
+    //TODO
+  });
 });
 
 // see simpleToObject in ElementPathType (enum)
