@@ -24,13 +24,13 @@ export function runBasicLoadTest(
 }
 
 describe("Test basic load function for empty working directory", () => {
-  it("shall return a LoadResult object where success is false, element is null, and message is a correct error message string, given an empty working directory path", () => {
+  it("shall return a YdsResult object where success is false, element is null, and message is a correct error message string, given an empty working directory path", () => {
     const result = load("", "");
     expect(result.success).to.equal(false);
     expect(result.element).to.equal(null);
     expect(result.message).to.equal(EMPTY_WORKINGDIR_PATH_ERROR);
   });
-  it("shall return a LoadResult object where success is false, element is null, and message is a correct error message string, given an empty working directory path and a non-empty element path", () => {
+  it("shall return a YdsResult object where success is false, element is null, and message is a correct error message string, given an empty working directory path and a non-empty element path", () => {
     const result = load("", "model");
     expect(result.success).to.equal(false);
     expect(result.element).to.equal(null);
