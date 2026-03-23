@@ -90,11 +90,8 @@ export function deleteElement(
       workingDirectoryPath,
       elementPath
     );
-    const parentElementFilePath = parentElementInfo.parentElementFilePath;
-    const parentElementFileContents = fs.readFileSync(
-      parentElementFilePath,
-      "utf-8"
-    );
+    const parentFilePath = parentElementInfo.parentFilePath;
+    const parentElementFileContents = fs.readFileSync(parentFilePath, "utf-8");
 
     // direct load of parent element from which to delete child element before storing back to disk
     let parentElement = yaml.load(parentElementFileContents);
@@ -108,7 +105,7 @@ export function deleteElement(
           parentElement,
           parentElementInfo.indexOfChild
         );
-        fs.writeFileSync(parentElementFilePath, yaml.dump(parentElement));
+        fs.writeFileSync(parentFilePath, yaml.dump(parentElement));
         const parentElementOfObjectStoredToDisk = load(
           workingDirectoryPath,
           parentElementPath,
@@ -150,7 +147,7 @@ export function deleteElement(
         // load parent element into memory for YdsResult object
         const parentElementOfListContentsToStore = yaml.dump(parentElement);
         fs.writeFileSync(
-          parentElementFilePath,
+          parentFilePath,
           parentElementOfListContentsToStore,
           "utf-8"
         );
@@ -172,7 +169,7 @@ export function deleteElement(
           parentElement,
           parentElementInfo.indexOfChild
         );
-        fs.writeFileSync(parentElementFilePath, yaml.dump(parentElement));
+        fs.writeFileSync(parentFilePath, yaml.dump(parentElement));
         return new YdsResult(true, parentElement, parentElementPath);
       case ElementPathType.simpleToComplexString:
       case ElementPathType.complexToComplexString:
@@ -190,7 +187,7 @@ export function deleteElement(
         const parentElementOfComplexStringContentsToStore =
           yaml.dump(parentElement);
         fs.writeFileSync(
-          parentElementFilePath,
+          parentFilePath,
           parentElementOfComplexStringContentsToStore,
           "utf-8"
         );

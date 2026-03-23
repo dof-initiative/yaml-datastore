@@ -329,7 +329,7 @@ export function getElementPathInfo(
 
 class ParentElementInfo {
   private _parentElementPath: string;
-  private _parentElementFilePath: string;
+  private _parentFilePath: string;
   private _indexOfChild: any;
   private _childElementPath: string;
 
@@ -337,18 +337,18 @@ class ParentElementInfo {
    * Default constructor for ParentElementInfo
    *
    * @param parentElementPath elementPath of parent
-   * @param parentElementFilePath file path to parent element
+   * @param parentFilePath file path to parent element
    * @param indexOfChild property in object or index in list
    * @param childElementPath elementPath to child
    */
   constructor(
     parentElementPath: string,
-    parentElementFilePath: string,
+    parentFilePath: string,
     indexOfChild: any,
     childElementPath: string
   ) {
     this._parentElementPath = parentElementPath;
-    this._parentElementFilePath = parentElementFilePath;
+    this._parentFilePath = parentFilePath;
     this._indexOfChild = indexOfChild;
     this._childElementPath = childElementPath;
   }
@@ -359,8 +359,8 @@ class ParentElementInfo {
   }
 
   /** @returns file path to parent element*/
-  public get parentElementFilePath() {
-    return this._parentElementFilePath;
+  public get parentFilePath() {
+    return this._parentFilePath;
   }
 
   /** @returns property in object or index in list */
@@ -398,10 +398,10 @@ export function getParentElementInfo(
     workingDirectoryPath,
     parentElementPath
   );
-  const parentElementFilePath = parentElementPathInfo.data;
+  const parentFilePath = parentElementPathInfo.data;
   return new ParentElementInfo(
     parentElementPath,
-    parentElementFilePath,
+    parentFilePath,
     indexOfChild,
     elementPath
   );

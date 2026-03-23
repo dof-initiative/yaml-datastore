@@ -34,11 +34,8 @@ export function clear(
       workingDirectoryPath,
       elementPath
     );
-    const parentElementFilePath = parentElementInfo.parentElementFilePath;
-    const parentElementFileContents = fs.readFileSync(
-      parentElementFilePath,
-      "utf-8"
-    );
+    const parentFilePath = parentElementInfo.parentFilePath;
+    const parentElementFileContents = fs.readFileSync(parentFilePath, "utf-8");
 
     // direct load of parent element from which to delete child element before storing back to disk
     let parentElement = yaml.load(parentElementFileContents);
@@ -49,7 +46,7 @@ export function clear(
       case ElementPathType.complexToObject:
         fs.rmSync(path.parse(elementPathInfo.data).dir, { recursive: true });
         (parentElement as any)[parentElementInfo.indexOfChild] = {};
-        fs.writeFileSync(parentElementFilePath, yaml.dump(parentElement));
+        fs.writeFileSync(parentFilePath, yaml.dump(parentElement));
         return new YdsResult(true, parentElement, parentElementPath);
       case ElementPathType.simpleToList:
       case ElementPathType.complexToList:
@@ -79,7 +76,7 @@ export function clear(
         // load parent element into memory for YdsResult object
         const parentElementOfListContentsToStore = yaml.dump(parentElement);
         fs.writeFileSync(
-          parentElementFilePath,
+          parentFilePath,
           parentElementOfListContentsToStore,
           "utf-8"
         );
@@ -109,7 +106,7 @@ export function clear(
           "string"
         ) {
           (parentElement as any)[parentElementInfo.indexOfChild] = "";
-          fs.writeFileSync(parentElementFilePath, yaml.dump(parentElement));
+          fs.writeFileSync(parentFilePath, yaml.dump(parentElement));
           return new YdsResult(true, parentElement, parentElementPath);
         } else if (
           typeof (parentElement as any)[parentElementInfo.indexOfChild] ===
@@ -118,7 +115,7 @@ export function clear(
             "boolean"
         ) {
           (parentElement as any)[parentElementInfo.indexOfChild] = null;
-          fs.writeFileSync(parentElementFilePath, yaml.dump(parentElement));
+          fs.writeFileSync(parentFilePath, yaml.dump(parentElement));
           return new YdsResult(true, parentElement, parentElementPath);
         }
       case ElementPathType.simpleToComplexString:
