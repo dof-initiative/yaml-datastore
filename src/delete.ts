@@ -11,6 +11,9 @@ import {
   ElementPathType,
 } from "./utils.js";
 
+export const DELETE_EMPTY_ELEMENT_PATH_ERROR =
+  "Error: Cannot delete element for empty element path";
+
 /**
  * Recursively deletes list including any complex list items (i.e., objects, lists, or complex strings) from disk
  *
@@ -98,6 +101,16 @@ export function deleteElement(
 
     switch (elementPathInfo.type) {
       case ElementPathType.empty:
+        return new YdsResult(
+          false,
+          null,
+          DELETE_EMPTY_ELEMENT_PATH_ERROR +
+            " [" +
+            workingDirectoryPath +
+            " | " +
+            elementPath +
+            "]"
+        );
       case ElementPathType.simpleToObject:
       case ElementPathType.complexToObject:
         fs.rmSync(path.parse(elementPathInfo.data).dir, { recursive: true });

@@ -10,6 +10,9 @@ import {
 } from "./utils.js";
 import { recursivelyDeleteList } from "./delete.js";
 
+export const CLEAR_EMPTY_ELEMENT_PATH_ERROR =
+  "Error: Cannot clear element for empty element path";
+
 /**
  *
  * @param workingDirectoryPath relative or absolute path to working directory containing yaml-datastore serialized content
@@ -42,6 +45,16 @@ export function clear(
 
     switch (elementPathInfo.type) {
       case ElementPathType.empty:
+        return new YdsResult(
+          false,
+          null,
+          CLEAR_EMPTY_ELEMENT_PATH_ERROR +
+            " [" +
+            workingDirectoryPath +
+            " | " +
+            elementPath +
+            "]"
+        );
       case ElementPathType.simpleToObject:
       case ElementPathType.complexToObject:
         fs.rmSync(path.parse(elementPathInfo.data).dir, { recursive: true });
