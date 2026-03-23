@@ -110,7 +110,7 @@ describe("Test basic delete function for empty element path pointing to an objec
     });
   });
   it("shall throw an error when attempting to delete an empty element path", async () => {
-    //TODO
+    //TODO: expect result.success to equal false & result.message to include DELETE_EMPTY_ELEMENT_PATH_ERROR
   });
 });
 

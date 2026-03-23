@@ -107,7 +107,7 @@ describe("Test basic clear function for empty element path pointing to an object
     });
   });
   it("shall throw an error when attempting to clear an empty element path", async () => {
-    //TODO
+    //TODO: expect result.success to equal false & result.message to include CLEAR_EMPTY_ELEMENT_PATH_ERROR
   });
 });
 
