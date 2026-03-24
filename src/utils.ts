@@ -95,20 +95,35 @@ export enum ElementPathType {
 export class ElementPathResult {
   private _type: ElementPathType;
   private _data: any;
+  private _parentElementPath: string;
+  private _parentFilePath: string;
+  private _keyName: any;
 
   /**
    * Default constructor for ElementPathResult
    *
    * @param type elementPath type
    * @param data filepath to be read into memory, or simple element, or null (for invalid path)
+   * @param parentElementPath elementPath of parent
+   * @param parentFilePath file path to parent element
+   * @param keyName property in object or index in list
    */
-  constructor(type: ElementPathType, data: any) {
+  constructor(
+    type: ElementPathType,
+    data: any,
+    parentElementPath: string,
+    parentFilePath: string,
+    keyName: any
+  ) {
     this._type = type;
     if (this._type === ElementPathType.invalid) {
       this._data = null;
     } else {
       this._data = data;
     }
+    this._parentElementPath = parentElementPath;
+    this._parentFilePath = parentFilePath;
+    this._keyName = keyName;
   }
 
   /** @returns elementPath type */
@@ -119,6 +134,21 @@ export class ElementPathResult {
   /** @returns filepath to be read into memory, or simple element, or null (for invalid path) */
   public get data() {
     return this._data;
+  }
+
+  /** @returns elementPath of parent */
+  public get parentElementPath() {
+    return this._parentElementPath;
+  }
+
+  /** @returns file path to parent element*/
+  public get parentFilePath() {
+    return this._parentFilePath;
+  }
+
+  /** @returns property in object or index in list */
+  public get keyName() {
+    return this._keyName;
   }
 }
 
@@ -174,11 +204,29 @@ export function getElementPathInfo(
   workingDirectoryPath: string,
   elementPath: string
 ): ElementPathResult {
+  let parentElementPath = "";
+  let parentFilePath = path.join(workingDirectoryPath, "..", "_this.yaml");
+  let keyName = "";
   if (elementPath === "") {
-    // case empty
+    // empty path case
+
     let filepath = path.join(workingDirectoryPath, "_this.yaml");
     if (fs.existsSync(filepath)) {
-      return new ElementPathResult(ElementPathType.empty, filepath);
+      // working directory itself is an object; parent element unknown
+
+      if (!fs.existsSync(parentFilePath)) {
+        // object has no parent
+        parentFilePath = workingDirectoryPath;
+      }
+      //TODO: helper function to test if parentFilePath is an element
+
+      return new ElementPathResult(
+        ElementPathType.empty,
+        filepath,
+        "",
+        parentFilePath,
+        keyName
+      );
     }
   } else if (
     !elementPath.includes(".") &&
@@ -186,28 +234,52 @@ export function getElementPathInfo(
     !elementPath.includes("]")
   ) {
     // simple path case
+
     let filePath = path.join(workingDirectoryPath, elementPath, "_this.yaml");
     if (fs.existsSync(filePath)) {
-      // object path case
-      return new ElementPathResult(ElementPathType.simpleToObject, filePath);
+      // element path points to an object
+
+      let parentFilePath = path.join(workingDirectoryPath, "_this.yaml");
+      if (!fs.existsSync(parentFilePath)) {
+        // object has no parent
+        parentFilePath = workingDirectoryPath;
+      }
+      //TODO: helper function to test if parentFilePath is an element
+
+      return new ElementPathResult(
+        ElementPathType.simpleToObject,
+        filePath,
+        "",
+        parentFilePath,
+        keyName
+      );
     }
 
-    //
     filePath = path.join(workingDirectoryPath, elementPath + ".yaml");
     if (fs.existsSync(filePath)) {
-      // list path case
-      return new ElementPathResult(ElementPathType.simpleToList, filePath);
+      // element path points to a list; parent element unknown
+
+      return new ElementPathResult(
+        ElementPathType.simpleToList,
+        filePath,
+        "",
+        "",
+        keyName
+      );
     }
 
-    filePath = path.join(workingDirectoryPath, "_this.yaml");
-    if (fs.existsSync(filePath)) {
-      // complex type path or property case
-      const thisYamlContent = fs.readFileSync(filePath, "utf-8");
+    const parentFilePath = path.join(workingDirectoryPath, "_this.yaml");
+    keyName = elementPath;
+    if (fs.existsSync(parentFilePath)) {
+      // element path points to a complex data type or property
+
+      const thisYamlContent = fs.readFileSync(parentFilePath, "utf-8");
       const yamlAsJsObj = yaml.load(thisYamlContent);
       const rawData = (yamlAsJsObj as any)[elementPath];
       if (typeof rawData === "string") {
         if (doubleParenthesesRegEx.test(rawData)) {
-          // complex string path case
+          // element path points to a complex string owned by an object
+
           filePath = path.join(
             workingDirectoryPath,
             trimDoubleParentheses(rawData)
@@ -215,31 +287,44 @@ export function getElementPathInfo(
           if (fs.existsSync(filePath)) {
             return new ElementPathResult(
               ElementPathType.simpleToComplexString,
-              filePath
+              filePath,
+              "",
+              parentFilePath,
+              elementPath
             );
           }
         }
       }
-      return new ElementPathResult(ElementPathType.simpleToSimple, rawData);
+      // element path points to a property owned by an object
+      return new ElementPathResult(
+        ElementPathType.simpleToSimple,
+        rawData,
+        "",
+        parentFilePath,
+        elementPath
+      );
     } else {
       // invalid case
-      return new ElementPathResult(ElementPathType.invalid, null);
+      return new ElementPathResult(ElementPathType.invalid, null, "", "", null);
     }
   } else {
     // complex path case containing "." or "[" or "]"
+
     const firstElementEntry = getNextElementPath(elementPath);
+    parentElementPath = firstElementEntry;
     if (
       firstElementEntry === "" ||
       firstElementEntry.includes(".") ||
       firstElementEntry.includes("[") ||
       firstElementEntry.includes("]")
     ) {
-      return new ElementPathResult(ElementPathType.invalid, null);
+      return new ElementPathResult(ElementPathType.invalid, null, "", "", null);
     }
     const firstElementPathInfo = getElementPathInfo(
       workingDirectoryPath,
       firstElementEntry
     );
+    parentFilePath = firstElementPathInfo.data;
     if (firstElementPathInfo.type !== ElementPathType.invalid) {
       const firstElementContent = fs.readFileSync(
         firstElementPathInfo.data,
@@ -256,7 +341,13 @@ export function getElementPathInfo(
           nextElementPath.includes("[") ||
           nextElementPath.includes("]")
         ) {
-          return new ElementPathResult(ElementPathType.invalid, null);
+          return new ElementPathResult(
+            ElementPathType.invalid,
+            null,
+            "",
+            "",
+            null
+          );
         }
         remainingElementEntries.push(nextElementPath);
         if (remainingElementPath[0] === ".") {
@@ -272,17 +363,35 @@ export function getElementPathInfo(
         }
       } while (remainingElementPath !== "");
 
+      if (remainingElementEntries.length > 1) {
+        for (const elementEntry of remainingElementEntries.slice(0, -1)) {
+          parentElementPath = parentElementPath + "[" + elementEntry + "]";
+          parentFilePath = getElementPathInfo(
+            workingDirectoryPath,
+            parentElementPath
+          ).data;
+        }
+      }
+      keyName = remainingElementEntries.slice(-1)[0];
+
       let currentElementAsJsObj = firstElementAsJsObj;
       let filePath = path.dirname(firstElementPathInfo.data);
       for (let i = 0; i < remainingElementEntries.length; i++) {
         const elementPath = remainingElementEntries[i];
         if (!(currentElementAsJsObj as any).hasOwnProperty(elementPath)) {
-          return new ElementPathResult(ElementPathType.invalid, null);
+          return new ElementPathResult(
+            ElementPathType.invalid,
+            null,
+            "",
+            "",
+            null
+          );
         }
         const rawData = (currentElementAsJsObj as any)[elementPath];
         if (typeof rawData === "string") {
           if (doubleParenthesesRegEx.test(rawData)) {
             // got a file path
+
             if (filePath.slice(-5) === ".yaml") {
               filePath = path.join(
                 filePath.split("/").slice(0, -1).join("/"),
@@ -296,21 +405,35 @@ export function getElementPathInfo(
             if (i === remainingElementEntries.length - 1) {
               if (filePath.slice(-10) === "_this.yaml") {
                 // got a YAML object
-                return new ElementPathResult(
+
+                const result = new ElementPathResult(
                   ElementPathType.complexToObject,
-                  filePath
+                  filePath,
+                  parentElementPath,
+                  parentFilePath,
+                  keyName
                 );
+                return result;
               } else if (filePath.slice(-5) === ".yaml") {
                 // got a YAML list
-                return new ElementPathResult(
+
+                const result = new ElementPathResult(
                   ElementPathType.complexToList,
-                  filePath
+                  filePath,
+                  parentElementPath,
+                  parentFilePath,
+                  keyName
                 );
+                return result;
               } else {
                 // got a complex string
+
                 return new ElementPathResult(
                   ElementPathType.complexToComplexString,
-                  filePath
+                  filePath,
+                  parentElementPath,
+                  parentFilePath,
+                  keyName
                 );
               }
             }
@@ -318,91 +441,19 @@ export function getElementPathInfo(
           }
         }
         // got a simple value
-        return new ElementPathResult(ElementPathType.complexToSimple, rawData);
+
+        const result = new ElementPathResult(
+          ElementPathType.complexToSimple,
+          rawData,
+          parentElementPath,
+          parentFilePath,
+          keyName
+        );
+        return result;
       }
     } else {
-      return new ElementPathResult(ElementPathType.invalid, null);
+      return new ElementPathResult(ElementPathType.invalid, null, "", "", null);
     }
   }
-  return new ElementPathResult(ElementPathType.invalid, null);
-}
-
-class ParentElementInfo {
-  private _parentElementPath: string;
-  private _parentFilePath: string;
-  private _keyName: any;
-  private _childElementPath: string;
-
-  /**
-   * Default constructor for ParentElementInfo
-   *
-   * @param parentElementPath elementPath of parent
-   * @param parentFilePath file path to parent element
-   * @param keyName property in object or index in list
-   * @param childElementPath elementPath to child
-   */
-  constructor(
-    parentElementPath: string,
-    parentFilePath: string,
-    keyName: any,
-    childElementPath: string
-  ) {
-    this._parentElementPath = parentElementPath;
-    this._parentFilePath = parentFilePath;
-    this._keyName = keyName;
-    this._childElementPath = childElementPath;
-  }
-
-  /** @returns elementPath of parent */
-  public get parentElementPath() {
-    return this._parentElementPath;
-  }
-
-  /** @returns file path to parent element*/
-  public get parentFilePath() {
-    return this._parentFilePath;
-  }
-
-  /** @returns property in object or index in list */
-  public get keyName() {
-    return this._keyName;
-  }
-
-  /** @returns elementPath of child */
-  public get childElementPath() {
-    return this._childElementPath;
-  }
-}
-
-/**
- * Helper function used to get information (s.a., element path, file path, and index) about an element and its relation to its parent element for use in delete and clear operations
- *
- * @param workingDirectoryPath relative or absolute path to working directory containing yaml-datastore serialized content
- * @param elementPath element path to element whose parent element info is to be extracted
- * @returns ParentElementInfo object
- */
-export function getParentElementInfo(
-  workingDirectoryPath: string,
-  elementPath: string
-): ParentElementInfo {
-  let parentElementPath = elementPath;
-  let keyName = null;
-  if (elementPath.slice(-1) === "]") {
-    parentElementPath = elementPath.slice(0, elementPath.lastIndexOf("["));
-    keyName = elementPath.slice(elementPath.lastIndexOf("[") + 1, -1);
-  } else if (elementPath.includes(".")) {
-    parentElementPath = elementPath.slice(0, elementPath.lastIndexOf("."));
-    keyName = elementPath.slice(elementPath.lastIndexOf(".") + 1);
-  }
-  const parentElementPathInfo = getElementPathInfo(
-    workingDirectoryPath,
-    parentElementPath
-  );
-  const parentFilePath = parentElementPathInfo.data;
-  return new ParentElementInfo(
-    parentElementPath,
-    parentFilePath,
-    keyName,
-    elementPath
-  );
+  return new ElementPathResult(ElementPathType.invalid, null, "", "", null);
 }

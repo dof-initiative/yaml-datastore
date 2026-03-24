@@ -3,11 +3,7 @@ import fs from "node:fs";
 import yaml from "js-yaml";
 import { load, YdsResult } from "./index.js";
 import { EMPTY_WORKINGDIR_PATH_ERROR, INVALID_PATH_ERROR } from "./load.js";
-import {
-  getParentElementInfo,
-  getElementPathInfo,
-  ElementPathType,
-} from "./utils.js";
+import { getElementPathInfo, ElementPathType } from "./utils.js";
 import { recursivelyDeleteList } from "./delete.js";
 
 export const CLEAR_EMPTY_ELEMENT_PATH_ERROR =
@@ -28,16 +24,12 @@ export function clear(
   if (workingDirectoryPath === "") {
     return new YdsResult(false, null, EMPTY_WORKINGDIR_PATH_ERROR);
   } else {
-    const parentElementInfo = getParentElementInfo(
-      workingDirectoryPath,
-      elementPath
-    );
-    const parentElementPath = parentElementInfo.parentElementPath;
     const elementPathInfo = getElementPathInfo(
       workingDirectoryPath,
       elementPath
     );
-    const parentFilePath = parentElementInfo.parentFilePath;
+    const parentElementPath = elementPathInfo.parentElementPath;
+    const parentFilePath = elementPathInfo.parentFilePath;
     const parentElementFileContents = fs.readFileSync(parentFilePath, "utf-8");
 
     // direct load of parent element from which to delete child element before storing back to disk
@@ -58,7 +50,7 @@ export function clear(
       case ElementPathType.simpleToObject:
       case ElementPathType.complexToObject:
         fs.rmSync(path.parse(elementPathInfo.data).dir, { recursive: true });
-        (parentElement as any)[parentElementInfo.keyName] = {};
+        (parentElement as any)[elementPathInfo.keyName] = {};
         fs.writeFileSync(parentFilePath, yaml.dump(parentElement));
         return new YdsResult(true, parentElement, parentElementPath);
       case ElementPathType.simpleToList:
@@ -84,7 +76,7 @@ export function clear(
         }
 
         // clear list from parent element
-        (parentElement as any)[parentElementInfo.keyName] = [];
+        (parentElement as any)[elementPathInfo.keyName] = [];
 
         // load parent element into memory for YdsResult object
         const parentElementOfListContentsToStore = yaml.dump(parentElement);
@@ -108,23 +100,22 @@ export function clear(
       case ElementPathType.simpleToSimple:
       case ElementPathType.complexToSimple:
         if (
-          (parentElement as any)[parentElementInfo.keyName] === null ||
-          (parentElement as any)[parentElementInfo.keyName] === "" ||
-          typeof (parentElement as any)[parentElementInfo.keyName] === "object"
+          (parentElement as any)[elementPathInfo.keyName] === null ||
+          (parentElement as any)[elementPathInfo.keyName] === "" ||
+          typeof (parentElement as any)[elementPathInfo.keyName] === "object"
         ) {
           return new YdsResult(true, parentElement, parentElementPath);
         } else if (
-          typeof (parentElement as any)[parentElementInfo.keyName] === "string"
+          typeof (parentElement as any)[elementPathInfo.keyName] === "string"
         ) {
-          (parentElement as any)[parentElementInfo.keyName] = "";
+          (parentElement as any)[elementPathInfo.keyName] = "";
           fs.writeFileSync(parentFilePath, yaml.dump(parentElement));
           return new YdsResult(true, parentElement, parentElementPath);
         } else if (
-          typeof (parentElement as any)[parentElementInfo.keyName] ===
-            "number" ||
-          typeof (parentElement as any)[parentElementInfo.keyName] === "boolean"
+          typeof (parentElement as any)[elementPathInfo.keyName] === "number" ||
+          typeof (parentElement as any)[elementPathInfo.keyName] === "boolean"
         ) {
-          (parentElement as any)[parentElementInfo.keyName] = null;
+          (parentElement as any)[elementPathInfo.keyName] = null;
           fs.writeFileSync(parentFilePath, yaml.dump(parentElement));
           return new YdsResult(true, parentElement, parentElementPath);
         }
