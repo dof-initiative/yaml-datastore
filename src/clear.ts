@@ -29,11 +29,18 @@ export function clear(
       elementPath
     );
     const parentElementPath = elementPathInfo.parentElementPath;
+    const parentIsAnElement = parentElementPath !== "";
     const parentFilePath = elementPathInfo.parentFilePath;
-    const parentElementFileContents = fs.readFileSync(parentFilePath, "utf-8");
+    let parentElement;
+    if (parentIsAnElement && fs.existsSync(parentFilePath)) {
+      const parentElementFileContents = fs.readFileSync(
+        parentFilePath,
+        "utf-8"
+      );
 
-    // direct load of parent element from which to delete child element before storing back to disk
-    let parentElement = yaml.load(parentElementFileContents);
+      // direct load of parent element from which to delete child element before storing back to disk
+      parentElement = yaml.load(parentElementFileContents);
+    }
 
     switch (elementPathInfo.type) {
       case ElementPathType.empty:
