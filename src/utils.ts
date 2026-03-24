@@ -216,7 +216,7 @@ export function getElementPathInfo(
 
       if (!fs.existsSync(parentFilePath)) {
         // object has no parent
-        parentFilePath = workingDirectoryPath;
+        parentFilePath = path.join(workingDirectoryPath, "..");
       }
       //TODO: helper function to test if parentFilePath is an element
 
