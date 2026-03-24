@@ -4,6 +4,7 @@ import { toJsonString, toSpecCasePath } from "./utils.spec";
 import { DEFAULT_SPEC_CASE_FOLDER } from "./spec_constants";
 import { StoreTestResult } from "./store.spec";
 import { getElementPathInfo } from "../src/utils";
+import { INVALID_PATH_ERROR } from "../src/store";
 import { expect } from "chai";
 import fs from "node:fs";
 import path from "path";
@@ -91,7 +92,28 @@ describe("Test basic clear function for invalid path", () => {
       force: true,
     });
   });
-  //TODO
+  it("shall throw an error when attempting to clear an empty element path where working directory is not an object", () => {
+    // 1. get spec case path
+    const specCasePath = toSpecCasePath(
+      "1.2.3_object_with_object_of_complex_data_types/" +
+        DEFAULT_SPEC_CASE_FOLDER
+    );
+    const workingDirectoryPath = TMP_WORKING_DIR_PATH;
+    const elementPathToClear = "";
+
+    // 2 copy (before operation state) spec case files into TMP_WORKING_DIR_PATH
+    const defaultCasePath = path.join(specCasePath, DEFAULT_SPEC_CASE_PATH);
+    fs.cpSync(defaultCasePath, TMP_WORKING_DIR_PATH, { recursive: true });
+
+    // 3. clear element, given working directory path and element path
+    const result = clear(workingDirectoryPath, elementPathToClear);
+
+    // 4. verify results of clearElement operation
+    expect(result.success).to.equal(false);
+    expect(result.message)
+      .to.be.a("string")
+      .and.satisfy((msg) => msg.startsWith(INVALID_PATH_ERROR));
+  });
 });
 
 // see empty in ElementPathType (enum)

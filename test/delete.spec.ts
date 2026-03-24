@@ -3,6 +3,7 @@ import { toJsonString, toSpecCasePath } from "./utils.spec";
 import { DEFAULT_SPEC_CASE_FOLDER } from "./spec_constants";
 import { StoreTestResult } from "./store.spec";
 import { getElementPathInfo } from "../src/utils";
+import { INVALID_PATH_ERROR } from "../src/store";
 import { DELETE_EMPTY_ELEMENT_PATH_ERROR } from "../src/delete";
 import { expect } from "chai";
 import fs from "node:fs";
@@ -94,7 +95,28 @@ describe("Test basic delete function for invalid path", () => {
       force: true,
     });
   });
-  //TODO
+  it("shall throw an error when attempting to delete an empty element path where working directory is not an object", () => {
+    // 1. get spec case path
+    const specCasePath = toSpecCasePath(
+      "1.2.3_object_with_object_of_complex_data_types/" +
+        DEFAULT_SPEC_CASE_FOLDER
+    );
+    const workingDirectoryPath = TMP_WORKING_DIR_PATH;
+    const elementPathToDelete = "";
+
+    // 2 copy (before operation state) spec case files into TMP_WORKING_DIR_PATH
+    const defaultCasePath = path.join(specCasePath, DEFAULT_SPEC_CASE_PATH);
+    fs.cpSync(defaultCasePath, TMP_WORKING_DIR_PATH, { recursive: true });
+
+    // 3. delete element, given working directory path and element path
+    const result = deleteElement(workingDirectoryPath, elementPathToDelete);
+
+    // 4. verify results of deleteElement operation
+    expect(result.success).to.equal(false);
+    expect(result.message)
+      .to.be.a("string")
+      .and.satisfy((msg) => msg.startsWith(INVALID_PATH_ERROR));
+  });
 });
 
 // see empty in ElementPathType (enum)
