@@ -330,7 +330,7 @@ export function getElementPathInfo(
 class ParentElementInfo {
   private _parentElementPath: string;
   private _parentFilePath: string;
-  private _indexOfChild: any;
+  private _keyName: any;
   private _childElementPath: string;
 
   /**
@@ -338,18 +338,18 @@ class ParentElementInfo {
    *
    * @param parentElementPath elementPath of parent
    * @param parentFilePath file path to parent element
-   * @param indexOfChild property in object or index in list
+   * @param keyName property in object or index in list
    * @param childElementPath elementPath to child
    */
   constructor(
     parentElementPath: string,
     parentFilePath: string,
-    indexOfChild: any,
+    keyName: any,
     childElementPath: string
   ) {
     this._parentElementPath = parentElementPath;
     this._parentFilePath = parentFilePath;
-    this._indexOfChild = indexOfChild;
+    this._keyName = keyName;
     this._childElementPath = childElementPath;
   }
 
@@ -364,8 +364,8 @@ class ParentElementInfo {
   }
 
   /** @returns property in object or index in list */
-  public get indexOfChild() {
-    return this._indexOfChild;
+  public get keyName() {
+    return this._keyName;
   }
 
   /** @returns elementPath of child */
@@ -386,13 +386,13 @@ export function getParentElementInfo(
   elementPath: string
 ): ParentElementInfo {
   let parentElementPath = elementPath;
-  let indexOfChild = null;
+  let keyName = null;
   if (elementPath.slice(-1) === "]") {
     parentElementPath = elementPath.slice(0, elementPath.lastIndexOf("["));
-    indexOfChild = elementPath.slice(elementPath.lastIndexOf("[") + 1, -1);
+    keyName = elementPath.slice(elementPath.lastIndexOf("[") + 1, -1);
   } else if (elementPath.includes(".")) {
     parentElementPath = elementPath.slice(0, elementPath.lastIndexOf("."));
-    indexOfChild = elementPath.slice(elementPath.lastIndexOf(".") + 1);
+    keyName = elementPath.slice(elementPath.lastIndexOf(".") + 1);
   }
   const parentElementPathInfo = getElementPathInfo(
     workingDirectoryPath,
@@ -402,7 +402,7 @@ export function getParentElementInfo(
   return new ParentElementInfo(
     parentElementPath,
     parentFilePath,
-    indexOfChild,
+    keyName,
     elementPath
   );
 }

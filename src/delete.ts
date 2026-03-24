@@ -114,10 +114,7 @@ export function deleteElement(
       case ElementPathType.simpleToObject:
       case ElementPathType.complexToObject:
         fs.rmSync(path.parse(elementPathInfo.data).dir, { recursive: true });
-        deleteChildFromParentElement(
-          parentElement,
-          parentElementInfo.indexOfChild
-        );
+        deleteChildFromParentElement(parentElement, parentElementInfo.keyName);
         fs.writeFileSync(parentFilePath, yaml.dump(parentElement));
         const parentElementOfObjectStoredToDisk = load(
           workingDirectoryPath,
@@ -152,10 +149,7 @@ export function deleteElement(
         }
 
         // delete list from parent element
-        deleteChildFromParentElement(
-          parentElement,
-          parentElementInfo.indexOfChild
-        );
+        deleteChildFromParentElement(parentElement, parentElementInfo.keyName);
 
         // load parent element into memory for YdsResult object
         const parentElementOfListContentsToStore = yaml.dump(parentElement);
@@ -178,10 +172,7 @@ export function deleteElement(
         );
       case ElementPathType.simpleToSimple:
       case ElementPathType.complexToSimple:
-        deleteChildFromParentElement(
-          parentElement,
-          parentElementInfo.indexOfChild
-        );
+        deleteChildFromParentElement(parentElement, parentElementInfo.keyName);
         fs.writeFileSync(parentFilePath, yaml.dump(parentElement));
         return new YdsResult(true, parentElement, parentElementPath);
       case ElementPathType.simpleToComplexString:
@@ -193,10 +184,7 @@ export function deleteElement(
         fs.rmSync(complexStringFilePath);
 
         // delete complex string from parent element
-        deleteChildFromParentElement(
-          parentElement,
-          parentElementInfo.indexOfChild
-        );
+        deleteChildFromParentElement(parentElement, parentElementInfo.keyName);
         const parentElementOfComplexStringContentsToStore =
           yaml.dump(parentElement);
         fs.writeFileSync(

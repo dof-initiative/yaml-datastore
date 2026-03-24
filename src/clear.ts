@@ -58,7 +58,7 @@ export function clear(
       case ElementPathType.simpleToObject:
       case ElementPathType.complexToObject:
         fs.rmSync(path.parse(elementPathInfo.data).dir, { recursive: true });
-        (parentElement as any)[parentElementInfo.indexOfChild] = {};
+        (parentElement as any)[parentElementInfo.keyName] = {};
         fs.writeFileSync(parentFilePath, yaml.dump(parentElement));
         return new YdsResult(true, parentElement, parentElementPath);
       case ElementPathType.simpleToList:
@@ -84,7 +84,7 @@ export function clear(
         }
 
         // clear list from parent element
-        (parentElement as any)[parentElementInfo.indexOfChild] = [];
+        (parentElement as any)[parentElementInfo.keyName] = [];
 
         // load parent element into memory for YdsResult object
         const parentElementOfListContentsToStore = yaml.dump(parentElement);
@@ -108,26 +108,23 @@ export function clear(
       case ElementPathType.simpleToSimple:
       case ElementPathType.complexToSimple:
         if (
-          (parentElement as any)[parentElementInfo.indexOfChild] === null ||
-          (parentElement as any)[parentElementInfo.indexOfChild] === "" ||
-          typeof (parentElement as any)[parentElementInfo.indexOfChild] ===
-            "object"
+          (parentElement as any)[parentElementInfo.keyName] === null ||
+          (parentElement as any)[parentElementInfo.keyName] === "" ||
+          typeof (parentElement as any)[parentElementInfo.keyName] === "object"
         ) {
           return new YdsResult(true, parentElement, parentElementPath);
         } else if (
-          typeof (parentElement as any)[parentElementInfo.indexOfChild] ===
-          "string"
+          typeof (parentElement as any)[parentElementInfo.keyName] === "string"
         ) {
-          (parentElement as any)[parentElementInfo.indexOfChild] = "";
+          (parentElement as any)[parentElementInfo.keyName] = "";
           fs.writeFileSync(parentFilePath, yaml.dump(parentElement));
           return new YdsResult(true, parentElement, parentElementPath);
         } else if (
-          typeof (parentElement as any)[parentElementInfo.indexOfChild] ===
+          typeof (parentElement as any)[parentElementInfo.keyName] ===
             "number" ||
-          typeof (parentElement as any)[parentElementInfo.indexOfChild] ===
-            "boolean"
+          typeof (parentElement as any)[parentElementInfo.keyName] === "boolean"
         ) {
-          (parentElement as any)[parentElementInfo.indexOfChild] = null;
+          (parentElement as any)[parentElementInfo.keyName] = null;
           fs.writeFileSync(parentFilePath, yaml.dump(parentElement));
           return new YdsResult(true, parentElement, parentElementPath);
         }
