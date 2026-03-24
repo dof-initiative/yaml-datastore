@@ -236,13 +236,13 @@ export function getElementPathInfo(
     ) {
       return new ElementPathResult(ElementPathType.invalid, null);
     }
-    const firstElementFilePath = getElementPathInfo(
+    const firstElementPathInfo = getElementPathInfo(
       workingDirectoryPath,
       firstElementEntry
     );
-    if (firstElementFilePath.type !== ElementPathType.invalid) {
+    if (firstElementPathInfo.type !== ElementPathType.invalid) {
       const firstElementContent = fs.readFileSync(
-        firstElementFilePath.data,
+        firstElementPathInfo.data,
         "utf-8"
       );
       const firstElementAsJsObj = yaml.load(firstElementContent);
@@ -273,7 +273,7 @@ export function getElementPathInfo(
       } while (remainingElementPath !== "");
 
       let currentElementAsJsObj = firstElementAsJsObj;
-      let filePath = path.dirname(firstElementFilePath.data);
+      let filePath = path.dirname(firstElementPathInfo.data);
       for (let i = 0; i < remainingElementEntries.length; i++) {
         const elementPath = remainingElementEntries[i];
         if (!(currentElementAsJsObj as any).hasOwnProperty(elementPath)) {
