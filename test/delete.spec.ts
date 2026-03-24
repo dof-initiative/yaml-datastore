@@ -28,7 +28,7 @@ function runBasicDeleteTest(
   specCaseName: string,
   elementPathToDelete: string,
   depth: number = -1
-) {
+): StoreTestResult {
   // 1. select spec case
   const specCasePath = toSpecCasePath(specCaseName);
 
