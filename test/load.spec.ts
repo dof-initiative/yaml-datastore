@@ -56,7 +56,7 @@ describe("Test basic load function for invalid path", () => {
       .to.be.a("string")
       .and.satisfy((msg) => msg.startsWith(INVALID_PATH_ERROR));
   });
-  it("shall error when working directory does not exist with complex element path", () => {
+  it("shall error when working directory does not exist with hierarchical element path", () => {
     const result = load("test/spec/does_not_exist", "model.address");
     expect(result.success).to.equal(false);
     expect(result.element).to.equal(null);
@@ -87,7 +87,7 @@ describe("Test basic load function for invalid path", () => {
       .to.be.a("string")
       .and.satisfy((msg) => msg.startsWith(INVALID_PATH_ERROR));
   });
-  it("shall return error for complex element path when first element is invalid", () => {
+  it("shall return error for hierarchical element path when first element is invalid", () => {
     const workingDir = path.join("test/spec/1.1_object_with_simple_data_types");
     const elementPath = "mode.name";
     const result = load(workingDir, elementPath);
@@ -97,7 +97,7 @@ describe("Test basic load function for invalid path", () => {
       .to.be.a("string")
       .and.satisfy((msg) => msg.startsWith(INVALID_PATH_ERROR));
   });
-  it("shall return error for complex element path when later element is invalid", () => {
+  it("shall return error for hierarchical element path when later element is invalid", () => {
     const workingDir = path.join("test/spec/1.1_object_with_simple_data_types");
     const elementPath = "model.nam";
     const result = load(workingDir, elementPath);
@@ -107,7 +107,7 @@ describe("Test basic load function for invalid path", () => {
       .to.be.a("string")
       .and.satisfy((msg) => msg.startsWith(INVALID_PATH_ERROR));
   });
-  it("shall return error for complex element path when later element is name of a typescript property", () => {
+  it("shall return error for hierarchical element path when later element is name of a typescript property", () => {
     const workingDir = path.join("test/spec/1.1_object_with_simple_data_types");
     const elementPath = "model.toString";
     const result = load(workingDir, elementPath);
@@ -336,8 +336,8 @@ describe("Test load function for short element path pointing to complex string",
   });
 });
 
-// see complexToObject in ElementPathType (enum)
-describe("Test basic load function for complex element path pointing to object", () => {
+// see hierarchicalToObject in ElementPathType (enum)
+describe("Test basic load function for hierarchical element path pointing to object", () => {
   it("shall load object for object property element path to object", () => {
     const specCasePath = toSpecCasePath(
       "1.2.2_object_with_object_of_simple_data_types"
@@ -430,8 +430,8 @@ describe("Test basic load function for complex element path pointing to object",
   });
 });
 
-// see complexToList in ElementPathType (enum)
-describe("Test basic load function for complex element path pointing to list", () => {
+// see hierarchicalToList in ElementPathType (enum)
+describe("Test basic load function for hierarchical element path pointing to list", () => {
   it("shall load list for object property element path to list", () => {
     const specCasePath = toSpecCasePath(
       "1.2.5_object_with_list_of_simple_data_types"
@@ -512,8 +512,8 @@ describe("Test basic load function for complex element path pointing to list", (
   });
 });
 
-// see complexToComplexString in ElementPathType (enum)
-describe("Test basic load function for complex element path pointing to complex string", () => {
+// see hierarchicalToComplexString in ElementPathType (enum)
+describe("Test basic load function for hierarchical element path pointing to complex string", () => {
   it("shall load complex string for object property element path to complex string", () => {
     const specCasePath = toSpecCasePath("1.2.1_object_with_complex_string");
     const workingDir = path.join(specCasePath, DEFAULT_SPEC_CASE_FOLDER);
@@ -592,8 +592,8 @@ describe("Test basic load function for complex element path pointing to complex 
   });
 });
 
-// see complexToSimple in ElementPathType (enum)
-describe("Test basic load function for complex element path pointing to simple data type", () => {
+// see hierarchicalToSimple in ElementPathType (enum)
+describe("Test basic load function for hierarchical element path pointing to simple data type", () => {
   it("shall load simple value for object property element path to simple value", () => {
     const specCasePath = toSpecCasePath("1.1_object_with_simple_data_types");
     const elementPaths = [

@@ -114,7 +114,7 @@ export function deleteElement(
             "]"
         );
       case ElementPathType.shortToObject:
-      case ElementPathType.complexToObject:
+      case ElementPathType.hierarchicalToObject:
         fs.rmSync(path.parse(elementPathInfo.data).dir, { recursive: true });
         deleteChildFromParentElement(parentElement, elementPathInfo.keyName);
         fs.writeFileSync(parentFilePath, yaml.dump(parentElement));
@@ -129,7 +129,7 @@ export function deleteElement(
           parentElementPath
         );
       case ElementPathType.shortToList:
-      case ElementPathType.complexToList:
+      case ElementPathType.hierarchicalToList:
         // get file path to list
         const listFilePath = elementPathInfo.data;
         // get parsed path to list
@@ -173,12 +173,12 @@ export function deleteElement(
           parentElementPath
         );
       case ElementPathType.shortToSimple:
-      case ElementPathType.complexToSimple:
+      case ElementPathType.hierarchicalToSimple:
         deleteChildFromParentElement(parentElement, elementPathInfo.keyName);
         fs.writeFileSync(parentFilePath, yaml.dump(parentElement));
         return new YdsResult(true, parentElement, parentElementPath);
       case ElementPathType.shortToComplexString:
-      case ElementPathType.complexToComplexString:
+      case ElementPathType.hierarchicalToComplexString:
         // get complex string file path
         const complexStringFilePath = elementPathInfo.data;
 

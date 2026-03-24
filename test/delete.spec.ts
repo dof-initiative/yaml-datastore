@@ -242,8 +242,8 @@ describe("Test basic delete function for short element path pointing to simple d
   //TODO
 });
 
-// see complexToObject in ElementPathType (enum)
-describe("Test basic delete function for complex element path pointing to object", () => {
+// see hierarchicalToObject in ElementPathType (enum)
+describe("Test basic delete function for hierarchical element path pointing to object", () => {
   beforeEach(function () {
     fs.mkdirSync(TMP_WORKING_DIR_PATH);
     fs.mkdirSync(TMP_SPEC_DIR_AFTER_OPERATION_PATH);
@@ -285,8 +285,8 @@ describe("Test basic delete function for complex element path pointing to object
   });
 });
 
-// see complexToList in ElementPathType (enum)
-describe("Test basic delete function for complex element path pointing to list", () => {
+// see hierarchicalToList in ElementPathType (enum)
+describe("Test basic delete function for hierarchical element path pointing to list", () => {
   beforeEach(function () {
     fs.mkdirSync(TMP_WORKING_DIR_PATH);
     fs.mkdirSync(TMP_SPEC_DIR_AFTER_OPERATION_PATH);
@@ -386,8 +386,8 @@ describe("Test basic delete function for complex element path pointing to list",
   });
 });
 
-// see complexToComplexString in ElementPathType (enum)
-describe("Test basic delete function for complex element path pointing to complex string", () => {
+// see hierarchicalToComplexString in ElementPathType (enum)
+describe("Test basic delete function for hierarchical element path pointing to complex string", () => {
   beforeEach(function () {
     fs.mkdirSync(TMP_WORKING_DIR_PATH);
     fs.mkdirSync(TMP_SPEC_DIR_AFTER_OPERATION_PATH);
@@ -443,8 +443,8 @@ describe("Test basic delete function for complex element path pointing to comple
   });
 });
 
-// see complexToSimple in ElementPathType (enum)
-describe("Test basic delete function for complex element path pointing to simple data type", () => {
+// see hierarchicalToSimple in ElementPathType (enum)
+describe("Test basic delete function for hierarchical element path pointing to simple data type", () => {
   beforeEach(function () {
     fs.mkdirSync(TMP_WORKING_DIR_PATH);
     fs.mkdirSync(TMP_SPEC_DIR_AFTER_OPERATION_PATH);

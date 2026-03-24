@@ -99,14 +99,14 @@ export function load(
       case ElementPathType.empty:
       case ElementPathType.shortToObject:
       case ElementPathType.shortToList:
-      case ElementPathType.complexToObject:
-      case ElementPathType.complexToList:
+      case ElementPathType.hierarchicalToObject:
+      case ElementPathType.hierarchicalToList:
         return loadYaml(elementPathInfo.data, elementPath, depth);
       case ElementPathType.shortToSimple:
-      case ElementPathType.complexToSimple:
+      case ElementPathType.hierarchicalToSimple:
         return new YdsResult(true, elementPathInfo.data, elementPath);
       case ElementPathType.shortToComplexString:
-      case ElementPathType.complexToComplexString:
+      case ElementPathType.hierarchicalToComplexString:
         const elementContent = fs.readFileSync(elementPathInfo.data, "utf-8");
         return new YdsResult(true, elementContent, elementPath);
       case ElementPathType.invalid:

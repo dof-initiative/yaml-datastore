@@ -71,22 +71,22 @@ export enum ElementPathType {
   /**
    * element path contains heirarchy, therefore filepath points to a directory containing an object or list containing an object to be loaded
    */
-  complexToObject,
+  hierarchicalToObject,
 
   /**
    * element path contains heirarchy, therefore filepath points to a directory containing an object or list containing a list to be loaded
    */
-  complexToList,
+  hierarchicalToList,
 
   /**
    * element path contains heirarchy, therefore filepath points to a directory containing an object or list containing a complex string to be loaded
    */
-  complexToComplexString,
+  hierarchicalToComplexString,
 
   /**
    * element path contains heirarchy and element is already in memory to be accessed
    */
-  complexToSimple,
+  hierarchicalToSimple,
 }
 
 /**
@@ -407,7 +407,7 @@ export function getElementPathInfo(
                 // got a YAML object
 
                 const result = new ElementPathResult(
-                  ElementPathType.complexToObject,
+                  ElementPathType.hierarchicalToObject,
                   filePath,
                   parentElementPath,
                   parentFilePath,
@@ -418,7 +418,7 @@ export function getElementPathInfo(
                 // got a YAML list
 
                 const result = new ElementPathResult(
-                  ElementPathType.complexToList,
+                  ElementPathType.hierarchicalToList,
                   filePath,
                   parentElementPath,
                   parentFilePath,
@@ -429,7 +429,7 @@ export function getElementPathInfo(
                 // got a complex string
 
                 return new ElementPathResult(
-                  ElementPathType.complexToComplexString,
+                  ElementPathType.hierarchicalToComplexString,
                   filePath,
                   parentElementPath,
                   parentFilePath,
@@ -443,7 +443,7 @@ export function getElementPathInfo(
         // got a simple value
 
         const result = new ElementPathResult(
-          ElementPathType.complexToSimple,
+          ElementPathType.hierarchicalToSimple,
           rawData,
           parentElementPath,
           parentFilePath,
