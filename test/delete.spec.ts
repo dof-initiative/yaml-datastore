@@ -1,4 +1,4 @@
-import { deleteElement, load, store } from "../src/index";
+import { deleteElement, load } from "../src/index";
 import { toJsonString, toSpecCasePath } from "./utils.spec";
 import { DEFAULT_SPEC_CASE_FOLDER } from "./spec_constants";
 import { StoreTestResult } from "./store.spec";
