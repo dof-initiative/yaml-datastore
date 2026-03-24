@@ -8,6 +8,7 @@ import { expect } from "chai";
 import fs from "node:fs";
 import path from "path";
 import { hashElement } from "folder-hash";
+import { CLEAR_EMPTY_ELEMENT_PATH_ERROR } from "../src/clear";
 
 const TMP_WORKING_DIR_PATH = "/tmp/my-project";
 const TMP_SPEC_DIR_AFTER_OPERATION_PATH = "/tmp/spec-project";
@@ -106,8 +107,49 @@ describe("Test basic clear function for empty element path pointing to an object
       force: true,
     });
   });
-  it("shall throw an error when attempting to clear an empty element path", async () => {
-    //TODO: expect result.success to equal false & result.message to include CLEAR_EMPTY_ELEMENT_PATH_ERROR
+  it("shall throw an error when attempting to clear an empty element path where working directory is an object and its parent is not an element", () => {
+    // 1. get spec case path
+    const specCasePath = toSpecCasePath(
+      "1.2.3_object_with_object_of_complex_data_types/" +
+        DEFAULT_SPEC_CASE_FOLDER
+    );
+    const workingDirectoryPath = path.join(TMP_WORKING_DIR_PATH, "model");
+    const elementPathToClear = "";
+
+    // 2 copy (before operation state) spec case files into TMP_WORKING_DIR_PATH
+    const defaultCasePath = path.join(specCasePath, DEFAULT_SPEC_CASE_PATH);
+    fs.cpSync(defaultCasePath, TMP_WORKING_DIR_PATH, { recursive: true });
+
+    // 3. clear element, given working directory path and element path
+    const result = clear(workingDirectoryPath, elementPathToClear);
+
+    // 4. verify results of clearElement operation
+    expect(result.success).to.equal(false);
+    expect(result.message)
+      .to.be.a("string")
+      .and.satisfy((msg) => msg.startsWith(CLEAR_EMPTY_ELEMENT_PATH_ERROR));
+  });
+  it("shall throw an error when attempting to clear an empty element path where working directory is an object and its parent is an element", () => {
+    // 1. get spec case path
+    const specCasePath = toSpecCasePath(
+      "1.2.3_object_with_object_of_complex_data_types/" +
+        DEFAULT_SPEC_CASE_FOLDER
+    );
+    const workingDirectoryPath = path.join(TMP_WORKING_DIR_PATH, "model/myObj");
+    const elementPathToClear = "";
+
+    // 2 copy (before operation state) spec case files into TMP_WORKING_DIR_PATH
+    const defaultCasePath = path.join(specCasePath, DEFAULT_SPEC_CASE_PATH);
+    fs.cpSync(defaultCasePath, TMP_WORKING_DIR_PATH, { recursive: true });
+
+    // 3. clear element, given working directory path and element path
+    const result = clear(workingDirectoryPath, elementPathToClear);
+
+    // 4. verify results of clearElement operation
+    expect(result.success).to.equal(false);
+    expect(result.message)
+      .to.be.a("string")
+      .and.satisfy((msg) => msg.startsWith(CLEAR_EMPTY_ELEMENT_PATH_ERROR));
   });
 });
 
@@ -442,7 +484,7 @@ describe("Test basic clear function for complex element path pointing to simple 
       toJsonString(specCasePathHash["children"])
     );
   });
-  it("shall delete other simple data types from list", async () => {
+  it("shall clear other simple data types from list", async () => {
     //TODO
   });
   it("shall clear simple data type from list in an object", async () => {

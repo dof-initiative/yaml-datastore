@@ -3,6 +3,7 @@ import { toJsonString, toSpecCasePath } from "./utils.spec";
 import { DEFAULT_SPEC_CASE_FOLDER } from "./spec_constants";
 import { StoreTestResult } from "./store.spec";
 import { getElementPathInfo } from "../src/utils";
+import { DELETE_EMPTY_ELEMENT_PATH_ERROR } from "../src/delete";
 import { expect } from "chai";
 import fs from "node:fs";
 import path from "path";
@@ -109,8 +110,49 @@ describe("Test basic delete function for empty element path pointing to an objec
       force: true,
     });
   });
-  it("shall throw an error when attempting to delete an empty element path", async () => {
-    //TODO: expect result.success to equal false & result.message to include DELETE_EMPTY_ELEMENT_PATH_ERROR
+  it("shall throw an error when attempting to delete an empty element path where working directory is an object and its parent is not an element", () => {
+    // 1. get spec case path
+    const specCasePath = toSpecCasePath(
+      "1.2.3_object_with_object_of_complex_data_types/" +
+        DEFAULT_SPEC_CASE_FOLDER
+    );
+    const workingDirectoryPath = path.join(TMP_WORKING_DIR_PATH, "model");
+    const elementPathToDelete = "";
+
+    // 2 copy (before operation state) spec case files into TMP_WORKING_DIR_PATH
+    const defaultCasePath = path.join(specCasePath, DEFAULT_SPEC_CASE_PATH);
+    fs.cpSync(defaultCasePath, TMP_WORKING_DIR_PATH, { recursive: true });
+
+    // 3. delete element, given working directory path and element path
+    const result = deleteElement(workingDirectoryPath, elementPathToDelete);
+
+    // 4. verify results of deleteElement operation
+    expect(result.success).to.equal(false);
+    expect(result.message)
+      .to.be.a("string")
+      .and.satisfy((msg) => msg.startsWith(DELETE_EMPTY_ELEMENT_PATH_ERROR));
+  });
+  it("shall throw an error when attempting to delete an empty element path where working directory is an object and its parent is an element", () => {
+    // 1. get spec case path
+    const specCasePath = toSpecCasePath(
+      "1.2.3_object_with_object_of_complex_data_types/" +
+        DEFAULT_SPEC_CASE_FOLDER
+    );
+    const workingDirectoryPath = path.join(TMP_WORKING_DIR_PATH, "model/myObj");
+    const elementPathToDelete = "";
+
+    // 2 copy (before operation state) spec case files into TMP_WORKING_DIR_PATH
+    const defaultCasePath = path.join(specCasePath, DEFAULT_SPEC_CASE_PATH);
+    fs.cpSync(defaultCasePath, TMP_WORKING_DIR_PATH, { recursive: true });
+
+    // 3. delete element, given working directory path and element path
+    const result = deleteElement(workingDirectoryPath, elementPathToDelete);
+
+    // 4. verify results of deleteElement operation
+    expect(result.success).to.equal(false);
+    expect(result.message)
+      .to.be.a("string")
+      .and.satisfy((msg) => msg.startsWith(DELETE_EMPTY_ELEMENT_PATH_ERROR));
   });
 });
 
