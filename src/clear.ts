@@ -54,13 +54,13 @@ export function clear(
             elementPath +
             "]"
         );
-      case ElementPathType.simpleToObject:
+      case ElementPathType.shortToObject:
       case ElementPathType.complexToObject:
         fs.rmSync(path.parse(elementPathInfo.data).dir, { recursive: true });
         (parentElement as any)[elementPathInfo.keyName] = {};
         fs.writeFileSync(parentFilePath, yaml.dump(parentElement));
         return new YdsResult(true, parentElement, parentElementPath);
-      case ElementPathType.simpleToList:
+      case ElementPathType.shortToList:
       case ElementPathType.complexToList:
         // get file path to list
         const listFilePath = elementPathInfo.data;
@@ -104,7 +104,7 @@ export function clear(
           parentElementOfListStoredToDisk,
           parentElementPath
         );
-      case ElementPathType.simpleToSimple:
+      case ElementPathType.shortToSimple:
       case ElementPathType.complexToSimple:
         if (
           (parentElement as any)[elementPathInfo.keyName] === null ||
@@ -126,7 +126,7 @@ export function clear(
           fs.writeFileSync(parentFilePath, yaml.dump(parentElement));
           return new YdsResult(true, parentElement, parentElementPath);
         }
-      case ElementPathType.simpleToComplexString:
+      case ElementPathType.shortToComplexString:
       case ElementPathType.complexToComplexString:
         // get complex string file path
         const complexStringFilePath = elementPathInfo.data;

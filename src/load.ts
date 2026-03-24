@@ -97,15 +97,15 @@ export function load(
     let elementPathInfo = getElementPathInfo(workingDirectoryPath, elementPath);
     switch (elementPathInfo.type) {
       case ElementPathType.empty:
-      case ElementPathType.simpleToObject:
-      case ElementPathType.simpleToList:
+      case ElementPathType.shortToObject:
+      case ElementPathType.shortToList:
       case ElementPathType.complexToObject:
       case ElementPathType.complexToList:
         return loadYaml(elementPathInfo.data, elementPath, depth);
-      case ElementPathType.simpleToSimple:
+      case ElementPathType.shortToSimple:
       case ElementPathType.complexToSimple:
         return new YdsResult(true, elementPathInfo.data, elementPath);
-      case ElementPathType.simpleToComplexString:
+      case ElementPathType.shortToComplexString:
       case ElementPathType.complexToComplexString:
         const elementContent = fs.readFileSync(elementPathInfo.data, "utf-8");
         return new YdsResult(true, elementContent, elementPath);

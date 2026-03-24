@@ -93,7 +93,7 @@ yaml-datastore, from an API perspective, "talks" in terms of element path.
 | Case name                                    | elementPath  | object interpretation                      | list interpretation                        | complex string interpretation              | simple value interpretation          | comments                                                  |
 | -------------------------------------------- | ------------ | ------------------------------------------ | ------------------------------------------ | ------------------------------------------ | ------------------------------------ | --------------------------------------------------------- |
 | empty element path                           |              | `load("_this.yaml")`                       | N/A                                        | N/A                                        | N/A                                  | should error if no `_this.yaml` exists                    |
-| simple element path                          | model        | `load("model/_this.yaml")`                 | `load("model.yaml")`                       | `load(load("_this.yaml").model)`           | `load("_this.yaml").model`           | need to verify file path to complex string content exists |
+| short element path                           | model        | `load("model/_this.yaml")`                 | `load("model.yaml")`                       | `load(load("_this.yaml").model)`           | `load("_this.yaml").model`           | need to verify file path to complex string content exists |
 | object property element path                 | model.foo    | `load(load("model/_this.yaml")["foo"])`    | `load(load("model/_this.yaml")["foo"])`    | `load(load("model/_this.yaml")["foo"])`    | `load("model/_this.yaml")["foo"]`    |                                                           |
 | list item of an object property element path | model.foo[1] | `load(load("model/_this.yaml")["foo"][1])` | `load(load("model/_this.yaml")["foo"][1])` | `load(load("model/_this.yaml")["foo"][1])` | `load("model/_this.yaml")["foo"][1]` | should error if no `_this.yaml` exists                    |
 | list item element path                       | model[1]     | `load(load("model.yaml")[1])`              | `load(load("model.yaml")[1])`              | `load(load("model.yaml")[1])`              | `load("model.yaml")[1]`              |                                                           |
@@ -116,7 +116,7 @@ test/spec/3.1_legacy_project/ | model.assemblySteps[0].summary | load(load(load(
 ergo...
 
 - when empty elementPath only 1 case, cwd is an object
-- when simple elementPath, 4 conditions to test, (obj, list, complex string/simple value)
+- when short element path, 4 conditions to test, (obj, list, complex string/simple value)
 - everything else is one of two cases,
   - elementPath points to a complex object (i.e., object, list, complex string)
   - elementPath points at a simple property

@@ -51,22 +51,22 @@ export enum ElementPathType {
   /**
    * element path contains no heirarchy and filepath points to a directory containing an object to be loaded
    */
-  simpleToObject,
+  shortToObject,
 
   /**
    * element path contains no heirarchy and filepath points to a list in a directory to be loaded
    */
-  simpleToList,
+  shortToList,
 
   /**
    * element path contains no heirarchy and filepath points to a complex string in a directory that is an object to be loaded
    */
-  simpleToComplexString,
+  shortToComplexString,
 
   /**
    * element path contains no heirarchy and element is already in memory to be accessed
    */
-  simpleToSimple,
+  shortToSimple,
 
   /**
    * element path contains heirarchy, therefore filepath points to a directory containing an object or list containing an object to be loaded
@@ -247,7 +247,7 @@ export function getElementPathInfo(
       //TODO: helper function to test if parentFilePath is an element
 
       return new ElementPathResult(
-        ElementPathType.simpleToObject,
+        ElementPathType.shortToObject,
         filePath,
         "",
         parentFilePath,
@@ -260,7 +260,7 @@ export function getElementPathInfo(
       // element path points to a list; parent element unknown
 
       return new ElementPathResult(
-        ElementPathType.simpleToList,
+        ElementPathType.shortToList,
         filePath,
         "",
         "",
@@ -286,7 +286,7 @@ export function getElementPathInfo(
           );
           if (fs.existsSync(filePath)) {
             return new ElementPathResult(
-              ElementPathType.simpleToComplexString,
+              ElementPathType.shortToComplexString,
               filePath,
               "",
               parentFilePath,
@@ -297,7 +297,7 @@ export function getElementPathInfo(
       }
       // element path points to a property owned by an object
       return new ElementPathResult(
-        ElementPathType.simpleToSimple,
+        ElementPathType.shortToSimple,
         rawData,
         "",
         parentFilePath,

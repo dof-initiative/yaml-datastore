@@ -48,7 +48,7 @@ describe("Test basic load function for invalid path", () => {
       .to.be.a("string")
       .and.satisfy((msg) => msg.startsWith(INVALID_PATH_ERROR));
   });
-  it("shall error when working directory does not exist with simple element path", () => {
+  it("shall error when working directory does not exist with short element path", () => {
     const result = load("test/spec/does_not_exist", "model");
     expect(result.success).to.equal(false);
     expect(result.element).to.equal(null);
@@ -77,7 +77,7 @@ describe("Test basic load function for invalid path", () => {
       .to.be.a("string")
       .and.satisfy((msg) => msg.startsWith(INVALID_PATH_ERROR));
   });
-  it("shall return error for simple element path when working directory is not an object", () => {
+  it("shall return error for short element path when working directory is not an object", () => {
     const workingDir = path.join("test/spec/2.1_list_of_simple_data_types");
     const elementPath = "address";
     const result = load(workingDir, elementPath);
@@ -169,8 +169,8 @@ describe("Test basic load function for empty element path pointing to an object"
   });
 });
 
-// see simpleToObject in ElementPathType (enum)
-describe("Test basic load function for simple element path pointing to object", () => {
+// see shortToObject in ElementPathType (enum)
+describe("Test basic load function for short element path pointing to object", () => {
   it("shall load object with simple data types", () => {
     runBasicLoadTest("1.1_object_with_simple_data_types");
   });
@@ -239,8 +239,8 @@ describe("Test basic load function for simple element path pointing to object", 
   });
 });
 
-// see simpleToList in ElementPathType (enum)
-describe("Test basic load function for simple element path pointing to list", () => {
+// see shortToList in ElementPathType (enum)
+describe("Test basic load function for short element path pointing to list", () => {
   it("shall load list of simple data types", () => {
     runBasicLoadTest("2.1_list_of_simple_data_types");
   });
@@ -276,9 +276,9 @@ describe("Test basic load function for simple element path pointing to list", ()
   });
 });
 
-// see simpleToSimple in ElementPathType (enum)
-describe("Test load function for simple element path pointing to simple data type", () => {
-  it("shall load simple value for simple element path to simple value", () => {
+// see shortToSimple in ElementPathType (enum)
+describe("Test load function for short element path pointing to simple data type", () => {
+  it("shall load simple value for short element path to simple value", () => {
     const specCasePath = toSpecCasePath(
       "1.1_object_with_simple_data_types/" + DEFAULT_SPEC_CASE_FOLDER
     );
@@ -315,9 +315,9 @@ describe("Test load function for simple element path pointing to simple data typ
   });
 });
 
-// see simpleToComplexString in ElementPathType (enum)
-describe("Test load function for simple element path pointing to complex string", () => {
-  it("shall load complex string for simple element path to complex string", () => {
+// see shortToComplexString in ElementPathType (enum)
+describe("Test load function for short element path pointing to complex string", () => {
+  it("shall load complex string for short element path to complex string", () => {
     const specCasePath = toSpecCasePath("1.2.1_object_with_complex_string");
     const elementPath = "lyrics_txt";
     const workingDir = path.join(

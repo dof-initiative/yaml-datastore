@@ -175,8 +175,8 @@ describe("Test basic clear function for empty element path pointing to an object
   });
 });
 
-// see simpleToObject in ElementPathType (enum)
-describe("Test basic clear function for simple element path pointing to object", () => {
+// see shortToObject in ElementPathType (enum)
+describe("Test basic clear function for short element path pointing to object", () => {
   beforeEach(function () {
     fs.mkdirSync(TMP_WORKING_DIR_PATH);
     fs.mkdirSync(TMP_SPEC_DIR_AFTER_OPERATION_PATH);
@@ -191,8 +191,8 @@ describe("Test basic clear function for simple element path pointing to object",
   //TODO
 });
 
-// see simpleToList in ElementPathType (enum)
-describe("Test basic clear function for simple element path pointing to list", () => {
+// see shortToList in ElementPathType (enum)
+describe("Test basic clear function for short element path pointing to list", () => {
   beforeEach(function () {
     fs.mkdirSync(TMP_WORKING_DIR_PATH);
     fs.mkdirSync(TMP_SPEC_DIR_AFTER_OPERATION_PATH);
@@ -207,8 +207,8 @@ describe("Test basic clear function for simple element path pointing to list", (
   //TODO
 });
 
-// see simpleToComplexString in ElementPathType (enum)
-describe("Test basic clear function for simple element path pointing to complex string", () => {
+// see shortToComplexString in ElementPathType (enum)
+describe("Test basic clear function for short element path pointing to complex string", () => {
   beforeEach(function () {
     fs.mkdirSync(TMP_WORKING_DIR_PATH);
     fs.mkdirSync(TMP_SPEC_DIR_AFTER_OPERATION_PATH);
@@ -223,8 +223,8 @@ describe("Test basic clear function for simple element path pointing to complex 
   //TODO
 });
 
-// see simpleToSimple in ElementPathType (enum)
-describe("Test basic clear function for simple element path pointing to simple data type", () => {
+// see shortToSimple in ElementPathType (enum)
+describe("Test basic clear function for short element path pointing to simple data type", () => {
   beforeEach(function () {
     fs.mkdirSync(TMP_WORKING_DIR_PATH);
     fs.mkdirSync(TMP_SPEC_DIR_AFTER_OPERATION_PATH);
