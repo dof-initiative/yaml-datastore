@@ -115,19 +115,23 @@ export function deleteElement(
         );
       case ElementPathType.shortToObject:
       case ElementPathType.hierarchicalToObject:
-        fs.rmSync(path.parse(elementPathInfo.data).dir, { recursive: true });
-        deleteChildFromParentElement(parentElement, elementPathInfo.keyName);
-        fs.writeFileSync(parentFilePath, yaml.dump(parentElement));
-        const parentElementOfObjectStoredToDisk = load(
-          workingDirectoryPath,
-          parentElementPath,
-          depth
-        ).element;
-        return new YdsResult(
-          true,
-          parentElementOfObjectStoredToDisk,
-          parentElementPath
-        );
+        const objectFilePath = path.parse(elementPathInfo.data).dir;
+        fs.rmSync(objectFilePath, { recursive: true });
+        if (parentIsAnElement && fs.existsSync(parentFilePath)) {
+          deleteChildFromParentElement(parentElement, elementPathInfo.keyName);
+          fs.writeFileSync(parentFilePath, yaml.dump(parentElement));
+          const parentElementOfObjectStoredToDisk = load(
+            workingDirectoryPath,
+            parentElementPath,
+            depth
+          ).element;
+          return new YdsResult(
+            true,
+            parentElementOfObjectStoredToDisk,
+            parentElementPath
+          );
+        }
+        return new YdsResult(true, null, "");
       case ElementPathType.shortToList:
       case ElementPathType.hierarchicalToList:
         // get file path to list
