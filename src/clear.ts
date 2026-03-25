@@ -57,9 +57,12 @@ export function clear(
       case ElementPathType.shortToObject:
       case ElementPathType.hierarchicalToObject:
         fs.rmSync(path.parse(elementPathInfo.data).dir, { recursive: true });
-        (parentElement as any)[elementPathInfo.keyName] = {};
-        fs.writeFileSync(parentFilePath, yaml.dump(parentElement));
-        return new YdsResult(true, parentElement, parentElementPath);
+        if (parentIsAnElement && fs.existsSync(parentFilePath)) {
+          (parentElement as any)[elementPathInfo.keyName] = {};
+          fs.writeFileSync(parentFilePath, yaml.dump(parentElement));
+          return new YdsResult(true, parentElement, parentElementPath);
+        }
+        break;
       case ElementPathType.shortToList:
       case ElementPathType.hierarchicalToList:
         // get file path to list
