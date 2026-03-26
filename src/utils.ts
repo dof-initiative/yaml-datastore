@@ -233,7 +233,7 @@ export function getElementPathInfo(
     !elementPath.includes("[") &&
     !elementPath.includes("]")
   ) {
-    // simple path case
+    // short element path case
 
     let filePath = path.join(workingDirectoryPath, elementPath, "_this.yaml");
     if (fs.existsSync(filePath)) {
@@ -308,7 +308,7 @@ export function getElementPathInfo(
       return new ElementPathResult(ElementPathType.invalid, null, "", "", null);
     }
   } else {
-    // complex path case containing "." or "[" or "]"
+    // hierarchical element path case containing "." or "[" or "]"
 
     const firstElementEntry = getNextElementPath(elementPath);
     parentElementPath = firstElementEntry;
