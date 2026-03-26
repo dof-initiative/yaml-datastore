@@ -32,7 +32,9 @@ temporary list of specs in markdown
 ## top-level entities
 
 - object
+  - empty object (`objectName/_this.yaml` containing an `{}`)
 - list
+  - empty list (`listName.yaml` containing an `[]`)
 
 ### objects
 
