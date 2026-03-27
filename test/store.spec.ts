@@ -424,8 +424,19 @@ describe("Test basic store function", () => {
       toJsonString(specCasePathHash["children"])
     );
   });
-  it("shall store object with empty list", () => {
-    runBasicStoreTest("1.4.2_object_with_empty_list");
+  it("shall store object with empty list", async () => {
+    const storeTestResult = runBasicStoreTest("1.4.2_object_with_empty_list");
+    const specCasePathHash = await hashElement(
+      storeTestResult.specCasePath,
+      options
+    );
+
+    const storePathHash = await hashElement(storeTestResult.storePath);
+
+    // verify that checksums of on-disk representation from spec case versus serialized content are identical
+    expect(toJsonString(storePathHash["children"])).to.equal(
+      toJsonString(specCasePathHash["children"])
+    );
   });
   it("shall store list of simple data types", async () => {
     const storeTestResult = runBasicStoreTest("2.1_list_of_simple_data_types");
