@@ -234,6 +234,9 @@ describe("Test basic load function for short element path pointing to object", (
   it("shall load object with empty list", () => {
     runBasicLoadTest("1.4.2_object_with_empty_list");
   });
+  it("shall load empty object", () => {
+    runBasicLoadTest("1.5_empty_object");
+  });
   it("shall load legacy project", () => {
     runBasicLoadTest("3.1_legacy_project");
   });
@@ -273,6 +276,9 @@ describe("Test basic load function for short element path pointing to list", () 
   });
   it("shall load list with empty list", () => {
     runBasicLoadTest("2.3.2_list_with_empty_list");
+  });
+  it("shall load empty list", () => {
+    runBasicLoadTest("2.4_empty_list");
   });
 });
 
