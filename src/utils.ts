@@ -150,6 +150,14 @@ export class ElementPathResult {
   public get keyName() {
     return this._keyName;
   }
+
+  /** @returns boolean value identifying if parent is an element */
+  public get parentIsElement() {
+    return (
+      this._parentFilePath.slice(-5) === ".yaml" &&
+      fs.existsSync(this._parentFilePath)
+    );
+  }
 }
 
 // local function used for parsing strings enclosed between double parentheses
@@ -218,7 +226,6 @@ export function getElementPathInfo(
         // object has no parent
         parentFilePath = path.join(workingDirectoryPath, "..");
       }
-      //TODO: helper function to test if parentFilePath is an element
 
       return new ElementPathResult(
         ElementPathType.empty,
@@ -244,7 +251,6 @@ export function getElementPathInfo(
         // object has no parent
         parentFilePath = workingDirectoryPath;
       }
-      //TODO: helper function to test if parentFilePath is an element
       keyName = elementPath;
 
       return new ElementPathResult(

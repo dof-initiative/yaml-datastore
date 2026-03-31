@@ -89,7 +89,7 @@ export function deleteElement(
     );
     const parentElementPath = elementPathInfo.parentElementPath;
     const parentFilePath = elementPathInfo.parentFilePath;
-    const parentIsAnElement = parentFilePath.slice(-5) === ".yaml";
+    const parentIsAnElement = elementPathInfo.parentIsElement;
     let parentElement;
     if (parentIsAnElement && fs.existsSync(parentFilePath)) {
       const parentElementFileContents = fs.readFileSync(
