@@ -210,7 +210,7 @@ describe("Test basic clear function for short element path pointing to object", 
       force: true,
     });
   });
-  //TODO
+  //TODO: clearing top-level element
 });
 
 // see shortToList in ElementPathType (enum)
