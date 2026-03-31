@@ -29,8 +29,8 @@ export function clear(
       elementPath
     );
     const parentElementPath = elementPathInfo.parentElementPath;
-    const parentIsAnElement = parentElementPath !== "";
     const parentFilePath = elementPathInfo.parentFilePath;
+    const parentIsAnElement = parentFilePath.slice(-5) === ".yaml";
     let parentElement;
     if (parentIsAnElement && fs.existsSync(parentFilePath)) {
       const parentElementFileContents = fs.readFileSync(
@@ -56,10 +56,15 @@ export function clear(
         );
       case ElementPathType.shortToObject:
       case ElementPathType.hierarchicalToObject:
-        fs.rmSync(path.parse(elementPathInfo.data).dir, { recursive: true });
+        const objectFilePath = path.parse(elementPathInfo.data).dir;
+        fs.rmSync(objectFilePath, { recursive: true });
         if (parentIsAnElement && fs.existsSync(parentFilePath)) {
           (parentElement as any)[elementPathInfo.keyName] = {};
-          fs.writeFileSync(parentFilePath, yaml.dump(parentElement));
+          const parentElementOfObjectContentsToStore = yaml.dump(parentElement);
+          fs.writeFileSync(
+            parentFilePath,
+            parentElementOfObjectContentsToStore
+          );
           return new YdsResult(true, parentElement, parentElementPath);
         }
         break;

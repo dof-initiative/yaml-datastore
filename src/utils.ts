@@ -245,6 +245,7 @@ export function getElementPathInfo(
         parentFilePath = workingDirectoryPath;
       }
       //TODO: helper function to test if parentFilePath is an element
+      keyName = elementPath;
 
       return new ElementPathResult(
         ElementPathType.shortToObject,

@@ -88,8 +88,8 @@ export function deleteElement(
       elementPath
     );
     const parentElementPath = elementPathInfo.parentElementPath;
-    const parentIsAnElement = parentElementPath !== "";
     const parentFilePath = elementPathInfo.parentFilePath;
+    const parentIsAnElement = parentFilePath.slice(-5) === ".yaml";
     let parentElement;
     if (parentIsAnElement && fs.existsSync(parentFilePath)) {
       const parentElementFileContents = fs.readFileSync(
@@ -119,7 +119,11 @@ export function deleteElement(
         fs.rmSync(objectFilePath, { recursive: true });
         if (parentIsAnElement && fs.existsSync(parentFilePath)) {
           deleteChildFromParentElement(parentElement, elementPathInfo.keyName);
-          fs.writeFileSync(parentFilePath, yaml.dump(parentElement));
+          const parentElementOfObjectContentsToStore = yaml.dump(parentElement);
+          fs.writeFileSync(
+            parentFilePath,
+            parentElementOfObjectContentsToStore
+          );
           const parentElementOfObjectStoredToDisk = load(
             workingDirectoryPath,
             parentElementPath,
