@@ -55,8 +55,24 @@ export function clear(
             "]"
         );
       case ElementPathType.shortToObject:
+        const shortToObjectParsedPath = path.parse(elementPathInfo.data);
+        const shortToObjectFilePath = shortToObjectParsedPath.dir;
+        if (!parentIsAnElement) {
+          // rm -rf directory and create new directory with an _this.yaml containing empty object, {}
+          fs.rmSync(shortToObjectFilePath, { recursive: true });
+          fs.mkdirSync(shortToObjectFilePath);
+          const elementToStore = {};
+          const objectContentsToStore = yaml.dump(elementToStore);
+          const thisYamlFilePath = path.join(
+            shortToObjectFilePath,
+            "_this.yaml"
+          );
+          fs.writeFileSync(thisYamlFilePath, objectContentsToStore);
+          return new YdsResult(true, elementToStore, elementPathInfo.keyName);
+        }
       case ElementPathType.hierarchicalToObject:
-        const objectFilePath = path.parse(elementPathInfo.data).dir;
+        const objectParsedPath = path.parse(elementPathInfo.data);
+        const objectFilePath = objectParsedPath.dir;
         fs.rmSync(objectFilePath, { recursive: true });
         if (parentIsAnElement && fs.existsSync(parentFilePath)) {
           (parentElement as any)[elementPathInfo.keyName] = {};
@@ -65,9 +81,8 @@ export function clear(
             parentFilePath,
             parentElementOfObjectContentsToStore
           );
-          return new YdsResult(true, parentElement, parentElementPath);
         }
-        break;
+        return new YdsResult(true, parentElement, parentElementPath);
       case ElementPathType.shortToList:
       case ElementPathType.hierarchicalToList:
         // get file path to list
