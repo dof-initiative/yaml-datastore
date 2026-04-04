@@ -304,7 +304,30 @@ describe("Test basic delete function for short element path pointing to list", (
       force: true,
     });
   });
-  //TODO
+  it("shall delete list of simple data types for short element path to list where working directory is not an object", async () => {
+    //TODO
+  });
+  it("shall delete list of complex string for short element path to list where working directory is not an object", async () => {
+    //TODO
+  });
+  it("shall delete list of object for short element path to list where working directory is not an object", async () => {
+    //TODO
+  });
+  it("shall delete list of list for short element path to list where working directory is not an object", async () => {
+    //TODO
+  });
+  it("shall delete list of simple data types for short element path to list where working directory is an object that is the parent element", async () => {
+    //TODO
+  });
+  it("shall delete list of complex string for short element path to list where working directory is an object that is the parent element", async () => {
+    //TODO
+  });
+  it("shall delete list of object for short element path to list where working directory is an object that is the parent element", async () => {
+    //TODO
+  });
+  it("shall delete list of list for short element path to list where working directory is an object that is the parent element", async () => {
+    //TODO
+  });
 });
 
 // see shortToComplexString in ElementPathType (enum)
