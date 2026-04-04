@@ -557,9 +557,9 @@ describe("Test basic clear function for hierarchical element path pointing to si
   it("shall clear other simple data types from object", async () => {
     const elementPaths = [
       "model.name", // test for clearing a non-empty string
-      "model.age", // test for clearing a non-empty string
+      "model.age", // test for clearing a number
       "model.attending", // test for clearing a boolean
-      "model.plusOne", // test for clearing a number
+      "model.plusOne", // test for clearing a null
       "model.degrees", // test for clearing an empty object
       "model.aliases", // test for clearing an empty list
       "model.notes", // test for clearing an empty string
@@ -603,7 +603,35 @@ describe("Test basic clear function for hierarchical element path pointing to si
     );
   });
   it("shall clear other simple data types from list", async () => {
-    //TODO
+    const elementPaths = [
+      "model[0]", // test for deleting a non-empty string
+      "model[1]", // test for deleting a number
+      "model[2]", // test for deleting a boolean
+      "model[3]", // test for deleting a null
+      "model[5]", // test for deleting an empty object
+      "model[6]", // test for deleting an empty list
+      "model[7]", // test for deleting an empty string
+    ];
+
+    for (const elementPath of elementPaths) {
+      const elementPathAsSplitString = elementPath.split("[");
+      const expectedRootElementSpec =
+        "clearItem" + elementPathAsSplitString[1].slice(0, -1);
+      const result = runBasicClearTest(
+        "2.1_list_of_simple_data_types/" + expectedRootElementSpec,
+        elementPath
+      );
+
+      const specCasePathHash = await hashElement(result.specCasePath, options);
+      const storePathHash = await hashElement(result.storePath, options);
+
+      // verify that checksums of on-disk representation from spec case versus serialized content are identical
+      expect(toJsonString(storePathHash["children"])).to.equal(
+        toJsonString(specCasePathHash["children"])
+      );
+      fs.rmSync(result.specCasePath, { recursive: true, force: true });
+      fs.rmSync(result.storePath, { recursive: true, force: true });
+    }
   });
   it("shall clear simple data type from list in an object", async () => {
     const result = runBasicClearTest(
