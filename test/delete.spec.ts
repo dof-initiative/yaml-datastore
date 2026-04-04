@@ -336,7 +336,76 @@ describe("Test basic delete function for short element path pointing to simple d
       force: true,
     });
   });
-  //TODO
+  it("shall delete simple data types from object for short element path to element where working directory is an object", async () => {
+    const elementPaths = [
+      "name", // test for deleting a non-empty string
+      "age", // test for deleting a number
+      "attending", // test for deleting a boolean
+      "plusOne", // test for deleting a null
+      "degrees", // test for deleting an empty object
+      "aliases", // test for deleting an empty list
+      "notes", // test for deleting an empty string
+    ];
+
+    for (const elementPathToDelete of elementPaths) {
+      const expectedRootElementSpec =
+        "delete" +
+        elementPathToDelete.charAt(0).toUpperCase() +
+        elementPathToDelete.slice(1);
+
+      // 1. get spec case path
+      const specCasePath = toSpecCasePath(
+        "1.1_object_with_simple_data_types/" + expectedRootElementSpec
+      );
+      const workingDirectoryPath = path.join(TMP_WORKING_DIR_PATH, "model");
+      const specCaseWorkingDirectoryPath = path.join(
+        TMP_SPEC_DIR_AFTER_OPERATION_PATH,
+        "model"
+      );
+      const depth = 0;
+
+      // 2.1 copy before-operation state spec case files into TMP_WORKING_DIR_PATH
+      const defaultCasePath = path.join(specCasePath, DEFAULT_SPEC_CASE_PATH);
+      fs.cpSync(defaultCasePath, TMP_WORKING_DIR_PATH, { recursive: true });
+
+      // 2.2 copy after-operation state spec case files into TMP_SPEC_DIR_AFTER_OPERATION_PATH
+      fs.cpSync(specCasePath, TMP_SPEC_DIR_AFTER_OPERATION_PATH, {
+        recursive: true,
+      });
+
+      // 3. delete element, given working directory path and element path
+      const result = deleteElement(
+        workingDirectoryPath,
+        elementPathToDelete,
+        depth
+      );
+
+      // 4. verify results of deleteElement operation
+      const expectedResult = load(
+        specCaseWorkingDirectoryPath,
+        result.message,
+        depth
+      );
+
+      const expectedParentElement = expectedResult.element;
+      expect(result.success).to.equal(true);
+      expect(toJsonString(result.element)).to.equal(
+        toJsonString(expectedParentElement)
+      );
+
+      // 5. get hashElements for expected directory and resulting (after-operation) directory
+      const specCasePathHash = await hashElement(
+        TMP_SPEC_DIR_AFTER_OPERATION_PATH,
+        options
+      );
+      const storePathHash = await hashElement(TMP_WORKING_DIR_PATH, options);
+
+      // verify that checksums of on-disk representation from spec case versus serialized content are identical
+      expect(toJsonString(storePathHash["children"])).to.equal(
+        toJsonString(specCasePathHash["children"])
+      );
+    }
+  });
 });
 
 // see hierarchicalToObject in ElementPathType (enum)

@@ -198,7 +198,7 @@ describe("Test basic clear function for short element path pointing to object", 
       TMP_SPEC_DIR_AFTER_OPERATION_PATH,
       "model"
     );
-    const elementPathToDelete = "myObj";
+    const elementPathToClear = "myObj";
     const depth = 0;
 
     // 2.1 copy before-operation state spec case files into TMP_WORKING_DIR_PATH
@@ -211,7 +211,7 @@ describe("Test basic clear function for short element path pointing to object", 
     });
 
     // 3. delete element, given working directory path and element path
-    const result = clear(workingDirectoryPath, elementPathToDelete, depth);
+    const result = clear(workingDirectoryPath, elementPathToClear, depth);
 
     // 4. verify results of deleteElement operation
     const expectedResult = load(
@@ -245,7 +245,7 @@ describe("Test basic clear function for short element path pointing to object", 
     );
     const workingDirectoryPath = TMP_WORKING_DIR_PATH;
     const specCaseWorkingDirectoryPath = TMP_SPEC_DIR_AFTER_OPERATION_PATH;
-    const elementPathToDelete = "model";
+    const elementPathToClear = "model";
     const depth = 0;
 
     // 2.1 copy before-operation state spec case files into TMP_WORKING_DIR_PATH
@@ -258,7 +258,7 @@ describe("Test basic clear function for short element path pointing to object", 
     });
 
     // 3. delete element, given working directory path and element path
-    const result = clear(workingDirectoryPath, elementPathToDelete, depth);
+    const result = clear(workingDirectoryPath, elementPathToClear, depth);
 
     // 4. verify results of deleteElement operation
     const expectedResult = load(
@@ -332,7 +332,72 @@ describe("Test basic clear function for short element path pointing to simple da
       force: true,
     });
   });
-  //TODO
+  it("shall clear simple data types from object for short element path to element where working directory is an object", async () => {
+    const elementPaths = [
+      "name", // test for deleting a non-empty string
+      "age", // test for deleting a number
+      "attending", // test for deleting a boolean
+      "plusOne", // test for deleting a null
+      "degrees", // test for deleting an empty object
+      "aliases", // test for deleting an empty list
+      "notes", // test for deleting an empty string
+    ];
+
+    for (const elementPathToClear of elementPaths) {
+      const expectedRootElementSpec =
+        "clear" +
+        elementPathToClear.charAt(0).toUpperCase() +
+        elementPathToClear.slice(1);
+
+      // 1. get spec case path
+      const specCasePath = toSpecCasePath(
+        "1.1_object_with_simple_data_types/" + expectedRootElementSpec
+      );
+      const workingDirectoryPath = path.join(TMP_WORKING_DIR_PATH, "model");
+      const specCaseWorkingDirectoryPath = path.join(
+        TMP_SPEC_DIR_AFTER_OPERATION_PATH,
+        "model"
+      );
+      const depth = 0;
+
+      // 2.1 copy before-operation state spec case files into TMP_WORKING_DIR_PATH
+      const defaultCasePath = path.join(specCasePath, DEFAULT_SPEC_CASE_PATH);
+      fs.cpSync(defaultCasePath, TMP_WORKING_DIR_PATH, { recursive: true });
+
+      // 2.2 copy after-operation state spec case files into TMP_SPEC_DIR_AFTER_OPERATION_PATH
+      fs.cpSync(specCasePath, TMP_SPEC_DIR_AFTER_OPERATION_PATH, {
+        recursive: true,
+      });
+
+      // 3. delete element, given working directory path and element path
+      const result = clear(workingDirectoryPath, elementPathToClear, depth);
+
+      // 4. verify results of deleteElement operation
+      const expectedResult = load(
+        specCaseWorkingDirectoryPath,
+        result.message,
+        depth
+      );
+
+      const expectedParentElement = expectedResult.element;
+      expect(result.success).to.equal(true);
+      expect(toJsonString(result.element)).to.equal(
+        toJsonString(expectedParentElement)
+      );
+
+      // 5. get hashElements for expected directory and resulting (after-operation) directory
+      const specCasePathHash = await hashElement(
+        TMP_SPEC_DIR_AFTER_OPERATION_PATH,
+        options
+      );
+      const storePathHash = await hashElement(TMP_WORKING_DIR_PATH, options);
+
+      // verify that checksums of on-disk representation from spec case versus serialized content are identical
+      expect(toJsonString(storePathHash["children"])).to.equal(
+        toJsonString(specCasePathHash["children"])
+      );
+    }
+  });
 });
 
 // see hierarchicalToObject in ElementPathType (enum)
