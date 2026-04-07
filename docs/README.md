@@ -26,6 +26,7 @@ YAML Datastore is a lightweight library that stores and manages data with struct
 2\. [Installation](#installation) <br>
 3\. [Overview](#overview) <br>
 3.1\. [Element Paths](#element-paths) <br>
+3.1.1\. [Types of Element paths](#types-of-element-paths) <br>
 3.2\. [Supported Data Types](#supported-data-types) <br>
 3.3\. [Mapping Complex Data Types to Files](#mapping-complex-data-types-to-files) <br>
 3.3.1\. [Multi-line Strings](#multi-line-strings) <br>
@@ -46,11 +47,9 @@ YAML Datastore is a lightweight library that stores and manages data with struct
 4.3\. [Delete Function](#delete-function) <br>
 4.3.1\. [Empty Element Path](#empty-element-path-1) <br>
 4.3.2\. [Short Element Path](#short-element-path-1) <br>
-4.3.3\. [Hiearchial Element Path](#hiearchial-element-path-1) <br>
 4.4\. [Clear Function](#clear-function) <br>
 4.4.1\. [Empty Element Path](#empty-element-path-2) <br>
 4.4.2\. [Short Element Path](#short-element-path-2) <br>
-4.4.3\. [Hiearchial Element Path](#hiearchial-element-path-2) <br>
 5\. [Use Cases](#use-cases) <br>
 5.1\. [Store Use Cases](#store-use-cases) <br>
 5.1.1\. [Object with Simple Data Types](#object-with-simple-data-types) <br>
@@ -91,8 +90,16 @@ This section provides comprehensive details about how the YAML Datastore library
 YAML Datastore implements the standard CRUD operations for transforming in-memory objects and lists into structured YAML files and back. We will describe the supported data types, how they map onto the file system, and provide a comprehensive list of example use cases. 
 
 ## Element Paths
-TODO: Add section on element paths complexity of simpleness of element paths
 
+YAML Datastore separates two distinct notions of location: the **file path** (where data lives on disk, e.g. numeric property `pi:3.14` lives in `model/constants/_this.yaml`) and the **element path** (where data lives in the in-memory model, e.g. `model.constants.pi`, `mylist[2]`, `model.info.mylist[2]`). 
+
+A **file path** follows standard filesystem conventions, a hierarchy of directories plus a single terminal file, for example `model/constants/_this.yaml`.
+
+An **element path** is an object path,dot-separated, with support for bracketed indexing for list elements or key-value pairs in objects, from the working directory to the element to be read into memory (i.e. `top-element.sub-element.property[3]`).
+
+All API calls use element paths; the library handles translation to and from file paths internally.
+
+**start notes:**
 - Two different types of paths: filepath (where in the file system the information is put), hiearchy of directories + single file in the hiearchy with the content e.g. value pi, some file contains numeric property `pi:3.14` in `model/constants/_this.yaml`; element path (where in the in memory representation is the information), expressed in dot and brackets notation, e.g. `model.constants.pi` , `mylist[2]`, `model.info.mylist[2]`. When you interact with the API you speak in element paths relative to a working directory
 
 <!-- include (test/spec/1.2.7.1_object_with_list_of_objects_of_simple_data_types/model.json) -->
@@ -135,12 +142,21 @@ model
 └── _this.yaml
 <!-- /include -->
 
+**end notes**
+
+### Types of Element paths
+
+* **Empty**: must refer to an object stored in the current working directory (must have a _this.yaml in it, otherwise invalid). This is the only valid case for an empty element path; it cannot point to any other data type.
+* **Short**: a single identifier with no dots or brackets (e.g. `model`, `avengers`, `firstName`). There are four conditions to test: the path may point to an object, a list, a complex string, or a simple value. If the current working directory contains `model/`, the short path to it is model. If the current working directory is model/, the short path to the list of avengers is avengers. If the current working directory is `model/avengers_E16F4F/`, the short paths to individual fields are `firstName` or `lastName`.
+* **Hierarchical**: a multi-step path using dots for object properties and brackets for list indices (e.g. `model.avengers[0].firstName`). Everything beyond a short path falls into one of two cases: the element path points to a complex type (object, list, or complex string), or it points to a simple property.
+
+**start notes**
 Element paths can take on three different qualities: 
 - empty ; must refer to an object that is stored in the current working dir (must have a _this.yaml in it, otherwise invalid)
 - short path ; a path that does not contain any hiearchy aka there are no dots or brackets in the path e.g. if the current working dir contains model dir, to access the model short element path to it is the string `model`. if the current working dir is the model dir, to access the list of avengers the short element path to it is the string `avengers`. if the current working dir is `model/avengers_E16F4F/` (note make sure we handle all directories with / at the end)to access `Steve` you would use short path `firstName`, or for `Rogers`, `lastName`. [contains no hiearchy]
 - hiearchial path ; a path that contains hiearchy, separated by dots or brackes because we are in element space instead of file space. e.g. if the current working dir contains the model dir and you want to access captain america's first name (first avenger) use `model.avengers[0].firstName` and if the current working dir is the model dir use `avengers[0].firstName`. To access all information about captain america, and current working dir is the model dir `avengers[0]`.
-
 Tool must account for the relationship between the element path and the element type that it is pointing to. e.g. empty element path that points to an object ; cannot have empty element path that points to any other data types (lists, complex strings, simple data types, etc)
+**end notes**
 
 ## Supported Data Types
 YAML Datastore supports any data types that are supported in YAML (and JSON). YAML Datastore categorizes these data types as simple or complex based upon their representation inside of a YAML file containing that data before serialization. The element that this YAML file represents is referred to as the root element. A root element can either be an object (root object) or a list (root list). 
@@ -155,7 +171,7 @@ Complex data types require more than one line to be represented as a YAML file. 
 | Number: `3.14`, `42`  | List |
 | Boolean: `true`, `false` | Object|
 | Null: `null` | |
-| Empty String: `''` | `'\n'`|
+| Empty String: `''` | Empty String w/ Newline: `'\n'`|
 | Empty List: `[]` | |
 | Empty Object: `{}` | |
 
@@ -190,45 +206,17 @@ To keep files stable, conflict-free, and diff-friendly in distributed environmen
 
 To ensure cross-implementation consistency, all implementations need to use the same seed value.
 
-The selected seed value is the integer `321`, which is the sum of the ASCII decimal codes for the string "OSHW" (79 + 83 + 72 + 87 = 321). The generator state needs to reset to this seed after every use. This ensures that the ID for an item depends only on the algorithm, not the order in which items were added or how many exist in the list. TODO: skip mechanism
+The selected seed value is the integer `321`, which is the sum of the ASCII decimal codes for the string "OSHW" (79 + 83 + 72 + 87 = 321). 
 
-We use Hex (0-9, A-F) to maximize the namespace while keeping directory names short and human-readable.
+Each ID is 6 uppercase hexadecimal digits (characters 0–9, A–F), maximizing the namespace while keeping directory names short and human-readable. 
 
-TODO: Show id is 6 uppercase hex digits long and show what we do with the IDs -- we append the end of a parent name _ id name for whatever the class of thing is that's complex - object, list, multi-line string - and this nests and the ids nest with underscores in the name. use spec directory. 
+A per-list counter (`idCounter`) tracks the total number of IDs ever generated for a given list, stored in a hidden dot-file named after the list (e.g. `.model.yaml`). When a new ID is needed, the RNG is seeded at 321 and advanced idCounter steps; that value becomes the new ID and the counter increments by one. The absence of the dot-file is equivalent to a counter value of zero. The generator state needs to reset to this seed after every use. This ensures that the ID for an item depends only on the algorithm, not the order in which items were added or how many exist in the list. *TODO: skip mechanism*
 
-List of Complex Strings
-model_E16F4F
+IDs are appended to the parent element name with an underscore `_` separator, followed by a suffix identifying the complex data type (`_this.yaml` for objects, `.yaml` for lists, `.txt` for multi-line strings). Nesting is reflected by chaining IDs with underscores, for example `model_E16F4F_506E59.yaml`.
 
-<!-- include (test/spec/2.2.1_list_of_complex_string/.model_tree.txt) -->
-model  [error opening dir]
-<!-- /include -->
-
-List of Objects
-model_506E59
-
-<!-- include (test/spec/2.2.2_list_of_objects_of_simple_data_types/.model_tree.txt lang=txt) -->
-```txt
-model  [error opening dir]
-```
-<!-- /include -->
-
-List of Lists
-model_E16F4F.yaml
-
-<!-- include (test/spec/2.2.4_list_of_list_of_simple_data_type/.model_tree.txt lang=txt) -->
-```txt
-model  [error opening dir]
-```
-<!-- /include -->
-
-List of List of Lists
-model_E16F4F_506E59.yaml
-
-<!-- include (test/spec/2.2.7.2_list_of_list_of_list_of_simple_data_type/.model_tree.txt lang=txt) -->
-```txt
-model  [error opening dir]
-```
-<!-- /include -->
+**start notes**
+Show id is 6 uppercase hex digits long and show what we do with the IDs -- we append the end of a parent name _ id name for whatever the class of thing is that's complex - object, list, multi-line string - and this nests and the ids nest with underscores in the name. use spec directory. 
+**end notes**
 
 # CRUD Operations
 We will discuss how each CRUD operation maps onto the library functions and use cases by function.
@@ -244,124 +232,78 @@ Todo: expressing iterative loading
 
 ## Store Function
 
-TODO - all the below was generated and needs human validation
-The Store function serializes in-memory data structures into the filesystem. It acts as a structural mapper, deciding whether to write data inline to a parent YAML or externalize it into a dedicated file or subdirectory based on the data type.
-
-Parameters:
-
-`elementPath`: The target location within the data structure (e.g., model.items[0]).
-
-`data`: The JavaScript object, list, or scalar to be persisted.
+The Store function serializes in-memory data structures into the filesystem, mapping each data type to its corresponding file or directory representation.
 
 ### Element is object
-Action: Creates a directory named after the object key.
-
-Initialization: Generates a _this.yaml file inside that directory to hold the object's simple properties.
-
-Recursion: For every property in the object, Store is called recursively. Simple types are written to _this.yaml, while complex types trigger further fragmentation.
+- Creates a directory named with the element name in the working directory path.
+- Generates a `_this.yaml` file inside that directory to hold the object's properties.
+- For every property in the object that are complex data types, Store is called recursively. Simple types are written to `_this.yaml` , while complex types are included as references. 
 
 ### Element is list
-Action: Creates a [key].yaml file to act as the index.
-
-ID Generation: For each item, the OSHW seed (321) is initialized and the Xorshift RNG generates a deterministic Hex ID.
-
-State Management: Checks for a hidden . [key].yaml file to retrieve the idCounter. This counter is incremented for every new item to ensure consistent ID generation regardless of previous deletions.
+- Creates a .yaml file named with the element name in the working directory path.
+- For every item in the list that are complex data types, the store function generates an ID
+- `idCounter`, in a hidden `.` (dot) file named after yaml list (e.g., `.model.yaml`) that increments. Absense of file means list counter value is 0 (zero).
 
 ## Load Function
-The Load function reconstructs disk data back into the in-memory object. It resolves filesystem references (((filename))) and hydrates the object tree based on a specified depth.
-Parameters:
-
-elementPath: The path to the specific data element to retrieve.
-
-depth: (Optional) How many levels of the tree to hydrate. Defaults to 0 (shallow).
+The Load function reconstructs disk data back into the in-memory object. It resolves filesystem references e.g. `((``))` and loads the object tree based on a specified depth.
 
 ### Empty Element Path
-Constraint: Must point to an Object. An empty path indicates the root of the current working directory.
-
-Validation: The function checks the target filepath for a _this.yaml file.
-
-Error Handling: If _this.yaml is missing, the function throws an error, as a directory without this file is not a valid object root in this spec.
+- Must point to an Object. An empty path indicates the root of the current working directory.
+- The function checks the target filepath for a `_this.yaml` file.
+- If `_this.yaml` is missing, the function throws an error, as a directory without this file is not a valid object root in this spec.
 
 ### Short Element Path
-A single-level identifier (no dots or brackets). The behavior is determined by the file extension found at that path.
+- A single-level identifier (no dots or brackets). The behavior is determined by the file extension found at that path.
 
 #### Element path points at Object
-Resolves to a subdirectory. The library loads the contents of [path]/_this.yaml and prepares for recursion.
+- The library loads the contents of [path]/_this.yaml
 
 #### Element path points at List
-Resolves to a [path].yaml file. The library loads the array of pointers and maps them to their respective generated ID directories.
+- [path].yaml file. The library loads the array 
 
 #### Element path points at Complex String
-Resolves to a [path].txt file. The library reads the raw text content, preserving newlines that would otherwise break standard YAML formatting.
+- The library loads the [path].txt file, preserving newlines that would otherwise break standard YAML formatting.
 
 #### Element path points at Simple Value
-The value is read directly from the parent YAML file. No further filesystem navigation is required.
+- The value is read directly from the parent YAML file.
 
 ### Hiearchial Element Path
-A multi-step path (e.g., model.assemblySteps[0].summary). The library recursively traverses the filesystem, resolving each segment until it reaches the target.
+A multi-step path (e.g., `model.assemblySteps[0].summary`). The library recursively traverses the filesystem, resolving each segment until it reaches the target.
 
 #### Element path points at complex data
-The function returns a pointer or a hydrated object/list depending on the depth parameter.
+?
 
-Example: model.assemblySteps might return a list of references: [ "((step_E16F4F))", "((step_506E59))" ].
+Example: `model.assemblySteps` might return a list of references: `[ "((step_E16F4F))", "((step_506E59))" ]`.
 
 #### Element path points at simple value
-The function traverses the complex parent structures and returns the final scalar value found in the terminal YAML file.
+- Returns the final scalar value found in the terminal YAML file.
 
-Example: model.assemblySteps[0].summary resolves through the list, into the specific step's _this.yaml, and returns the string stored under the summary key.
+Example: `model.assemblySteps[0].summary` resolves through the list, into the specific step's _this.yaml, and returns the string stored under the summary key.
 
 ## Delete Function
-The Delete function permanently removes an element from the data structure. It modifies the parent (object or list) to excise the reference and deletes the corresponding files or directories from the filesystem.
-
-Parameters:
-
-elementPath: The path to the specific data element to be removed.
+The Delete function permanently removes an element from the data structure. It modifies the parent (object or list) to excise the reference and deletes the corresponding files or directories from the filesystem. (e.g., if `model.foo` points to a string, "bar", "delete" operation removes `model.foo` entirely)
 
 ### Empty Element Path
 - Error - Cannot delete directory while inside
 
 ### Short Element Path
-The behavior is determined by the "owning" structure (the CWD).
-
-If Parent is an Object: The key is removed from the _this.yaml file. If the value was a complex type, its associated subdirectory or file (e.g., model/ or model.txt) is deleted from the disk.
-
-If Parent is a List: The index is removed from the [list].yaml file. The associated generated ID directory is deleted. Note that this shifts the indices of all subsequent items in the list, but does not reset the idCounter.
-
-ID Persistence: Clearing a list removes its expanded file representation but does not reset the associated . [list].yaml idCounter. This ensures that subsequent additions to the list continue the unique ID sequence, preventing collisions with previously existing (or cleared) elements.
-
-### Hiearchial Element Path
-The library traverses the path to the terminal element’s parent. It then performs the deletion as described in the Short Element Path logic, ensuring that the entire expanded representation (all child files and folders) is removed recursively from the disk.
+- The behavior is determined by the "owning" structure (the CWD).
+- **If Parent is an Object**: The key is removed from the _this.yaml file. If the value was a complex type, its associated subdirectory or file (e.g., model/ or model.txt) is deleted from the disk.
+- **If Parent is a List**: The index is removed from the [list].yaml file. The associated generated ID directory is deleted. Note that this shifts the indices of all subsequent items in the list, but does not reset the idCounter.
+- Clearing a list removes its expanded file representation but does not reset the idCounter. This ensures that subsequent additions to the list continue the unique ID sequence, preventing collisions with previously existing (or cleared) elements.
 
 ## Clear Function
-The Clear function removes the expanded filesystem representation of a complex data type without removing the element itself from the parent model. It is used to reduce filesystem overhead while maintaining the data’s "pointer" in the structure.
-Simple and Complex
-
-Parameters:
-
-elementPath: The path to the element whose contents should be cleared.
+The Clear function removes the expanded filesystem representation of a complex data type without removing the element itself from the parent model. e.g., if `model.foo` points to a string, "bar", "clear" operation "removes" contents of `model.foo`, but `model.foo` itself still exists.
 
 ### Empty Element Path
-Error: Similar to the Delete function, you cannot clear the root directory from within itself.
-
-Identity: An empty path always implies an Object (the current directory). Clearing it would require moving to the parent context and targeting this directory by name.
+- Similar to the Delete function, you cannot clear the root directory from within itself.
+- An empty path always implies an Object (the current directory). Clearing it would require moving to the parent context and targeting this directory by name.
 
 ### Short Element Path
-The function first performs an internal check to see if the element is already cleared.
-
-Complex Data Types: If the element contains a reference (e.g., ((model.txt))), the function deletes that file/directory from the disk. The reference string remains in the parent YAML, but it now points to a non-existent (cleared) resource.
-
-Simple Data Types: Since simple values (numbers, booleans, simple strings) exist only as inline data in the parent YAML, "clearing" them has no effect on the filesystem. The function returns success with no changes.
-
-ID Persistence: Clearing a list removes its expanded file representation but does not reset the associated . [list].yaml idCounter. This ensures that subsequent additions to the list continue the unique ID sequence, preventing collisions with previously existing (or cleared) elements.
-
-### Hiearchial Element Path
-The library resolves the path to the target element.
-
-If the target is Complex: It recursively deletes the expanded representation from the disk (e.g., rm -rf [id_folder]/).
-
-If the target is Simple: It confirms the value exists and returns success.
-
-Refined Behavior: If the element is already cleared (the pointer exists but the file does not), the operation is a no-op and returns a success status.
+- The function first performs an internal check to see if the element is already cleared.
+- Complex Data Types: If the element contains a reference (e.g., `((model.txt))`), the function deletes that file/directory from the disk. The reference string remains in the parent YAML, but it now points to a non-existent (cleared) resource.
+- Simple Data Types: Since simple values (numbers, booleans, simple strings) exist only as inline data in the parent YAML, "clearing" them has no effect on the filesystem. The function returns success with no changes.
+- Clearing a list removes its expanded file representation but does not reset the idCounter.
 
 # Use Cases
 This section provides an explanation for each identified use case in the YAML Datastore specification. For each use case we provide an example data structure along with its representation on disk and an explanation of why that is the representation. All of these use cases are of a element (an object or a list) named model.
