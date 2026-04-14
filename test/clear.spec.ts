@@ -489,7 +489,61 @@ describe("Test basic clear function for short element path pointing to list", ()
     );
   });
   it("shall clear list of simple data types for short element path to list where working directory is an object that is the parent element", async () => {
-    //TODO
+    // 1. get spec case path
+    const specCasePath = toSpecCasePath(
+      path.join(
+        "1.3.5_object_with_two_lists_of_simple_data_types",
+        "clearPersonInfo1"
+      )
+    );
+    const parentElementName = "model";
+    const workingDirectoryPath = path.join(
+      TMP_WORKING_DIR_PATH,
+      parentElementName
+    );
+    const specCaseWorkingDirectoryPath = path.join(
+      TMP_SPEC_DIR_AFTER_OPERATION_PATH,
+      parentElementName
+    );
+    const elementPathToClear = "personInfo1";
+    const depth = 0;
+
+    // 2.1 copy before-operation state spec case files into TMP_WORKING_DIR_PATH
+    const defaultCasePath = path.join(specCasePath, DEFAULT_SPEC_CASE_PATH);
+    fs.cpSync(defaultCasePath, TMP_WORKING_DIR_PATH, { recursive: true });
+
+    // 2.2 copy after-operation state spec case files into TMP_SPEC_DIR_AFTER_OPERATION_PATH
+    fs.cpSync(specCasePath, TMP_SPEC_DIR_AFTER_OPERATION_PATH, {
+      recursive: true,
+    });
+
+    // 3. clear element, given working directory path and element path
+    const result = clear(workingDirectoryPath, elementPathToClear, depth);
+
+    // 4. verify results of clear operation
+    const expectedResult = load(
+      specCaseWorkingDirectoryPath,
+      result.message,
+      depth
+    );
+
+    const expectedParentElement = expectedResult.element;
+    expect(result.success).to.equal(true);
+    expect(toJsonString(result.element)).to.equal(
+      toJsonString(expectedParentElement)
+    );
+
+    // 5. get hashElements for expected directory and resulting (after-operation) directory
+    const specCasePathHash = await hashElement(
+      TMP_SPEC_DIR_AFTER_OPERATION_PATH,
+      options
+    );
+    const storePathHash = await hashElement(TMP_WORKING_DIR_PATH, options);
+
+    // verify that checksums of on-disk representation from spec case versus serialized content are identical
+    expect(toJsonString(storePathHash["children"])).to.equal(
+      toJsonString(specCasePathHash["children"])
+    );
   });
   it("shall clear list of complex string for short element path to list where working directory is an object that is the parent element", async () => {
     //TODO

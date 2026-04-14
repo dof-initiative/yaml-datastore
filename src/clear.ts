@@ -31,7 +31,7 @@ export function clear(
     const parentElementPath = elementPathInfo.parentElementPath;
     const parentFilePath = elementPathInfo.parentFilePath;
     const parentIsAnElement = elementPathInfo.parentIsElement;
-    let parentElement;
+    let parentElement = null;
     if (parentIsAnElement && fs.existsSync(parentFilePath)) {
       const parentElementFileContents = fs.readFileSync(
         parentFilePath,
@@ -84,6 +84,14 @@ export function clear(
         }
         return new YdsResult(true, parentElement, parentElementPath);
       case ElementPathType.shortToList:
+      /*if (parentIsAnElement && fs.existsSync(parentFilePath)) {
+          const parentElementPath = elementPathInfo.parentElementPath;
+          parentElement = load(
+            workingDirectoryPath,
+            parentElementPath,
+            depth
+          ).element;
+        }*/
       case ElementPathType.hierarchicalToList:
         // get file path to list
         const listFilePath = elementPathInfo.data;
@@ -111,7 +119,11 @@ export function clear(
 
         let parentElementOfListStoredToDisk = null;
         // clear list from parent element
-        if (parentIsAnElement && fs.existsSync(parentFilePath)) {
+        if (
+          parentIsAnElement &&
+          fs.existsSync(parentFilePath) /*&&
+          elementPathInfo.type === ElementPathType.hierarchicalToList*/
+        ) {
           (parentElement as any)[elementPathInfo.keyName] = [];
 
           // load parent element into memory for YdsResult object
@@ -150,7 +162,7 @@ export function clear(
         }
 
         // return result of clear list operation
-        return new YdsResult(true, null, parentElementPath);
+        return new YdsResult(true, parentElement, parentElementPath);
       case ElementPathType.shortToSimple:
       case ElementPathType.hierarchicalToSimple:
         if (

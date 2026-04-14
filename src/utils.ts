@@ -256,7 +256,7 @@ export function getElementPathInfo(
       return new ElementPathResult(
         ElementPathType.shortToObject,
         filePath,
-        "",
+        parentElementPath,
         parentFilePath,
         keyName
       );
@@ -264,13 +264,20 @@ export function getElementPathInfo(
 
     filePath = path.join(workingDirectoryPath, elementPath + ".yaml");
     if (fs.existsSync(filePath)) {
-      // element path points to a list; parent element unknown
+      // element path points to a list
+
+      let parentFilePath = path.join(workingDirectoryPath, "_this.yaml");
+      if (!fs.existsSync(parentFilePath)) {
+        // list has no parent
+        parentFilePath = "";
+      }
+      keyName = elementPath;
 
       return new ElementPathResult(
         ElementPathType.shortToList,
         filePath,
-        "",
-        "",
+        parentElementPath,
+        parentFilePath,
         keyName
       );
     }
