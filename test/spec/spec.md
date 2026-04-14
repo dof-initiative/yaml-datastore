@@ -342,6 +342,9 @@ Solution 1 implemented as property, `idCounter`, of type number in a . (dot) fil
 
 ### delete cases
 
+TODO: describe case for deleting root elements
+TODO: describe case for deleting complex data types from root elements that have a single entry
+
 #### delete from object
 
 - delete simple string from object:
@@ -381,6 +384,8 @@ Solution 1 implemented as property, `idCounter`, of type number in a . (dot) fil
   - delete delete item at specified index from list.
 
 ### clear cases
+
+TODO: describe case for clearing root elements
 
 #### clear from object
 
