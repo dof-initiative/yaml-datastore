@@ -105,28 +105,38 @@ export function clear(
           fs.rmSync(listMetadataFilePath);
         }
 
+        let parentElementOfListStoredToDisk = null;
         // clear list from parent element
-        (parentElement as any)[elementPathInfo.keyName] = [];
+        if (parentIsAnElement && fs.existsSync(parentFilePath)) {
+          (parentElement as any)[elementPathInfo.keyName] = [];
 
-        // load parent element into memory for YdsResult object
-        const parentElementOfListContentsToStore = yaml.dump(parentElement);
-        fs.writeFileSync(
-          parentFilePath,
-          parentElementOfListContentsToStore,
-          "utf-8"
-        );
-        const parentElementOfListStoredToDisk = load(
-          workingDirectoryPath,
-          parentElementPath,
-          depth
-        ).element;
+          // load parent element into memory for YdsResult object
+          const parentElementOfListContentsToStore = yaml.dump(parentElement);
+          fs.writeFileSync(
+            parentFilePath,
+            parentElementOfListContentsToStore,
+            "utf-8"
+          );
+          parentElementOfListStoredToDisk = load(
+            workingDirectoryPath,
+            parentElementPath,
+            depth
+          ).element;
 
-        // return result of delete list operation
-        return new YdsResult(
-          true,
-          parentElementOfListStoredToDisk,
-          parentElementPath
-        );
+          // return result of clear list operation
+          return new YdsResult(
+            true,
+            parentElementOfListStoredToDisk,
+            parentElementPath
+          );
+        }
+
+        // create file at list file path and set its contents to an empty list, [], for case where list is the root element
+        const listContentsToStore = yaml.dump([]);
+        fs.writeFileSync(listFilePath, listContentsToStore, "utf-8");
+
+        // return result of clear list operation
+        return new YdsResult(true, null, parentElementPath);
       case ElementPathType.shortToSimple:
       case ElementPathType.hierarchicalToSimple:
         if (
