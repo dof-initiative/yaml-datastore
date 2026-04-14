@@ -391,7 +391,50 @@ describe("Test basic delete function for short element path pointing to list", (
     );
   });
   it("shall delete list of object for short element path to list where working directory is not an object", async () => {
-    //TODO
+    // 1. get spec case path
+    const specCasePath = toSpecCasePath(
+      path.join(
+        "2.2.2_list_of_objects_of_simple_data_types",
+        DEFAULT_SPEC_CASE_FOLDER
+      )
+    );
+    const workingDirectoryPath = TMP_WORKING_DIR_PATH;
+    const elementPathToDelete = "model";
+    const depth = 0;
+
+    // 2 copy before-operation state spec case files into TMP_WORKING_DIR_PATH
+    const defaultCasePath = path.join(specCasePath, DEFAULT_SPEC_CASE_PATH);
+    fs.cpSync(defaultCasePath, TMP_WORKING_DIR_PATH, { recursive: true });
+
+    // 3. delete element, given working directory path and element path
+    const result = deleteElement(
+      workingDirectoryPath,
+      elementPathToDelete,
+      depth
+    );
+
+    // 4. verify results of deleteElement operation
+    const expectedParentElement = load(
+      TMP_SPEC_DIR_AFTER_OPERATION_PATH,
+      result.message,
+      depth
+    ).element;
+    expect(result.success).to.equal(true);
+    expect(toJsonString(result.element)).to.equal(
+      toJsonString(expectedParentElement)
+    );
+
+    // 5. get hashElements for expected directory and resulting (after-operation) directory
+    const specCasePathHash = await hashElement(
+      TMP_SPEC_DIR_AFTER_OPERATION_PATH,
+      options
+    );
+    const storePathHash = await hashElement(TMP_WORKING_DIR_PATH, options);
+
+    // verify that checksums of on-disk representation from spec case versus serialized content are identical
+    expect(toJsonString(storePathHash["children"])).to.equal(
+      toJsonString(specCasePathHash["children"])
+    );
   });
   it("shall delete list of list for short element path to list where working directory is not an object", async () => {
     //TODO
