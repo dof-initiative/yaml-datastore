@@ -92,18 +92,22 @@ export function clear(
         // get parent diriectory of list
         const listParentDir = listPath.dir;
 
-        // (recursively) delete list from disk
-        recursivelyDeleteList(listPath);
-
-        // delete list metadata file if one exists
+        // read list metadata file if one exists
         const listMetadataFilePath = path.join(
           listPath.dir,
           "." + listPath.base
         );
         const directoryContents = fs.readdirSync(listParentDir);
+        let listMeetadataFileContents = "";
         if (directoryContents.includes("." + listPath.base)) {
-          fs.rmSync(listMetadataFilePath);
+          listMeetadataFileContents = fs.readFileSync(
+            listMetadataFilePath,
+            "utf-8"
+          );
         }
+
+        // (recursively) delete list from disk
+        recursivelyDeleteList(listPath);
 
         let parentElementOfListStoredToDisk = null;
         // clear list from parent element
@@ -134,6 +138,16 @@ export function clear(
         // create file at list file path and set its contents to an empty list, [], for case where list is the root element
         const listContentsToStore = yaml.dump([]);
         fs.writeFileSync(listFilePath, listContentsToStore, "utf-8");
+
+        // recreate list metadata file, if one existed
+        // TODO: consider refactoring recursivelyDeleteList() helper function to not delete root list metadata file when used for clear operation
+        if (listMeetadataFileContents !== "") {
+          const listMetadataFilePath = path.join(
+            listPath.dir,
+            "." + listPath.base
+          );
+          fs.writeFileSync(listMetadataFilePath, listMeetadataFileContents);
+        }
 
         // return result of clear list operation
         return new YdsResult(true, null, parentElementPath);

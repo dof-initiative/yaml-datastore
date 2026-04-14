@@ -21,6 +21,8 @@ export const DELETE_EMPTY_ELEMENT_PATH_ERROR =
 export function recursivelyDeleteList(listPath: path.ParsedPath) {
   // get file path to list
   const listFilePath = path.join(listPath.dir, listPath.base);
+  // get parent diriectory of list
+  const listParentDir = listPath.dir;
   // get contents of list
   const listContents = fs.readFileSync(listFilePath, "utf-8");
   // load list as jsObject
@@ -50,6 +52,14 @@ export function recursivelyDeleteList(listPath: path.ParsedPath) {
       }
     }
   }
+
+  // delete list metadata file if one exists
+  const listMetadataFilePath = path.join(listPath.dir, "." + listPath.base);
+  const directoryContents = fs.readdirSync(listParentDir);
+  if (directoryContents.includes("." + listPath.base)) {
+    fs.rmSync(listMetadataFilePath);
+  }
+
   // Finish by deleting list itself
   fs.rmSync(listFilePath);
 }
@@ -142,21 +152,9 @@ export function deleteElement(
         const listFilePath = elementPathInfo.data;
         // get parsed path to list
         const listPath = path.parse(listFilePath);
-        // get parent diriectory of list
-        const listParentDir = listPath.dir;
 
         // (recursively) delete list from disk
         recursivelyDeleteList(listPath);
-
-        // delete list metadata file if one exists
-        const listMetadataFilePath = path.join(
-          listPath.dir,
-          "." + listPath.base
-        );
-        const directoryContents = fs.readdirSync(listParentDir);
-        if (directoryContents.includes("." + listPath.base)) {
-          fs.rmSync(listMetadataFilePath);
-        }
 
         let parentElementOfListStoredToDisk = null;
         // delete list from parent element
