@@ -601,7 +601,63 @@ describe("Test basic delete function for short element path pointing to list", (
     );
   });
   it("shall delete list of object for short element path to list where working directory is an object that is the parent element", async () => {
-    //TODO
+    // 1. get spec case path
+    const specCasePath = toSpecCasePath(
+      path.join(
+        "1.3.7.1_object_with_two_lists_of_objects_of_simple_data_types",
+        "deleteNcc1701dCommanders"
+      )
+    );
+    const parentElementName = "model";
+    const workingDirectoryPath = path.join(
+      TMP_WORKING_DIR_PATH,
+      parentElementName
+    );
+    const specCaseWorkingDirectoryPath = path.join(
+      TMP_SPEC_DIR_AFTER_OPERATION_PATH,
+      parentElementName
+    );
+    const elementPathToDelete = "ncc1701dCommanders";
+    const depth = 0;
+
+    // 2.1 copy before-operation state spec case files into TMP_WORKING_DIR_PATH
+    const defaultCasePath = path.join(specCasePath, DEFAULT_SPEC_CASE_PATH);
+    fs.cpSync(defaultCasePath, TMP_WORKING_DIR_PATH, { recursive: true });
+
+    // 2.2 copy after-operation state spec case files into TMP_SPEC_DIR_AFTER_OPERATION_PATH
+    fs.cpSync(specCasePath, TMP_SPEC_DIR_AFTER_OPERATION_PATH, {
+      recursive: true,
+    });
+
+    // 3. delete element, given working directory path and element path
+    const result = deleteElement(
+      workingDirectoryPath,
+      elementPathToDelete,
+      depth
+    );
+
+    // 4. verify results of deleteElement operation
+    const expectedParentElement = load(
+      specCaseWorkingDirectoryPath,
+      result.message,
+      depth
+    ).element;
+    expect(result.success).to.equal(true);
+    expect(toJsonString(result.element)).to.equal(
+      toJsonString(expectedParentElement)
+    );
+
+    // 5. get hashElements for expected directory and resulting (after-operation) directory
+    const specCasePathHash = await hashElement(
+      TMP_SPEC_DIR_AFTER_OPERATION_PATH,
+      options
+    );
+    const storePathHash = await hashElement(TMP_WORKING_DIR_PATH, options);
+
+    // verify that checksums of on-disk representation from spec case versus serialized content are identical
+    expect(toJsonString(storePathHash["children"])).to.equal(
+      toJsonString(specCasePathHash["children"])
+    );
   });
   it("shall delete list of list for short element path to list where working directory is an object that is the parent element", async () => {
     //TODO
