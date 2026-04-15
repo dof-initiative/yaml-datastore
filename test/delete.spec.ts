@@ -1,4 +1,5 @@
 import { deleteElement, load } from "../src/index";
+import { EMPTY_WORKINGDIR_PATH_ERROR } from "../src/load";
 import { toJsonString, toSpecCasePath } from "./utils.spec";
 import { DEFAULT_SPEC_CASE_FOLDER } from "./spec_constants";
 import { StoreTestResult } from "./store.spec";
@@ -81,6 +82,31 @@ function runBasicDeleteTest(
     directoryPathToResultParentElement
   );
 }
+
+describe("Test basic delete function for empty working directory path", () => {
+  beforeEach(function () {
+    fs.mkdirSync(TMP_WORKING_DIR_PATH);
+    fs.mkdirSync(TMP_SPEC_DIR_AFTER_OPERATION_PATH);
+  });
+  afterEach(function () {
+    fs.rmSync(TMP_WORKING_DIR_PATH, { recursive: true, force: true });
+    fs.rmSync(TMP_SPEC_DIR_AFTER_OPERATION_PATH, {
+      recursive: true,
+      force: true,
+    });
+  });
+  it("shall throw an error when attempting to delete an empty working directory path", () => {
+    const workingDirectoryPath = "";
+    const elementPathToDelete = "";
+
+    const result = deleteElement(workingDirectoryPath, elementPathToDelete);
+
+    expect(result.success).to.equal(false);
+    expect(result.message)
+      .to.be.a("string")
+      .and.satisfy((msg) => msg.startsWith(EMPTY_WORKINGDIR_PATH_ERROR));
+  });
+});
 
 // see invalid in ElementPathType (enum)
 describe("Test basic delete function for invalid path", () => {

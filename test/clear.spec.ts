@@ -1,15 +1,15 @@
 import { clear } from "../src/index";
-import { load } from "../src/load";
+import { load, EMPTY_WORKINGDIR_PATH_ERROR } from "../src/load";
 import { toJsonString, toSpecCasePath } from "./utils.spec";
 import { DEFAULT_SPEC_CASE_FOLDER } from "./spec_constants";
 import { StoreTestResult } from "./store.spec";
 import { getElementPathInfo } from "../src/utils";
 import { INVALID_PATH_ERROR } from "../src/store";
+import { CLEAR_EMPTY_ELEMENT_PATH_ERROR } from "../src/clear";
 import { expect } from "chai";
 import fs from "node:fs";
 import path from "path";
 import { hashElement } from "folder-hash";
-import { CLEAR_EMPTY_ELEMENT_PATH_ERROR } from "../src/clear";
 
 const TMP_WORKING_DIR_PATH = "/tmp/my-project";
 const TMP_SPEC_DIR_AFTER_OPERATION_PATH = "/tmp/spec-project";
@@ -78,6 +78,31 @@ function runBasicClearTest(
     directoryPathToResultParentElement
   );
 }
+describe("Test basic clear function for empty working directory path", () => {
+  beforeEach(function () {
+    fs.mkdirSync(TMP_WORKING_DIR_PATH);
+    fs.mkdirSync(TMP_SPEC_DIR_AFTER_OPERATION_PATH);
+  });
+  afterEach(function () {
+    fs.rmSync(TMP_WORKING_DIR_PATH, { recursive: true, force: true });
+    fs.rmSync(TMP_SPEC_DIR_AFTER_OPERATION_PATH, {
+      recursive: true,
+      force: true,
+    });
+  });
+  it("shall throw an error when attempting to clear an empty working directory path", () => {
+    // 1. get spec case path
+    const workingDirectoryPath = "";
+    const elementPathToClear = "";
+
+    const result = clear(workingDirectoryPath, elementPathToClear);
+
+    expect(result.success).to.equal(false);
+    expect(result.message)
+      .to.be.a("string")
+      .and.satisfy((msg) => msg.startsWith(EMPTY_WORKINGDIR_PATH_ERROR));
+  });
+});
 
 // see invalid in ElementPathType (enum)
 describe("Test basic clear function for invalid path", () => {
