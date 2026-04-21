@@ -7,6 +7,7 @@ import {
   getElementPathInfo,
   ElementPathType,
   convertYamlFilePathToElementPath,
+  generateDeleteOrClearYdsResult,
 } from "./utils.js";
 import { recursivelyDeleteList } from "./delete.js";
 
@@ -26,7 +27,12 @@ export function clear(
   depth: number = 0
 ): YdsResult {
   if (workingDirectoryPath === "") {
-    return new YdsResult(false, null, EMPTY_WORKINGDIR_PATH_ERROR);
+    return generateDeleteOrClearYdsResult(
+      false,
+      workingDirectoryPath,
+      EMPTY_WORKINGDIR_PATH_ERROR,
+      0
+    );
   } else {
     const elementPathInfo = getElementPathInfo(
       workingDirectoryPath,
@@ -178,17 +184,13 @@ export function clear(
             parentElementOfListContentsToStore,
             "utf-8"
           );
-          parentElementOfListStoredToDisk = load(
+
+          // return result of clear list operation
+          return generateDeleteOrClearYdsResult(
+            true,
             workingDirectoryPath,
             parentElementPath,
             depth
-          ).element;
-
-          // return result of clear list operation
-          return new YdsResult(
-            true,
-            parentElementOfListStoredToDisk,
-            parentElementPath
           );
         }
 
@@ -248,15 +250,16 @@ export function clear(
       case ElementPathType.invalid:
         break;
     }
-    return new YdsResult(
+    return generateDeleteOrClearYdsResult(
       false,
-      null,
+      workingDirectoryPath,
       INVALID_PATH_ERROR +
         " [" +
         workingDirectoryPath +
         " | " +
         elementPath +
-        "]"
+        "]",
+      0
     );
   }
 }

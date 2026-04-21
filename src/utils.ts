@@ -1,6 +1,7 @@
 import path from "path";
 import fs from "node:fs";
 import yaml from "js-yaml";
+import { load, YdsResult } from "./index.js";
 
 // Regular expression used for matching element file paths enclosed between double parentheses
 export const doubleParenthesesRegEx = new RegExp(/\(\(.*\)\)/);
@@ -49,6 +50,35 @@ export function convertYamlFilePathToElementPath(filePath: string): string {
     // handle case where filePath is a YAML list
     const elementPath = filePath.slice(0, -5).replace("/", ".");
     return elementPath;
+  }
+}
+
+/**
+ *
+ * @param success
+ * @param workingDirectoryPath
+ * @param parentElementPathOrError
+ * @param depth
+ */
+export function generateDeleteOrClearYdsResult(
+  success: boolean,
+  workingDirectoryPath: string,
+  parentElementPathOrError: string,
+  depth: number
+): YdsResult {
+  if (success) {
+    const parentElementResult = load(
+      workingDirectoryPath,
+      parentElementPathOrError,
+      depth
+    );
+    return new YdsResult(
+      success,
+      parentElementResult.element,
+      parentElementPathOrError
+    );
+  } else {
+    return new YdsResult(success, null, parentElementPathOrError);
   }
 }
 
