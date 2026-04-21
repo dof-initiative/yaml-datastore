@@ -35,6 +35,24 @@ export function fileNameToComplexStringKey(fileName: string): string {
 }
 
 /**
+ * helper function used for converting YAML filePath to elementPath
+ *
+ * @param filePath
+ * @returns
+ */
+export function convertYamlFilePathToElementPath(filePath: string): string {
+  if (filePath.slice(-10) === "_this.yaml") {
+    // handle case where filePath is a YAML object
+    const elementPath = filePath.split("/").slice(0, -1).join(".");
+    return elementPath;
+  } else {
+    // handle case where filePath is a YAML list
+    const elementPath = filePath.slice(0, -5).replace("/", ".");
+    return elementPath;
+  }
+}
+
+/**
  * Describes the nature of an element path + filepath combination.
  */
 export enum ElementPathType {

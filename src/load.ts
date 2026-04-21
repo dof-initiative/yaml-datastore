@@ -7,25 +7,13 @@ import {
   trimDoubleParentheses,
   getElementPathInfo,
   ElementPathType,
+  convertYamlFilePathToElementPath,
 } from "./utils.js";
 
 export const EMPTY_WORKINGDIR_PATH_ERROR =
   "Error: Cannot load from empty working directory path";
 export const INVALID_PATH_ERROR =
   "Error: Invalid path to element on filesystem";
-
-// local function used for converting YAML filePath to elementPath
-function convertYamlFilePathToElementPath(filePath: string): string {
-  if (filePath.slice(-10) === "_this.yaml") {
-    // handle case where filePath is a YAML object
-    const elementPath = filePath.split("/").slice(0, -1).join(".");
-    return elementPath;
-  } else {
-    // handle case where filePath is a YAML list
-    const elementPath = filePath.slice(0, -5).replace("/", ".");
-    return elementPath;
-  }
-}
 
 // local function used for loading YAML file
 function loadYaml(

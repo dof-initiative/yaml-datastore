@@ -3,7 +3,11 @@ import fs from "node:fs";
 import yaml from "js-yaml";
 import { load, YdsResult } from "./index.js";
 import { EMPTY_WORKINGDIR_PATH_ERROR, INVALID_PATH_ERROR } from "./load.js";
-import { getElementPathInfo, ElementPathType } from "./utils.js";
+import {
+  getElementPathInfo,
+  ElementPathType,
+  convertYamlFilePathToElementPath,
+} from "./utils.js";
 import { recursivelyDeleteList } from "./delete.js";
 
 export const CLEAR_EMPTY_ELEMENT_PATH_ERROR =
@@ -44,36 +48,83 @@ export function clear(
 
     switch (elementPathInfo.type) {
       case ElementPathType.empty:
-        return new YdsResult(
-          false,
-          null,
-          CLEAR_EMPTY_ELEMENT_PATH_ERROR +
-            " [" +
-            workingDirectoryPath +
-            " | " +
-            elementPath +
-            "]"
-        );
+        // empty element path must be pointing to an object
+
+        // get file path to object
+        const elementFilePath = elementPathInfo.data;
+        // get parsed path to object
+        const emptyToObjectParsedPath = path.parse(elementPathInfo.data);
+        // get directory path to object
+        const emptyToObjectDirPath = emptyToObjectParsedPath.dir;
+
+        // recursively delete contents of directory path and directory itself
+        fs.rmSync(emptyToObjectDirPath, { recursive: true });
+
+        // if parent is an element clear its key-value pair
+        if (parentIsAnElement && fs.existsSync(parentFilePath)) {
+          // extract element name from filepath
+          const elementName = convertYamlFilePathToElementPath(elementFilePath)
+            .split(".")
+            .slice(-1)[0];
+          // clear key-value pair for element name in parent element
+          (parentElement as any)[elementName] = {};
+          // load contents of parent element
+          const parentElementOfObjectContentsToStore = yaml.dump(parentElement);
+
+          // overwrite contents of parent element with cleared key-value pair for element name
+          fs.writeFileSync(
+            parentFilePath,
+            parentElementOfObjectContentsToStore
+          );
+
+          // return result of clear object operation
+          return new YdsResult(true, parentElement, parentElementPath);
+        }
+
+        // object has no parent, therefore it is the root element whose contents shall be cleared
+        const objectContentsToStore = yaml.dump({});
+
+        // recreate directory for persisting cleared object
+        fs.mkdirSync(emptyToObjectDirPath);
+        // recreate _this.yaml whose contents are an empty object, {}
+        fs.writeFileSync(elementFilePath, objectContentsToStore, "utf-8");
+
+        // return result of clear object operation
+        return new YdsResult(true, parentElement, parentElementPath);
       case ElementPathType.shortToObject:
+        // get parsed path to object
         const shortToObjectParsedPath = path.parse(elementPathInfo.data);
-        const shortToObjectFilePath = shortToObjectParsedPath.dir;
+        // get directory path to object
+        const shortToObjectDirPath = shortToObjectParsedPath.dir;
+
+        // if object has no parent, clear its contents
         if (!parentIsAnElement) {
-          // rm -rf directory and create new directory with an _this.yaml containing empty object, {}
-          fs.rmSync(shortToObjectFilePath, { recursive: true });
-          fs.mkdirSync(shortToObjectFilePath);
+          // rm -rf directory
+          fs.rmSync(shortToObjectDirPath, { recursive: true });
+          // recreate new directory with a _this.yaml containing empty object, {}
+          fs.mkdirSync(shortToObjectDirPath);
+
           const elementToStore = {};
           const objectContentsToStore = yaml.dump(elementToStore);
           const thisYamlFilePath = path.join(
-            shortToObjectFilePath,
+            shortToObjectDirPath,
             "_this.yaml"
           );
+
+          // recreate _this.yaml whose contents are an empty object, {}
           fs.writeFileSync(thisYamlFilePath, objectContentsToStore);
+
+          // return result of clear object operation
           return new YdsResult(true, elementToStore, elementPathInfo.keyName);
         }
       case ElementPathType.hierarchicalToObject:
-        const objectParsedPath = path.parse(elementPathInfo.data);
-        const objectFilePath = objectParsedPath.dir;
-        fs.rmSync(objectFilePath, { recursive: true });
+        // get parsed path to object
+        const hierarchicalToObjectParsedPath = path.parse(elementPathInfo.data);
+        // get directory path to object
+        const hierarchicalToObjectDirPath = hierarchicalToObjectParsedPath.dir;
+
+        fs.rmSync(hierarchicalToObjectDirPath, { recursive: true });
+
         if (parentIsAnElement && fs.existsSync(parentFilePath)) {
           (parentElement as any)[elementPathInfo.keyName] = {};
           const parentElementOfObjectContentsToStore = yaml.dump(parentElement);
@@ -82,16 +133,10 @@ export function clear(
             parentElementOfObjectContentsToStore
           );
         }
+
+        // return result of clear object operation
         return new YdsResult(true, parentElement, parentElementPath);
       case ElementPathType.shortToList:
-      /*if (parentIsAnElement && fs.existsSync(parentFilePath)) {
-          const parentElementPath = elementPathInfo.parentElementPath;
-          parentElement = load(
-            workingDirectoryPath,
-            parentElementPath,
-            depth
-          ).element;
-        }*/
       case ElementPathType.hierarchicalToList:
         // get file path to list
         const listFilePath = elementPathInfo.data;
