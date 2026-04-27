@@ -161,7 +161,10 @@ describe("Test basic clear function for empty element path pointing to an object
     );
     const elementName = "model";
     const workingDirectoryPath = path.join(TMP_WORKING_DIR_PATH, elementName);
-    const specCaseWorkingDirectoryPath = TMP_SPEC_DIR_AFTER_OPERATION_PATH;
+    const specCaseWorkingDirectoryPath = path.join(
+      TMP_SPEC_DIR_AFTER_OPERATION_PATH,
+      elementName
+    );
     const elementPathToClear = "";
     const depth = 0;
 
