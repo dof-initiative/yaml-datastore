@@ -1,7 +1,7 @@
 import path from "path";
 import fs from "node:fs";
 import yaml from "js-yaml";
-import { load, YdsResult } from "./index.js";
+import { YdsResult } from "./index.js";
 import { EMPTY_WORKINGDIR_PATH_ERROR, INVALID_PATH_ERROR } from "./load.js";
 import {
   getElementPathInfo,
@@ -84,7 +84,12 @@ export function clear(
           );
 
           // return result of clear object operation
-          return new YdsResult(true, parentElement, parentElementPath);
+          return generateDeleteOrClearYdsResult(
+            true,
+            workingDirectoryPath,
+            parentElementPath,
+            depth
+          );
         }
 
         // object has no parent, therefore it is the root element whose contents shall be cleared
@@ -96,7 +101,12 @@ export function clear(
         fs.writeFileSync(elementFilePath, objectContentsToStore, "utf-8");
 
         // return result of clear object operation
-        return new YdsResult(true, parentElement, parentElementPath);
+        return generateDeleteOrClearYdsResult(
+          true,
+          workingDirectoryPath,
+          parentElementPath,
+          depth
+        );
       case ElementPathType.shortToObject:
         // get parsed path to object
         const shortToObjectParsedPath = path.parse(elementPathInfo.data);
@@ -121,7 +131,12 @@ export function clear(
           fs.writeFileSync(thisYamlFilePath, objectContentsToStore);
 
           // return result of clear object operation
-          return new YdsResult(true, elementToStore, elementPathInfo.keyName);
+          return generateDeleteOrClearYdsResult(
+            true,
+            workingDirectoryPath,
+            parentElementPath,
+            depth
+          );
         }
       case ElementPathType.hierarchicalToObject:
         // get parsed path to object
@@ -141,7 +156,12 @@ export function clear(
         }
 
         // return result of clear object operation
-        return new YdsResult(true, parentElement, parentElementPath);
+        return generateDeleteOrClearYdsResult(
+          true,
+          workingDirectoryPath,
+          parentElementPath,
+          depth
+        );
       case ElementPathType.shortToList:
       case ElementPathType.hierarchicalToList:
         // get file path to list
@@ -209,7 +229,12 @@ export function clear(
         }
 
         // return result of clear list operation
-        return new YdsResult(true, parentElement, parentElementPath);
+        return generateDeleteOrClearYdsResult(
+          true,
+          workingDirectoryPath,
+          parentElementPath,
+          depth
+        );
       case ElementPathType.shortToSimple:
       case ElementPathType.hierarchicalToSimple:
         if (
@@ -217,20 +242,35 @@ export function clear(
           (parentElement as any)[elementPathInfo.keyName] === "" ||
           typeof (parentElement as any)[elementPathInfo.keyName] === "object"
         ) {
-          return new YdsResult(true, parentElement, parentElementPath);
+          return generateDeleteOrClearYdsResult(
+            true,
+            workingDirectoryPath,
+            parentElementPath,
+            depth
+          );
         } else if (
           typeof (parentElement as any)[elementPathInfo.keyName] === "string"
         ) {
           (parentElement as any)[elementPathInfo.keyName] = "";
           fs.writeFileSync(parentFilePath, yaml.dump(parentElement));
-          return new YdsResult(true, parentElement, parentElementPath);
+          return generateDeleteOrClearYdsResult(
+            true,
+            workingDirectoryPath,
+            parentElementPath,
+            depth
+          );
         } else if (
           typeof (parentElement as any)[elementPathInfo.keyName] === "number" ||
           typeof (parentElement as any)[elementPathInfo.keyName] === "boolean"
         ) {
           (parentElement as any)[elementPathInfo.keyName] = null;
           fs.writeFileSync(parentFilePath, yaml.dump(parentElement));
-          return new YdsResult(true, parentElement, parentElementPath);
+          return generateDeleteOrClearYdsResult(
+            true,
+            workingDirectoryPath,
+            parentElementPath,
+            depth
+          );
         }
       case ElementPathType.shortToComplexString:
       case ElementPathType.hierarchicalToComplexString:
@@ -246,7 +286,12 @@ export function clear(
         );
 
         // return result of clear complex string operation
-        return new YdsResult(true, parentElement, parentElementPath);
+        return generateDeleteOrClearYdsResult(
+          true,
+          workingDirectoryPath,
+          parentElementPath,
+          depth
+        );
       case ElementPathType.invalid:
         break;
     }
