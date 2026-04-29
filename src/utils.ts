@@ -6,6 +6,9 @@ import { load, YdsResult } from "./index.js";
 // Regular expression used for matching element file paths enclosed between double parentheses
 export const doubleParenthesesRegEx = new RegExp(/\(\(.*\)\)/);
 
+// Regular expression used for matching 6-character uppercase alphanumeric string
+export const idRegex = new RegExp(/^[A-Z0-9]{6}$/);
+
 /**
  * Maps complex string key name to file name using the following rules:
  *

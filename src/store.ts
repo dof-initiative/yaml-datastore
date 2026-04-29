@@ -3,7 +3,7 @@ import fs from "node:fs";
 import yaml from "js-yaml";
 import { generateIDs } from "./index.js";
 import { YdsResult } from "./index.js";
-import { complexStringKeyToFileName } from "../src/utils.js";
+import { idRegex, complexStringKeyToFileName } from "../src/utils.js";
 
 export const INVALID_ELEMENT_NAME = "Error: Invalid element name";
 export const INVALID_PATH_ERROR = "Error: Invalid path";
@@ -78,9 +78,6 @@ export const reserved_keywords = [
   "with",
   "yield",
 ];
-
-// Regular expression used for matching 6-character uppercase alphanumeric string
-export const idRegex = new RegExp(/^[A-Z0-9]{6}$/);
 
 /**
  * Describes the nature of a container
