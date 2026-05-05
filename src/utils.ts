@@ -273,7 +273,24 @@ export function getElementPathInfo(
     if (fs.existsSync(filepath)) {
       // working directory itself is an object; parent element unknown
 
-      if (!fs.existsSync(parentFilePath)) {
+      // verify if object has a list ID in its name
+      const workingDirectoryParsedPath = path.parse(workingDirectoryPath);
+      const workingDirectoryBase = workingDirectoryParsedPath.base;
+      let parentElementName;
+      if (idRegex.test(workingDirectoryBase.split("_").slice(-1)[0])) {
+        // object has a list as its parent
+        parentElementName = workingDirectoryBase
+          .split("_")
+          .slice(0, -1)
+          .join("_");
+        parentFilePath = path.join(
+          workingDirectoryPath,
+          "..",
+          parentElementName + ".yaml"
+        );
+      }
+      // verify parent is not an object
+      else if (!fs.existsSync(parentFilePath)) {
         // object has no parent
         parentFilePath = path.join(workingDirectoryPath, "..");
       }

@@ -11,9 +11,6 @@ import {
 } from "./utils.js";
 import { recursivelyDeleteList } from "./delete.js";
 
-export const CLEAR_EMPTY_ELEMENT_PATH_ERROR =
-  "Error: Cannot clear element for empty element path";
-
 /**
  *
  * @param workingDirectoryPath relative or absolute path to working directory containing yaml-datastore serialized content
@@ -72,8 +69,26 @@ export function clear(
           const elementName = convertYamlFilePathToElementPath(elementFilePath)
             .split(".")
             .slice(-1)[0];
-          // clear key-value pair for element name in parent element
-          (parentElement as any)[elementName] = {};
+
+          // clear element from parent element
+          if (Array.isArray(parentElement)) {
+            // parent element is a list
+
+            // iterate through list to identify index containing element to be cleared
+            for (let index of Object.keys(parentElement)) {
+              // if file reference to object at index matches element name + /_this.yaml (enclosed in double-parentheses), clear element from parent element
+              if (
+                parentElement[index as any] ===
+                "((" + elementName + "/_this.yaml))"
+              ) {
+                (parentElement as any)[index] = {};
+                break;
+              }
+            }
+          } else {
+            // parent element is an object
+            (parentElement as any)[elementName] = {};
+          }
           // load contents of parent element
           const parentElementOfObjectContentsToStore = yaml.dump(parentElement);
 
@@ -84,12 +99,8 @@ export function clear(
           );
 
           // return result of clear object operation
-          return generateDeleteOrClearYdsResult(
-            true,
-            workingDirectoryPath,
-            parentElementPath,
-            depth
-          );
+          // TODO: refactor to use generateDeleteOrClearYdsResult()
+          return new YdsResult(true, parentElement, "");
         }
 
         // object has no parent, therefore it is the root element whose contents shall be cleared
@@ -299,11 +310,11 @@ export function clear(
       false,
       workingDirectoryPath,
       INVALID_PATH_ERROR +
-        " [" +
+        " [ " +
         workingDirectoryPath +
         " | " +
         elementPath +
-        "]",
+        " ]",
       0
     );
   }

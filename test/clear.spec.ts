@@ -5,7 +5,6 @@ import { DEFAULT_SPEC_CASE_FOLDER } from "./spec_constants";
 import { StoreTestResult } from "./store.spec";
 import { getElementPathInfo } from "../src/utils";
 import { INVALID_PATH_ERROR } from "../src/store";
-import { CLEAR_EMPTY_ELEMENT_PATH_ERROR } from "../src/clear";
 import { expect } from "chai";
 import fs from "node:fs";
 import path from "path";
@@ -204,7 +203,7 @@ describe("Test basic clear function for empty element path pointing to an object
       toJsonString(specCasePathHash["children"])
     );
   });
-  it("shall clear object for empty element path where working directory is an object and its parent is an element", async () => {
+  it("shall clear object for empty element path where working directory is an object and its parent is an object", async () => {
     // 1. get spec case path
     const specCasePath = toSpecCasePath(
       path.join("1.2.3_object_with_object_of_complex_data_types", "clearMyObj")
@@ -239,6 +238,103 @@ describe("Test basic clear function for empty element path pointing to an object
     const expectedResult = load(
       specCaseWorkingDirectoryPath,
       result.message,
+      depth
+    );
+    const expectedParentElement = expectedResult.element;
+    expect(result.success).to.equal(true);
+    expect(toJsonString(result.element)).to.equal(
+      toJsonString(expectedParentElement)
+    );
+
+    // 5. get hashElements for expected directory and resulting (after-operation) directory
+    const specCasePathHash = await hashElement(
+      TMP_SPEC_DIR_AFTER_OPERATION_PATH,
+      options
+    );
+    const storePathHash = await hashElement(TMP_WORKING_DIR_PATH, options);
+
+    // verify that checksums of on-disk representation from spec case versus serialized content are identical
+    expect(toJsonString(storePathHash["children"])).to.equal(
+      toJsonString(specCasePathHash["children"])
+    );
+  });
+  it("shall clear object for empty element path where working directory is an object and its parent is a list", async () => {
+    // 1. get spec case path
+    const specCasePath = toSpecCasePath(
+      path.join("2.2.3_list_of_objects_of_complex_data_types", "clearModel0")
+    );
+    const elementName = "model_E16F4F";
+    const workingDirectoryPath = path.join(TMP_WORKING_DIR_PATH, elementName);
+    const specCaseWorkingDirectoryPath = path.join(
+      TMP_SPEC_DIR_AFTER_OPERATION_PATH
+    );
+    const elementPathToClear = "";
+    const depth = 0;
+
+    // 2.1 copy (before operation state) spec case files into TMP_WORKING_DIR_PATH
+    const defaultCasePath = path.join(specCasePath, DEFAULT_SPEC_CASE_PATH);
+    fs.cpSync(defaultCasePath, TMP_WORKING_DIR_PATH, { recursive: true });
+
+    // 2.2 copy (after operation state) spec case files into TMP_SPEC_DIR_AFTER_OPERATION_PATH
+    fs.cpSync(specCasePath, TMP_SPEC_DIR_AFTER_OPERATION_PATH, {
+      recursive: true,
+    });
+
+    // 3. clear element, given working directory path and element path
+    const result = clear(workingDirectoryPath, elementPathToClear);
+
+    // 4. verify results of clear operation
+    const expectedResult = load(specCaseWorkingDirectoryPath, "model", depth);
+    const expectedParentElement = expectedResult.element;
+    expect(result.success).to.equal(true);
+    expect(toJsonString(result.element)).to.equal(
+      toJsonString(expectedParentElement)
+    );
+
+    // 5. get hashElements for expected directory and resulting (after-operation) directory
+    const specCasePathHash = await hashElement(
+      TMP_SPEC_DIR_AFTER_OPERATION_PATH,
+      options
+    );
+    const storePathHash = await hashElement(TMP_WORKING_DIR_PATH, options);
+
+    // verify that checksums of on-disk representation from spec case versus serialized content are identical
+    expect(toJsonString(storePathHash["children"])).to.equal(
+      toJsonString(specCasePathHash["children"])
+    );
+  });
+  it("shall clear object for empty element path where working directory is an object and its parent is a list nested in a list", async () => {
+    // 1. get spec case path
+    const specCasePath = toSpecCasePath(
+      path.join(
+        "2.2.7.1_list_of_list_of_objects_of_simple_data_types",
+        "clearModel00"
+      )
+    );
+    const elementName = "model_E16F4F_E16F4F";
+    const workingDirectoryPath = path.join(TMP_WORKING_DIR_PATH, elementName);
+    const specCaseWorkingDirectoryPath = path.join(
+      TMP_SPEC_DIR_AFTER_OPERATION_PATH
+    );
+    const elementPathToClear = "";
+    const depth = 0;
+
+    // 2.1 copy (before operation state) spec case files into TMP_WORKING_DIR_PATH
+    const defaultCasePath = path.join(specCasePath, DEFAULT_SPEC_CASE_PATH);
+    fs.cpSync(defaultCasePath, TMP_WORKING_DIR_PATH, { recursive: true });
+
+    // 2.2 copy (after operation state) spec case files into TMP_SPEC_DIR_AFTER_OPERATION_PATH
+    fs.cpSync(specCasePath, TMP_SPEC_DIR_AFTER_OPERATION_PATH, {
+      recursive: true,
+    });
+
+    // 3. clear element, given working directory path and element path
+    const result = clear(workingDirectoryPath, elementPathToClear);
+
+    // 4. verify results of clear operation
+    const expectedResult = load(
+      specCaseWorkingDirectoryPath,
+      "model[0]",
       depth
     );
     const expectedParentElement = expectedResult.element;
