@@ -1,13 +1,14 @@
 import path from "path";
 import fs from "node:fs";
 import yaml from "js-yaml";
-import { load, YdsResult } from "./index.js";
+import { YdsResult } from "./index.js";
 import { EMPTY_WORKINGDIR_PATH_ERROR, INVALID_PATH_ERROR } from "./load.js";
 import {
   doubleParenthesesRegEx,
   trimDoubleParentheses,
   getElementPathInfo,
   ElementPathType,
+  generateDeleteOrClearYdsResult,
 } from "./utils.js";
 
 export const DELETE_EMPTY_ELEMENT_PATH_ERROR =
@@ -91,7 +92,12 @@ export function deleteElement(
   depth: number = 0
 ): YdsResult {
   if (workingDirectoryPath === "") {
-    return new YdsResult(false, null, EMPTY_WORKINGDIR_PATH_ERROR);
+    return generateDeleteOrClearYdsResult(
+      false,
+      workingDirectoryPath,
+      EMPTY_WORKINGDIR_PATH_ERROR,
+      0
+    );
   } else {
     const elementPathInfo = getElementPathInfo(
       workingDirectoryPath,
@@ -113,39 +119,44 @@ export function deleteElement(
 
     switch (elementPathInfo.type) {
       case ElementPathType.empty:
-        return new YdsResult(
+        // empty element path must be pointing to an object (i.e., working directory is an object)
+
+        // return error, since attempting delete an element from within the element is nonsensical
+        return generateDeleteOrClearYdsResult(
           false,
-          null,
+          workingDirectoryPath,
           DELETE_EMPTY_ELEMENT_PATH_ERROR +
             " [" +
             workingDirectoryPath +
             " | " +
             elementPath +
-            "]"
+            "]",
+          0
         );
       case ElementPathType.shortToObject:
       case ElementPathType.hierarchicalToObject:
+        // get parsed path to object
         const objectFilePath = path.parse(elementPathInfo.data).dir;
+
+        // recursively delete directory path to object
         fs.rmSync(objectFilePath, { recursive: true });
+
+        // if parent element exists, delete key-value pair from parent
         if (parentIsAnElement && fs.existsSync(parentFilePath)) {
+          // delete object from parent element
           deleteChildFromParentElement(parentElement, elementPathInfo.keyName);
-          const parentElementOfObjectContentsToStore = yaml.dump(parentElement);
-          fs.writeFileSync(
-            parentFilePath,
-            parentElementOfObjectContentsToStore
-          );
-          const parentElementOfObjectStoredToDisk = load(
-            workingDirectoryPath,
-            parentElementPath,
-            depth
-          ).element;
-          return new YdsResult(
-            true,
-            parentElementOfObjectStoredToDisk,
-            parentElementPath
-          );
+
+          // write contents of updated parent element to disk
+          fs.writeFileSync(parentFilePath, yaml.dump(parentElement));
         }
-        return new YdsResult(true, null, "");
+
+        // return result of delete object operation
+        return generateDeleteOrClearYdsResult(
+          true,
+          workingDirectoryPath,
+          parentElementPath,
+          depth
+        );
       case ElementPathType.shortToList:
       case ElementPathType.hierarchicalToList:
         // get file path to list
@@ -156,39 +167,45 @@ export function deleteElement(
         // (recursively) delete list from disk
         recursivelyDeleteList(listPath);
 
-        let parentElementOfListStoredToDisk = null;
-        // delete list from parent element
+        // if parent element exists, delete list from parent element
         if (parentIsAnElement && fs.existsSync(parentFilePath)) {
+          // delete list from parent element
           deleteChildFromParentElement(parentElement, elementPathInfo.keyName);
 
-          // load parent element into memory for YdsResult object
-          const parentElementOfListContentsToStore = yaml.dump(parentElement);
-          fs.writeFileSync(
-            parentFilePath,
-            parentElementOfListContentsToStore,
-            "utf-8"
-          );
-          parentElementOfListStoredToDisk = load(
+          // write contents of updated parent element to disk
+          fs.writeFileSync(parentFilePath, yaml.dump(parentElement), "utf-8");
+
+          // return result of delete list operation
+          return generateDeleteOrClearYdsResult(
+            true,
             workingDirectoryPath,
             parentElementPath,
             depth
-          ).element;
-
-          // return result of delete list operation
-          return new YdsResult(
-            true,
-            parentElementOfListStoredToDisk,
-            parentElementPath
           );
         }
 
         // return result of delete list operation
-        return new YdsResult(true, null, parentElementPath);
+        return generateDeleteOrClearYdsResult(
+          true,
+          workingDirectoryPath,
+          parentElementPath,
+          depth
+        );
       case ElementPathType.shortToSimple:
       case ElementPathType.hierarchicalToSimple:
+        // delete simple data type from parent element
         deleteChildFromParentElement(parentElement, elementPathInfo.keyName);
+
+        // write contents of updated parent element to disk
         fs.writeFileSync(parentFilePath, yaml.dump(parentElement));
-        return new YdsResult(true, parentElement, parentElementPath);
+
+        // return result of delete simple data type operation
+        return generateDeleteOrClearYdsResult(
+          true,
+          workingDirectoryPath,
+          parentElementPath,
+          depth
+        );
       case ElementPathType.shortToComplexString:
       case ElementPathType.hierarchicalToComplexString:
         // get complex string file path
@@ -199,37 +216,30 @@ export function deleteElement(
 
         // delete complex string from parent element
         deleteChildFromParentElement(parentElement, elementPathInfo.keyName);
-        const parentElementOfComplexStringContentsToStore =
-          yaml.dump(parentElement);
-        fs.writeFileSync(
-          parentFilePath,
-          parentElementOfComplexStringContentsToStore,
-          "utf-8"
-        );
+
+        // write contents of updated parent element to disk
+        fs.writeFileSync(parentFilePath, yaml.dump(parentElement), "utf-8");
 
         // return result of delete complex string operation
-        const parentElementOfComplexStringStoredToDisk = load(
+        return generateDeleteOrClearYdsResult(
+          true,
           workingDirectoryPath,
           parentElementPath,
           depth
-        ).element;
-        return new YdsResult(
-          true,
-          parentElementOfComplexStringStoredToDisk,
-          parentElementPath
         );
       case ElementPathType.invalid:
         break;
     }
-    return new YdsResult(
+    return generateDeleteOrClearYdsResult(
       false,
-      null,
+      workingDirectoryPath,
       INVALID_PATH_ERROR +
         " [" +
         workingDirectoryPath +
         " | " +
         elementPath +
-        "]"
+        "]",
+      0
     );
   }
 }
