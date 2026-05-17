@@ -57,11 +57,12 @@ export function convertYamlFilePathToElementPath(filePath: string): string {
 }
 
 /**
+ * Factory helper function used to generate YdsResult for delete or clear operations
  *
- * @param success
- * @param workingDirectoryPath
- * @param parentElementPathOrError
- * @param depth
+ * @param success boolean specifying success status of delete or clear operation
+ * @param workingDirectoryPath string specifying working directory path
+ * @param parentElementPathOrError string specifying element path to parent element to be returned as part of YdsResult or error message for failed delete/clear operations
+ * @param depth number specifying depth to load parentElement to be returned as part of YdsResult
  */
 export function generateDeleteOrClearYdsResult(
   success: boolean,
