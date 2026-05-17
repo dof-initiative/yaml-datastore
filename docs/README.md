@@ -1,22 +1,22 @@
 ![Bart Simpson in front of chalkboard writing repeatedly "GIT IS NOT A DATABASE"](./bartsimpsonmeme.png)
 <br>
-**Git is not a database.—but what if it was?** With YAML datastore, you can make your data Git-friendly. 
+**Git is not a database.—but what if it was?** With YAML datastore, you can make your data Git-friendly.
 
-YAML Datastore is a lightweight library that stores and manages data with structured plaintext files and YAML syntax, designed for use with version control systems. This enables you to gain the advantages of Git for your data—track changes at the feature level, store data across multiple systems, and merge data seamlessly. 
+YAML Datastore is a lightweight library that stores and manages data with structured plaintext files and YAML syntax, designed for use with version control systems. This enables you to gain the advantages of Git for your data—track changes at the feature level, store data across multiple systems, and merge data seamlessly.
 <br>
 
 **Getting Started**
 
-* New to YAML Data Store? Get [introduced](#introduction)
-* Ready to install? Follow the [installation steps](#installation)
-* Want to learn how YAML Datastore stores information based on data types? Read the [Overview](#overview) section
-* Curious about use cases? Read about the [CRUD Operations](#crud-operations)
-* Want to use the API? See [the API documentation](#api-v000)
+- New to YAML Data Store? Get [introduced](#introduction)
+- Ready to install? Follow the [installation steps](#installation)
+- Find detailed explanations about data types and storage in [About YAML Datastore Library](#about-yaml-datastore-library)
+- Want to learn how YAML Datastore [CRUDs](#crud-operations) data? 
+- Curious about [use cases](#use-cases)? 
+- Want to use the API? See [the API documentation](#api-v000)
 
 <br>
 
-
-**Contents** 
+**Contents**
 
 <!-- !toc (numbered) -->
 
@@ -24,83 +24,75 @@ YAML Datastore is a lightweight library that stores and manages data with struct
 1.1\. [What is YAML Datastore?](#what-is-yaml-datastore) <br>
 1.2\. [Purpose of YAML Datastore](#purpose-of-yaml-datastore) <br>
 2\. [Installation](#installation) <br>
-3\. [Overview](#overview) <br>
+3\. [About YAML Datastore Library](#about-yaml-datastore-library) <br>
 3.1\. [Element Paths](#element-paths) <br>
 3.1.1\. [Types of Element paths](#types-of-element-paths) <br>
 3.2\. [Supported Data Types](#supported-data-types) <br>
 3.3\. [Mapping Complex Data Types to Files](#mapping-complex-data-types-to-files) <br>
-3.3.1\. [Multi-line Strings](#multi-line-strings) <br>
+3.3.1\. [Complex Strings](#complex-strings) <br>
 3.3.2\. [Lists](#lists) <br>
 3.3.3\. [Objects](#objects) <br>
 3.4\. [References to Subfiles](#references-to-subfiles) <br>
 3.5\. [List Element IDs](#list-element-ids) <br>
 3.5.1\. [Why it works](#why-it-works) <br>
 3.5.2\. [Implementation and Format](#implementation-and-format) <br>
-4\. [CRUD Operations](#crud-operations) <br>
-4.1\. [Store Function](#store-function) <br>
-4.1.1\. [Element is object](#element-is-object) <br>
-4.1.2\. [Element is list](#element-is-list) <br>
-4.2\. [Load Function](#load-function) <br>
-4.2.1\. [Empty Element Path](#empty-element-path) <br>
-4.2.2\. [Short Element Path](#short-element-path) <br>
-4.2.3\. [Hiearchial Element Path](#hiearchial-element-path) <br>
-4.3\. [Delete Function](#delete-function) <br>
-4.3.1\. [Empty Element Path](#empty-element-path-1) <br>
-4.3.2\. [Short Element Path](#short-element-path-1) <br>
-4.4\. [Clear Function](#clear-function) <br>
-4.4.1\. [Empty Element Path](#empty-element-path-2) <br>
-4.4.2\. [Short Element Path](#short-element-path-2) <br>
-5\. [Use Cases](#use-cases) <br>
-5.1\. [Store Use Cases](#store-use-cases) <br>
-5.1.1\. [Object with Simple Data Types](#object-with-simple-data-types) <br>
-5.1.2\. [Object with Complex String](#object-with-complex-string) <br>
-5.1.3\. [Object with Object of Simple Data Types](#object-with-object-of-simple-data-types) <br>
-5.1.4\. [Object with Object of Complex Data Types](#object-with-object-of-complex-data-types) <br>
-5.1.5\. [Object with List of Simple Data Type](#object-with-list-of-simple-data-type) <br>
-5.1.6\. [Object with List of Simple Data Types](#object-with-list-of-simple-data-types) <br>
-5.1.7\. [Object with List of Complex Strings](#object-with-list-of-complex-strings) <br>
-5.1.8\. [Object with List of Objects of Simple Data Types](#object-with-list-of-objects-of-simple-data-types) <br>
-5.1.9\. [Object with List of List of Simple Data Type](#object-with-list-of-list-of-simple-data-type) <br>
-6\. [API v0.0.0](#api-v000) <br>
-6.1\. [Classes](#classes) <br>
-6.2\. [Functions](#functions) <br>
-7\. [License](#license) <br>
-8\. [Contributions](#contributions) <br>
+3.6\. [CRUD Operations](#crud-operations) <br>
+3.6.1\. [Store Function](#store-function) <br>
+3.6.2\. [Load Function](#load-function) <br>
+3.6.3\. [Delete Function](#delete-function) <br>
+3.6.4\. [Clear Function](#clear-function) <br>
+4\. [Use Cases](#use-cases) <br>
+4.1\. [Store Use Cases](#store-use-cases) <br>
+4.1.1\. [Object with Simple Data Types](#object-with-simple-data-types) <br>
+4.1.2\. [Object with Complex String](#object-with-complex-string) <br>
+4.1.3\. [Object with Object of Simple Data Types](#object-with-object-of-simple-data-types) <br>
+4.1.4\. [Object with Object of Complex Data Types](#object-with-object-of-complex-data-types) <br>
+4.1.5\. [Object with List of Simple Data Type](#object-with-list-of-simple-data-type) <br>
+4.1.6\. [Object with List of Simple Data Types](#object-with-list-of-simple-data-types) <br>
+4.1.7\. [Object with List of Complex Strings](#object-with-list-of-complex-strings) <br>
+4.1.8\. [Object with List of Objects of Simple Data Types](#object-with-list-of-objects-of-simple-data-types) <br>
+4.1.9\. [Object with List of List of Simple Data Type](#object-with-list-of-list-of-simple-data-type) <br>
+5\. [API v0.0.0](#api-v000) <br>
+5.1\. [Classes](#classes) <br>
+5.2\. [Functions](#functions) <br>
+6\. [License](#license) <br>
+7\. [Contributions](#contributions) <br>
 
 <!-- toc! -->
 
 # Introduction
 
 ## What is YAML Datastore?
+
 YAML Datastore is a lightweight Typescript library designed for observable, human-readable data storage and retrieval using YAML files. It serves as an alternative to traditional databases that do not store data in a version control-friendly way.
 
 ## Purpose of YAML Datastore
-YAML Datastore exists because we rather than try to add Git-like features to how we store and manage data, we want to do data management in a way that fits in Git. We found that existing systems attempting to use Git as a backend didn't account properly for structure. YAML Datastore automatically manages this structure with easy to understand rules that we explain in the Usage section. 
+
+YAML Datastore exists because rather than try to add Git-like features to how we store and manage data, we want to do data management in a way that fits in Git. We found that existing systems attempting to use Git as a backend didn't account properly for structure. YAML Datastore automatically manages this structure with easy to understand rules that we explain in About [YAML Datastore Library](#about-yaml-datastore-library). 
 
 # Installation
+
 Install the library in the root directory of your project using npm or yarn.
 
-  `npm install yaml-datastore` 
+`npm install yaml-datastore`
 
-  `yarn add yaml-datastore` 
+`yarn add yaml-datastore`
 
-# Overview
+# About YAML Datastore Library
+
 This section provides comprehensive details about how the YAML Datastore library organizes and stores data on disk.
 
-YAML Datastore implements the standard CRUD operations for transforming in-memory objects and lists into structured YAML files and back. We will describe the supported data types, how they map onto the file system, and provide a comprehensive list of example use cases. 
+YAML Datastore implements the standard CRUD operations for transforming in-memory objects and lists into structured YAML files and back. We will describe the supported data types, how they map onto the file system, and provide a comprehensive list of example use cases.
 
 ## Element Paths
 
-YAML Datastore separates two distinct notions of location: the **file path** (where data lives on disk, e.g. numeric property `pi:3.14` lives in `model/constants/_this.yaml`) and the **element path** (where data lives in the in-memory model, e.g. `model.constants.pi`, `mylist[2]`, `model.info.mylist[2]`). 
+YAML Datastore defines two types of locations. The first type is the **file path**, where data lives on disk. For example, the file path for the numeric property `pi: 3.14` that is part of the constants object `model/constants/_this.yaml` (the value pi will be included in the file). The second type is the **element path**, where data lives in the in-memory model. Continuing from the previous example, the element path for pi would be `model.constants.pi`. Element paths can also include list notations, such as `mylist[2]`, `model.info.mylist[2]`, `model.mylist[3][1]`.
 
-A **file path** follows standard filesystem conventions, a hierarchy of directories plus a single terminal file, for example `model/constants/_this.yaml`.
+A **file path** follows standard filesystem conventions, a hierarchy of directories plus a single terminal file, as seen in the example for the filepath to pi, `model/constants/_this.yaml`.
 
-An **element path** is an object path,dot-separated, with support for bracketed indexing for list elements or key-value pairs in objects, from the working directory to the element to be read into memory (i.e. `top-element.sub-element.property[3]`).
+An **element path** is an object path, expressed in dot and brackets notation, from the working directory to the element to be read into memory. As an example, if the working contains `top-element/sub-element/properties.yaml` then the element path `top-element.sub-element.properties[3]` refers to the value that index 3 in the list stored in `properties.yaml`.
 
-All API calls use element paths; the library handles translation to and from file paths internally.
-
-**start notes:**
-- Two different types of paths: filepath (where in the file system the information is put), hiearchy of directories + single file in the hiearchy with the content e.g. value pi, some file contains numeric property `pi:3.14` in `model/constants/_this.yaml`; element path (where in the in memory representation is the information), expressed in dot and brackets notation, e.g. `model.constants.pi` , `mylist[2]`, `model.info.mylist[2]`. When you interact with the API you speak in element paths relative to a working directory
+Putting this all together, to retrieve `Steve`, when the current working directory _contains_the model directory, use `model.avengers[0].firstName`. If the current working directory _is_ the model directory, then to get Steve use `avengers[0].firstName`. TODO Explain filepath The list contains objects ... the first item is Steve... may want to include after the tree view of _this.yaml with steve rogers
 
 <!-- include (test/spec/1.2.7.1_object_with_list_of_objects_of_simple_data_types/model.json) -->
 {
@@ -124,11 +116,7 @@ All API calls use element paths; the library handles translation to and from fil
 }
 <!-- /include -->
 
-To get Steve, use `model.avengers[0].firstName`, only if the current working directory *contains* the model directory
-
-If the current working directory *is* the model directory, then to get Steve use `avengers[0].firstName`
-
-YAML datastore maintains a mapping between element space and file system space based on the way it separates the content out into separate files.
+See in this directory how the library maintains a mapping between element space and file system space based on the way it separates the content out into separate files.
 
 <!-- include (test/spec/1.2.7.1_object_with_list_of_objects_of_simple_data_types/.model_tree.txt) -->
 model
@@ -142,62 +130,71 @@ model
 └── _this.yaml
 <!-- /include -->
 
-**end notes**
+All API calls use element paths; the library handles translation to and from file paths internally.
 
 ### Types of Element paths
 
-* **Empty**: must refer to an object stored in the current working directory (must have a _this.yaml in it, otherwise invalid). This is the only valid case for an empty element path; it cannot point to any other data type.
-* **Short**: a single identifier with no dots or brackets (e.g. `model`, `avengers`, `firstName`). There are four conditions to test: the path may point to an object, a list, a complex string, or a simple value. If the current working directory contains `model/`, the short path to it is model. If the current working directory is model/, the short path to the list of avengers is avengers. If the current working directory is `model/avengers_E16F4F/`, the short paths to individual fields are `firstName` or `lastName`.
-* **Hierarchical**: a multi-step path using dots for object properties and brackets for list indices (e.g. `model.avengers[0].firstName`). Everything beyond a short path falls into one of two cases: the element path points to a complex type (object, list, or complex string), or it points to a simple property.
+- **Empty**: must refer to an object stored in the current working directory (must have a \_this.yaml in it, otherwise invalid). This is the only valid case for an empty element path; it cannot point to any other data type.
+- **Short**: a single identifier with no dots or brackets (e.g. `model`, `avengers`, `firstName`). There are four conditions to test: the path may point to an object, a list, a complex string, or a simple value. If the current working directory contains `model/`, the short path to it is model. If the current working directory is model/, the short path to the list of avengers is avengers. If the current working directory is `model/avengers_E16F4F/`, the short paths to individual fields are `firstName` or `lastName`.
+- **Hierarchical**: a multi-step path using dots for object properties and brackets for list indices (e.g. `model.avengers[0].firstName`). Everything beyond a short path falls into one of two cases: the element path points to a complex type (object, list, or complex string), or it points to a simple property.
 
 **start notes**
-Element paths can take on three different qualities: 
-- empty ; must refer to an object that is stored in the current working dir (must have a _this.yaml in it, otherwise invalid)
+Element paths can take on three different qualities:
+
+- empty ; must refer to an object that is stored in the current working dir (must have a \_this.yaml in it, otherwise invalid)
 - short path ; a path that does not contain any hiearchy aka there are no dots or brackets in the path e.g. if the current working dir contains model dir, to access the model short element path to it is the string `model`. if the current working dir is the model dir, to access the list of avengers the short element path to it is the string `avengers`. if the current working dir is `model/avengers_E16F4F/` (note make sure we handle all directories with / at the end)to access `Steve` you would use short path `firstName`, or for `Rogers`, `lastName`. [contains no hiearchy]
 - hiearchial path ; a path that contains hiearchy, separated by dots or brackes because we are in element space instead of file space. e.g. if the current working dir contains the model dir and you want to access captain america's first name (first avenger) use `model.avengers[0].firstName` and if the current working dir is the model dir use `avengers[0].firstName`. To access all information about captain america, and current working dir is the model dir `avengers[0]`.
-Tool must account for the relationship between the element path and the element type that it is pointing to. e.g. empty element path that points to an object ; cannot have empty element path that points to any other data types (lists, complex strings, simple data types, etc)
-**end notes**
+  Tool must account for the relationship between the element path and the element type that it is pointing to. e.g. empty element path that points to an object ; cannot have empty element path that points to any other data types (lists, complex strings, simple data types, etc)
+  **end notes**
 
 ## Supported Data Types
-YAML Datastore supports any data types that are supported in YAML (and JSON). YAML Datastore categorizes these data types as simple or complex based upon their representation inside of a YAML file containing that data before serialization. The element that this YAML file represents is referred to as the root element. A root element can either be an object (root object) or a list (root list). 
 
-Simple data types can be represented as a single line in a YAML file. This includes all scalar types; scalar types in YAML are strings without newlines, numbers, booleans, or nulls. Empty lists and empty objects are also simple data types. Empty strings without new lines are a simple data type. 
+YAML Datastore supports any data types that are supported in YAML (and JSON). YAML Datastore categorizes these data types as simple or complex based upon their representation inside of a YAML file containing that data before serialization. The element that this YAML file represents is referred to as the root element. A root element can either be an object (root object) or a list (root list).
 
-Complex data types require more than one line to be represented as a YAML file. This includes multi-line strings and (non-empty) lists and objects. Empty strings with new lines are a complex data type. Complex data types are serialized into individual files. Lists and objects may have child elements that are simple or complex data types. How parent lists and objects reference complex data types will be covered in [Mapping Complex Data Types to Files](#mapping-complex-data-types-to-files).
+Simple data types can be represented as a single line in a YAML file. This includes all scalar types; scalar types in YAML are strings without newlines, numbers, booleans, or nulls. Empty lists and empty objects are also simple data types. Empty strings without new lines are a simple data type.
 
-| Simple Data Types  | Complex Data Types |
-| ------------------ | ------------------ |
-| String w/o Newline: `"Hello World"`  |  Multi-line String |
-| Number: `3.14`, `42`  | List |
-| Boolean: `true`, `false` | Object|
-| Null: `null` | |
-| Empty String: `''` | Empty String w/ Newline: `'\n'`|
-| Empty List: `[]` | |
-| Empty Object: `{}` | |
+Complex data types require more than one line to be represented as a YAML file. This includes complex strings and (non-empty) lists and objects. Empty strings with new lines are a complex data type. Complex data types are serialized into individual files. Lists and objects may have child elements that are simple or complex data types. How parent lists and objects reference complex data types will be covered in [Mapping Complex Data Types to Files](#mapping-complex-data-types-to-files).
+
+| Simple Data Types                   | Complex Data Types              |
+| ----------------------------------- | ------------------------------- |
+| String w/o Newline: `"Hello World"` | Complex String                  |
+| Number: `3.14`, `42`                | List                            |
+| Boolean: `true`, `false`            | Object                          |
+| Null: `null`                        |                                 |
+| Empty String: `''`                  | Empty String w/ Newline: `'\n'` |
+| Empty List: `[]`                    |                                 |
+| Empty Object: `{}`                  |                                 |
 
 ## Mapping Complex Data Types to Files
-This section describes each of the complex data types and the method used to serialize them to disk. 
 
-### Multi-line Strings
-Multi-line strings are serialized to disk as text files. Multi-line strings will either have an object or list as a parent. For objects, the text files are a sibling of the parent element's `_this.yaml` file. For lists, the text files are a sibling of the parent element's yaml file. The parent file [references](#references-to-subfiles) such files using a convention described in the next section. 
+This section describes each of the complex data types and the method used to serialize them to disk.
+
+### Complex Strings
+
+Complex strings are serialized to disk as text files. Complex strings will either have an object or list as a parent. For objects, the text files are a sibling of the parent element's `_this.yaml` file. For lists, the text files are a sibling of the parent element's yaml file. The parent file [references](#references-to-subfiles) such files using a convention described in the next section.
 
 ### Lists
-Lists are serialized to disk as yaml files. A root list file  lives directly in the working directory. If list is the child of a parent list or object, the list will require its own file which will be [referenced](#references-to-subfiles) in the parent using a convention described in the next section. If the parent is an object, the list will be named after the key*. If the parent is a list, list elements require unique names which are generated using a process described in [List Element IDs](#list-element-ids).
 
-* If key name includes an underscore `_`, this will be changed to a dot separator `.`.  
+Lists are serialized to disk as yaml files. A root list file lives directly in the working directory. If list is the child of a parent list or object, the list will require its own file which will be [referenced](#references-to-subfiles) in the parent using a convention described in the next section. If the parent is an object, the list will be named after the key\*. If the parent is a list, list elements require unique names which are generated using a process described in [List Element IDs](#list-element-ids).
+
+- If key name includes an underscore `_`, this will be changed to a dot separator `.`.
 
 ### Objects
-Objects are serialized to disk with a directory and a file `_this.yaml` containing the information. The root object's directory and file contents lives in the working directory. If the object is a child of a parent list or object, the object will require its own directory containing its own `_this.yaml` file, and the parent will [reference](#references-to-subfiles) the object using the convention described in the next section. When the object is the child of an object, the directory is nested in its parent object's directory and be named after the key*. When the object is the child of a list, the object's directory will require a unique name which is generated using a process described in [List Element IDs](#list-element-ids).
+
+Objects are serialized to disk with a directory and a file `_this.yaml` containing the information. The root object's directory and file contents lives in the working directory. If the object is a child of a parent list or object, the object will require its own directory containing its own `_this.yaml` file, and the parent will [reference](#references-to-subfiles) the object using the convention described in the next section. When the object is the child of an object, the directory is nested in its parent object's directory and be named after the key\*. When the object is the child of a list, the object's directory will require a unique name which is generated using a process described in [List Element IDs](#list-element-ids).
 
 ## References to Subfiles
-To point to the files storing complex data, we use the convention of enclosing the relative filepath in double parentheses `((` `))`. For objects, any underscores `_` are replaced with dot separator `.`. For example `stringname_txt` becomes `((stringname.txt))`. 
+
+To point to the files storing complex data, we use the convention of enclosing the relative filepath in double parentheses `((` `))`. For objects, any underscores `_` are replaced with dot separator `.`. For example `stringname_txt` becomes `((stringname.txt))`.
 
 ## List Element IDs
+
 To keep files stable, conflict-free, and diff-friendly in distributed environments, we generate IDs for list elements of complex data types using a seeded Xorshift Random Number Generator (RNG). This approach avoids issues that could arise from using traditional identifiers like UUIDs, GUIDs, short ids, or math.random() which could add "noise" into commits.
 
 ### Why it works
+
 1. **Deterministic reproducibility**: By using a seeded RNG, the sequence of random numbers is always the same. If you generate a list of 10 items, delete them all, and then re-add the exact same 10 items, the resulting directory IDs will be identical to the first run. Your local filesystem doesn't "drift" or accumulate entropy over time; it remains a stable, predictable reflection of the current data state.
-2. **Conflict-free merging**: By using a seeded RNG, the sequence of random numbers is the same across different environments. If two users independently add *identical* data to a list, the resulting directory IDs remain consistent. When merging branches in Git, these "overlapping" files resolve naturally without manual intervention. 
+2. **Conflict-free merging**: By using a seeded RNG, the sequence of random numbers is the same across different environments. If two users independently add _identical_ data to a list, the resulting directory IDs remain consistent. When merging branches in Git, these "overlapping" files resolve naturally without manual intervention.
 3. **Meaningful Diffs**: Filesystem changes only reflect the actual data updates. Metadata noise, such as timestamps or environment-specific IDs are avoided, providing a clean version control history. If you swap the positions of two items in a list, the Git diff will show only the reordering of the references in the list.yaml file.
 4. **A-Chronological logic**: IDs are non-sequential by design. The filesystem doesn't imply a "rank" or "order" that doesn't exist in the data structure.
 5. **Lightweight**: Since JS doesn't include a seeded RNG, YAML datastore has to include a third-party RNG library. We selected pure-rand for its standards compliant implementation and the fact that it has zero run-time dependencies.
@@ -206,109 +203,134 @@ To keep files stable, conflict-free, and diff-friendly in distributed environmen
 
 To ensure cross-implementation consistency, all implementations need to use the same seed value.
 
-The selected seed value is the integer `321`, which is the sum of the ASCII decimal codes for the string "OSHW" (79 + 83 + 72 + 87 = 321). 
+The selected seed value is the integer `321`, which is the sum of the ASCII decimal codes for the string "OSHW" (79 + 83 + 72 + 87 = 321).
 
-Each ID is 6 uppercase hexadecimal digits (characters 0–9, A–F), maximizing the namespace while keeping directory names short and human-readable. 
+Each ID is 6 uppercase hexadecimal digits (characters 0–9, A–F), maximizing the namespace while keeping directory names short and human-readable.
 
-A per-list counter (`idCounter`) tracks the total number of IDs ever generated for a given list, stored in a hidden dot-file named after the list (e.g. `.model.yaml`). When a new ID is needed, the RNG is seeded at 321 and advanced idCounter steps; that value becomes the new ID and the counter increments by one. The absence of the dot-file is equivalent to a counter value of zero. The generator state needs to reset to this seed after every use. This ensures that the ID for an item depends only on the algorithm, not the order in which items were added or how many exist in the list. *TODO: skip mechanism*
+A per-list counter (`idCounter`) tracks the total number of IDs ever generated for a given list, stored in a hidden dot-file named after the list (e.g. `.model.yaml`). When a new ID is needed, the RNG is seeded at 321 and advanced idCounter steps; that value becomes the new ID and the counter increments by one. The absence of the dot-file is equivalent to a counter value of zero. The generator state needs to reset to this seed after every use. This ensures that the ID for an item depends only on the algorithm, not the order in which items were added or how many exist in the list. _TODO: skip mechanism_
 
-IDs are appended to the parent element name with an underscore `_` separator, followed by a suffix identifying the complex data type (`_this.yaml` for objects, `.yaml` for lists, `.txt` for multi-line strings). Nesting is reflected by chaining IDs with underscores, for example `model_E16F4F_506E59.yaml`.
+IDs are appended to the parent element name with an underscore `_` separator, followed by a suffix identifying the complex data type (`_this.yaml` for objects, `.yaml` for lists, `.txt` for complex strings). Nesting is reflected by chaining IDs with underscores, for example `model_E16F4F_506E59.yaml`.
 
 **start notes**
-Show id is 6 uppercase hex digits long and show what we do with the IDs -- we append the end of a parent name _ id name for whatever the class of thing is that's complex - object, list, multi-line string - and this nests and the ids nest with underscores in the name. use spec directory. 
+Show id is 6 uppercase hex digits long and show what we do with the IDs -- we append the end of a parent name \_ id name for whatever the class of thing is that's complex - object, list, complex string - and this nests and the ids nest with underscores in the name. use spec directory.
 **end notes**
 
-# CRUD Operations
+## CRUD Operations
+
 We will discuss how each CRUD operation maps onto the library functions and use cases by function.
 Todo: expressing iterative loading
 
-| CRUD Operation  | Library Function | Parameters |
-| --------------- | ---------------- | ------------- |
-| Create  |  Store | `element: object, workingDirectoryPath: string, elementName: string` |
-| Read | Load | `workingDirectoryPath: string, elementPath: string, depth: number = -1` |
-| Update | TBD | TBD | 
-| Delete | Delete | `workingDirectoryPath: string, elementPath: string, depth: number = 0` |
-| | Clear | `workingDirectoryPath: string, elementPath: string, depth: number = 0` | 
+| CRUD Operation | Library Function | Parameters                                                              |
+| -------------- | ---------------- | ----------------------------------------------------------------------- |
+| Create         | Store            | `element: object, workingDirectoryPath: string, elementName: string`    |
+| Read           | Load             | `workingDirectoryPath: string, elementPath: string, depth: number = -1` |
+| Update         | TBD              | TBD                                                                     |
+| Delete         | Delete           | `workingDirectoryPath: string, elementPath: string, depth: number = 0`  |
+|                | Clear            | `workingDirectoryPath: string, elementPath: string, depth: number = 0`  |
 
-## Store Function
+TODO: note about element: object; arrays in TypeScript are objects
 
-The Store function serializes in-memory data structures into the filesystem, mapping each data type to its corresponding file or directory representation.
+### Store Function
 
-### Element is object
+The Store function serializes in-memory data structures onto the filesystem, mapping each data type to its corresponding file or directory representation. It takes an object or list element as an input.
+
+#### Element is object
+
 - Creates a directory named with the element name in the working directory path.
 - Generates a `_this.yaml` file inside that directory to hold the object's properties.
-- For every property in the object that are complex data types, Store is called recursively. Simple types are written to `_this.yaml` , while complex types are included as references. 
+- For every property in the object that are objects or list, Store is called recursively. Simple types are written to `_this.yaml` , while complex types are included as references.
 
-### Element is list
+#### Element is list
+
 - Creates a .yaml file named with the element name in the working directory path.
-- For every item in the list that are complex data types, the store function generates an ID
-- `idCounter`, in a hidden `.` (dot) file named after yaml list (e.g., `.model.yaml`) that increments. Absense of file means list counter value is 0 (zero).
+- For every item in the list that are objects or list, Store is called recursively and generates an ID.
+- `idCounter`, in a hidden `.` (dot) file named after the yaml list (e.g., `.model.yaml`) that increments. Absense of file means list counter value is 0 (zero).
 
-## Load Function
-The Load function reconstructs disk data back into the in-memory object. It resolves filesystem references e.g. `((``))` and loads the object tree based on a specified depth.
+### Load Function
 
-### Empty Element Path
+The Load function reconstructs disk data back into the in-memory data structure and resolves filesystem [references](#references-to-subfiles) e.g. `((``))`. The depth to load the object tree is specfied as a parameter, the default depth is -1. The Load Function takes as input the working directory, element path, and depth. Here is the expected behavior for different types of element paths.
+
+#### Empty Element Path
+
 - Must point to an Object. An empty path indicates the root of the current working directory.
-- The function checks the target filepath for a `_this.yaml` file.
+- The function checks the working directory for a `_this.yaml` file.
 - If `_this.yaml` is missing, the function throws an error, as a directory without this file is not a valid object root in this spec.
 
-### Short Element Path
+#### Short Element Path
+
 - A single-level identifier (no dots or brackets). The behavior is determined by the file extension found at that path.
 
-#### Element path points at Object
-- The library loads the contents of [path]/_this.yaml
+##### Element path points at Object
 
-#### Element path points at List
-- [path].yaml file. The library loads the array 
+- The library loads the contents of [path]/\_this.yaml
 
-#### Element path points at Complex String
+##### Element path points at List
+
+- [path].yaml file. The library loads the array
+
+##### Element path points at Complex String
+
 - The library loads the [path].txt file, preserving newlines that would otherwise break standard YAML formatting.
 
-#### Element path points at Simple Value
+##### Element path points at Simple Value
+
 - The value is read directly from the parent YAML file.
 
-### Hiearchial Element Path
-A multi-step path (e.g., `model.assemblySteps[0].summary`). The library recursively traverses the filesystem, resolving each segment until it reaches the target.
+#### Hiearchial Element Path
 
-#### Element path points at complex data
-?
+A multi-step path (e.g., `model.assemblySteps[0].summary`). The library recursively traverses the filesystem, resolving each segment until it reaches the target.
 
 Example: `model.assemblySteps` might return a list of references: `[ "((step_E16F4F))", "((step_506E59))" ]`.
 
-#### Element path points at simple value
+##### Element path points at simple value
+
 - Returns the final scalar value found in the terminal YAML file.
 
-Example: `model.assemblySteps[0].summary` resolves through the list, into the specific step's _this.yaml, and returns the string stored under the summary key.
+Example: `model.assemblySteps[0].summary` resolves through the list, into the specific step's \_this.yaml, and returns the string stored under the summary key.
 
-## Delete Function
+### Delete Function
+
 The Delete function permanently removes an element from the data structure. It modifies the parent (object or list) to excise the reference and deletes the corresponding files or directories from the filesystem. (e.g., if `model.foo` points to a string, "bar", "delete" operation removes `model.foo` entirely)
 
-### Empty Element Path
+#### Empty Element Path
+
 - Error - Cannot delete directory while inside
 
-### Short Element Path
+#### Short Element Path
+
 - The behavior is determined by the "owning" structure (the CWD).
-- **If Parent is an Object**: The key is removed from the _this.yaml file. If the value was a complex type, its associated subdirectory or file (e.g., model/ or model.txt) is deleted from the disk.
+- **If Parent is an Object**: The key is removed from the \_this.yaml file. If the value was a complex type, its associated subdirectory or file (e.g., model/ or model.txt) is deleted from the disk.
 - **If Parent is a List**: The index is removed from the [list].yaml file. The associated generated ID directory is deleted. Note that this shifts the indices of all subsequent items in the list, but does not reset the idCounter.
 - Clearing a list removes its expanded file representation but does not reset the idCounter. This ensures that subsequent additions to the list continue the unique ID sequence, preventing collisions with previously existing (or cleared) elements.
 
-## Clear Function
+#### Hiearchial Element Path
+TODO
+
+### Clear Function
+
 The Clear function removes the expanded filesystem representation of a complex data type without removing the element itself from the parent model. e.g., if `model.foo` points to a string, "bar", "clear" operation "removes" contents of `model.foo`, but `model.foo` itself still exists.
 
-### Empty Element Path
+#### Empty Element Path
+
 - Similar to the Delete function, you cannot clear the root directory from within itself.
 - An empty path always implies an Object (the current directory). Clearing it would require moving to the parent context and targeting this directory by name.
 
-### Short Element Path
+#### Short Element Path
+
 - The function first performs an internal check to see if the element is already cleared.
 - Complex Data Types: If the element contains a reference (e.g., `((model.txt))`), the function deletes that file/directory from the disk. The reference string remains in the parent YAML, but it now points to a non-existent (cleared) resource.
 - Simple Data Types: Since simple values (numbers, booleans, simple strings) exist only as inline data in the parent YAML, "clearing" them has no effect on the filesystem. The function returns success with no changes.
 - Clearing a list removes its expanded file representation but does not reset the idCounter.
 
+#### Hiearchial Element Path
+TODO
+
 # Use Cases
+
 This section provides an explanation for each identified use case in the YAML Datastore specification. For each use case we provide an example data structure along with its representation on disk and an explanation of why that is the representation. All of these use cases are of a element (an object or a list) named model.
 
 ## Store Use Cases
+
 {Intro}
 
 TODO: wordsmith above
@@ -800,8 +822,10 @@ matrix: ((matrix.yaml))
 <!-- /include -->
 
 # License
+
 Mach30/yaml-datastore is licensed under the [Apache 2.0 License](https://github.com/Mach30/yaml-datastore/blob/main/LICENSE).
 
 # Contributions
+
 Include information about developer documentation, contribution policy and community chat boards
 
