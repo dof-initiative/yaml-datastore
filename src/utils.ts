@@ -260,6 +260,13 @@ function getNextElementPath(elementPath: string): string {
   return firstElementEntry;
 }
 
+/**
+ * helper function used to obtain information about an element path
+ *
+ * @param workingDirectoryPath string specifying working directory path
+ * @param elementPath string specifying element path
+ * @returns ElementInfo to be returned
+ */
 export function getElementPathInfo(
   workingDirectoryPath: string,
   elementPath: string
