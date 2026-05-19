@@ -45,6 +45,8 @@ export function fileNameToComplexStringKey(fileName: string): string {
  * @returns
  */
 export function convertYamlFilePathToElementPath(filePath: string): string {
+  // TODO (future work): refactor to get actual element path as opposed to file/directory name
+
   if (filePath.slice(-10) === "_this.yaml") {
     // handle case where filePath is a YAML object
     const elementPath = filePath.split("/").slice(0, -1).join(".");

@@ -7,6 +7,7 @@ import {
   getElementPathInfo,
   ElementPathType,
   convertYamlFilePathToElementPath,
+  idRegex,
   generateDeleteOrClearYdsResult,
 } from "./utils.js";
 import { recursivelyDeleteList } from "./delete.js";
@@ -98,9 +99,30 @@ export function clear(
             parentElementOfObjectContentsToStore
           );
 
-          // return result of clear object operation
-          // TODO: refactor to use generateDeleteOrClearYdsResult()
-          return new YdsResult(true, parentElement, "");
+          const parentWorkingDirectory = path.join(workingDirectoryPath, "..");
+
+          // determine parent element name for returning results of clear operation
+          let parentElementName = elementName;
+          if (idRegex.test(elementName.split("_").slice(-1)[0])) {
+            // parent element is a list
+            parentElementName = elementName.split("_").slice(0, -1).join("_");
+
+            // return result of clear object operation for case where parent element is a list
+            return generateDeleteOrClearYdsResult(
+              true,
+              parentWorkingDirectory,
+              parentElementName,
+              depth
+            );
+          }
+
+          // return result of clear object operation for case where parent element is an object
+          return generateDeleteOrClearYdsResult(
+            true,
+            parentWorkingDirectory,
+            parentElementName,
+            depth
+          );
         }
 
         // object has no parent, therefore it is the root element whose contents shall be cleared
