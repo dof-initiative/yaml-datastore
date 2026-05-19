@@ -9,6 +9,7 @@
     "dist"
   ],
   "scripts": {
+    "prepare": "npm run build",
     "build": "tsup",
     "dev": "tsup --watch",
     "test": "c8 mocha --forbid-only",
