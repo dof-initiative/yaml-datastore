@@ -426,6 +426,7 @@ export function getElementPathInfo(
       let remainingElementPath = elementPath.replace(firstElementEntry, "");
       let remainingElementEntries: string[] = [];
       do {
+        // TODO (future work): following lines need to be DRY'ed see lines 408...
         const nextElementPath = getNextElementPath(remainingElementPath);
         if (
           nextElementPath === "" ||
