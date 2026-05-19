@@ -2,7 +2,8 @@ import path from "path";
 import fs from "node:fs";
 import yaml from "js-yaml";
 import { generateIDs } from "./index.js";
-import { complexStringKeyToFileName } from "../src/utils.js";
+import { YdsResult } from "./index.js";
+import { idRegex, complexStringKeyToFileName } from "../src/utils.js";
 
 export const INVALID_ELEMENT_NAME = "Error: Invalid element name";
 export const INVALID_PATH_ERROR = "Error: Invalid path";
@@ -78,9 +79,6 @@ export const reserved_keywords = [
   "yield",
 ];
 
-// Regular expression used for matching 6-character uppercase alphanumeric string
-const idRegex = new RegExp(/^[A-Z0-9]{6}$/);
-
 /**
  * Describes the nature of a container
  */
@@ -93,34 +91,6 @@ enum ContainerType {
    * Container is an Object
    */
   IsObject,
-}
-
-/**
- * Represents results of a call to the store function
- */
-export class StoreResult {
-  private _success: boolean;
-  private _message: string;
-
-  /**
-   * Default constructor for StoreResult
-   *
-   * @param success success status of store() operation
-   * @param message message describing success status of store() operation
-   * @returns new StoreResult object
-   */
-  constructor(success: boolean, message: string) {
-    this._success = success;
-    this._message = message;
-  }
-  /** @returns success status. */
-  public get success() {
-    return this._success;
-  }
-  /** @returns file path to root element serialized to disk on success or an explanation of the failure. */
-  public get message() {
-    return this._message;
-  }
 }
 
 // validate element name to be conformant to rules for javascript variable name
@@ -191,11 +161,12 @@ function elementNameFromFileName(elementFileName: string): string {
 }
 
 // serialize element as YAML object or list
-function storeYaml(
+export function storeYaml(
   element: { [index: string]: any }, // should expect jsObject as element type. Iteration approach requires this typing
   workingDirectoryPath: string,
-  elementName: string
-): StoreResult {
+  elementName: string,
+  depth: number = -1
+): YdsResult {
   // convert element to on-disk YAML representation
   let jsObjToSerialize: { [index: string]: any } = {};
   let dirPath = "";
@@ -214,11 +185,14 @@ function storeYaml(
     filename = elementName + ".yaml";
   } else {
     dirPath = path.join(workingDirectoryPath, elementName);
-    fs.mkdirSync(dirPath);
+    if (depth !== 0 && !fs.existsSync(dirPath)) {
+      fs.mkdirSync(dirPath);
+    }
     filename = "_this.yaml";
   }
   // iterate through items of list or object and replace complex data types with appropriate string-formatted file path
-  let ids = generateIDs(keys.length, 0).reverse();
+  let idCounter = 0;
+  //let ids = generateIDs(idCounter, 0).reverse();
   keys.forEach((key) => {
     const value = element[key];
     if (typeof value === "string") {
@@ -228,9 +202,11 @@ function storeYaml(
         let complexStringFilename = "";
         // generate complex string file name
         if (container === ContainerType.IsList) {
+          let id = generateIDs(1, idCounter).pop();
+          idCounter++;
           complexStringFilename = generateComplexStringFilename(
             elementName,
-            ids.pop()
+            id
           );
         } else {
           complexStringFilename = generateComplexStringFilename(key);
@@ -243,7 +219,9 @@ function storeYaml(
         );
 
         // write complex string at file path to disk
-        fs.writeFileSync(complexStringFilePath, value);
+        if (depth !== 0) {
+          fs.writeFileSync(complexStringFilePath, value);
+        }
       } else {
         // element to store is a simple string: save value to be serialized as element in container
         jsObjToSerialize[key] = value;
@@ -260,10 +238,12 @@ function storeYaml(
       let elementFileName = "";
       // generate object or list file name
       if (container === ContainerType.IsList) {
+        let id = generateIDs(1, idCounter).pop();
+        idCounter++;
         elementFileName = generateObjectOrListFilename(
           elementName,
           Array.isArray(value),
-          ids.pop()
+          id
         );
       } else {
         elementFileName = generateObjectOrListFilename(
@@ -274,8 +254,18 @@ function storeYaml(
       // save value to be serialized as string-formatted generated object or list filename
       jsObjToSerialize[key] = encloseInDoubleParentheses(elementFileName);
 
-      // recursively call storeYaml() to serialize list or object
-      storeYaml(value, dirPath, elementNameFromFileName(elementFileName));
+      if (depth !== 0) {
+        if (depth > 0) {
+          depth = depth - 1;
+        }
+        // recursively call storeYaml() to serialize list or object
+        storeYaml(
+          value,
+          dirPath,
+          elementNameFromFileName(elementFileName),
+          depth
+        );
+      }
     }
   });
 
@@ -287,9 +277,15 @@ function storeYaml(
   const yamlContentToSerialize = yaml.dump(jsObjToSerialize);
 
   // write YAML content do disk
+  if (idCounter > 0) {
+    const listMetadataFilePath = path.join(dirPath, "." + filename);
+    const listMetadata = { idCounter: idCounter };
+    const listMetadataAsYaml = yaml.dump(listMetadata);
+    fs.writeFileSync(listMetadataFilePath, listMetadataAsYaml, "utf-8");
+  }
   fs.writeFileSync(filePath, yamlContentToSerialize, "utf-8");
 
-  return new StoreResult(true, filePath.toString());
+  return new YdsResult(true, element, elementName);
 }
 
 /**
@@ -298,32 +294,35 @@ function storeYaml(
  * @param element object or list to store on-disk
  * @param workingDirectoryPath relative or absolute path to an empty working directory to store element in
  * @param elementName name of element to store
- * @returns a StoreResult containing the status of the call to store function
+ * @returns a YdsResult containing the status of the call to store function
  */
 export function store(
   element: object,
   workingDirectoryPath: string,
   elementName: string
-): StoreResult {
+): YdsResult {
   if (fs.existsSync(workingDirectoryPath)) {
     if (fs.readdirSync(workingDirectoryPath).length > 0) {
-      return new StoreResult(
+      return new YdsResult(
         false,
+        element,
         NONEMPTY_WORKINGDIR_PATH_ERROR + " [" + workingDirectoryPath + "]"
       );
     } else {
       if (validateElementName(elementName)) {
         return storeYaml(element, workingDirectoryPath, elementName);
       } else {
-        return new StoreResult(
+        return new YdsResult(
           false,
+          element,
           INVALID_ELEMENT_NAME + " [" + elementName + "]"
         );
       }
     }
   }
-  return new StoreResult(
+  return new YdsResult(
     false,
+    element,
     INVALID_PATH_ERROR + " [" + workingDirectoryPath + "]"
   );
 }
