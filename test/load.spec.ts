@@ -344,6 +344,32 @@ describe("Test load function for short element path pointing to complex string",
 
 // see hierarchicalToObject in ElementPathType (enum)
 describe("Test basic load function for hierarchical element path pointing to object", () => {
+  it("shall error for invalid element path ending in a dot", () => {
+    const specCasePath = toSpecCasePath(
+      "1.2.2_object_with_object_of_simple_data_types"
+    );
+    const workingDir = path.join(specCasePath, DEFAULT_SPEC_CASE_FOLDER);
+    const elementPath = "model.addres.";
+    const result = load(workingDir, elementPath);
+    expect(result.success).to.equal(false);
+    expect(result.element).to.equal(null);
+    expect(result.message)
+      .to.be.a("string")
+      .and.satisfy((msg) => msg.startsWith(INVALID_PATH_ERROR));
+  });
+  it("shall error for invalid element path entry name", () => {
+    const specCasePath = toSpecCasePath(
+      "1.2.2_object_with_object_of_simple_data_types"
+    );
+    const workingDir = path.join(specCasePath, DEFAULT_SPEC_CASE_FOLDER);
+    const elementPath = "model.addres";
+    const result = load(workingDir, elementPath);
+    expect(result.success).to.equal(false);
+    expect(result.element).to.equal(null);
+    expect(result.message)
+      .to.be.a("string")
+      .and.satisfy((msg) => msg.startsWith(INVALID_PATH_ERROR));
+  });
   it("shall load object for object property element path to object", () => {
     const specCasePath = toSpecCasePath(
       "1.2.2_object_with_object_of_simple_data_types"
