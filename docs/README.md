@@ -26,15 +26,15 @@ YAML Datastore is a lightweight library that stores and manages data with struct
 2\. [Installation](#installation) <br>
 3\. [About YAML Datastore Library](#about-yaml-datastore-library) <br>
 3.1\. [Element Paths](#element-paths) <br>
-3.1.1\. [Types of Element paths](#types-of-element-paths) <br>
+3.1.1\. [Cases of Element Paths](#cases-of-element-paths) <br>
 3.2\. [Supported Data Types](#supported-data-types) <br>
 3.3\. [Mapping Complex Data Types to Files](#mapping-complex-data-types-to-files) <br>
 3.3.1\. [Complex Strings](#complex-strings) <br>
 3.3.2\. [Lists](#lists) <br>
 3.3.3\. [Objects](#objects) <br>
 3.4\. [References to Subfiles](#references-to-subfiles) <br>
-3.5\. [List Element IDs](#list-element-ids) <br>
-3.5.1\. [Why it works](#why-it-works) <br>
+3.5\. [About List Element IDs](#about-list-element-ids) <br>
+3.5.1\. [Reasons for using List Element IDs](#reasons-for-using-list-element-ids) <br>
 3.5.2\. [Implementation and Format](#implementation-and-format) <br>
 3.6\. [CRUD Operations](#crud-operations) <br>
 3.6.1\. [Store Function](#store-function) <br>
@@ -118,34 +118,29 @@ Putting this all together, to retrieve `Steve`, when the current working directo
 
 See in this directory how the library maintains a mapping between element space and file system space based on the way it separates the content out into separate files.
 
-<!-- include (test/spec/1.2.7.1_object_with_list_of_objects_of_simple_data_types/.model_tree.txt) -->
-model
-├── avengers_506E59
-│   └── _this.yaml
-├── avengers_A28836
-│   └── _this.yaml
-├── avengers_E16F4F
-│   └── _this.yaml
-├── avengers.yaml
-└── _this.yaml
-<!-- /include -->
+!include (test/spec/1.2.7.1_object_with_list_of_objects_of_simple_data_types/.model_tree.txt)
 
 All API calls use element paths; the library handles translation to and from file paths internally.
 
-### Types of Element paths
+### Cases of Element Paths
 
-- **Empty**: must refer to an object stored in the current working directory (must have a \_this.yaml in it, otherwise invalid). This is the only valid case for an empty element path; it cannot point to any other data type.
-- **Short**: a single identifier with no dots or brackets (e.g. `model`, `avengers`, `firstName`). There are four conditions to test: the path may point to an object, a list, a complex string, or a simple value. If the current working directory contains `model/`, the short path to it is model. If the current working directory is model/, the short path to the list of avengers is avengers. If the current working directory is `model/avengers_E16F4F/`, the short paths to individual fields are `firstName` or `lastName`.
-- **Hierarchical**: a multi-step path using dots for object properties and brackets for list indices (e.g. `model.avengers[0].firstName`). Everything beyond a short path falls into one of two cases: the element path points to a complex type (object, list, or complex string), or it points to a simple property.
+Element paths can be empty, short, or hierarchical. 
 
-**start notes**
-Element paths can take on three different qualities:
+**Empty** element paths must refer to an *object* stored in the current working directory. Essentially, the current working directory must have a `\_this.yaml` in it, otherwise the element path is invalid. *This is the only valid case for an empty element path; it cannot point to any other data type.*
 
-- empty ; must refer to an object that is stored in the current working dir (must have a \_this.yaml in it, otherwise invalid)
-- short path ; a path that does not contain any hiearchy aka there are no dots or brackets in the path e.g. if the current working dir contains model dir, to access the model short element path to it is the string `model`. if the current working dir is the model dir, to access the list of avengers the short element path to it is the string `avengers`. if the current working dir is `model/avengers_E16F4F/` (note make sure we handle all directories with / at the end)to access `Steve` you would use short path `firstName`, or for `Rogers`, `lastName`. [contains no hiearchy]
-- hiearchial path ; a path that contains hiearchy, separated by dots or brackes because we are in element space instead of file space. e.g. if the current working dir contains the model dir and you want to access captain america's first name (first avenger) use `model.avengers[0].firstName` and if the current working dir is the model dir use `avengers[0].firstName`. To access all information about captain america, and current working dir is the model dir `avengers[0]`.
-  Tool must account for the relationship between the element path and the element type that it is pointing to. e.g. empty element path that points to an object ; cannot have empty element path that points to any other data types (lists, complex strings, simple data types, etc)
-  **end notes**
+**Short** element paths may refer to an object, a list, a complex string, or a simple value. They contain no hierarchy and use a single identifier with no dots or brackets (e.g. `model`, `avengers`, `firstName`). 
+Examples:
+* If the current working directory contains `model/`, the short path to it is `model`. 
+* If the current working directory is `model/`, the short path to the list of avengers is `avengers`. 
+* If the current working directory is `model/avengers_E16F4F/`, the short paths to individual fields are `firstName` or `lastName`.
+* If ?? to access `Steve` you would use short path `firstName`, or for `Rogers`, `lastName`. 
+
+**Hierarchical** element paths are multi-step and use dots for object properties and brackets for list indices (e.g. `model.avengers[0].firstName`). 
+Examples:
+* If the current working dir contains the model dir and you want to access captain america's first name (first avenger) use `model.avengers[0].firstName` 
+* If the current working dir is the model dir use `avengers[0].firstName`. 
+* To access all information about captain america, and current working dir is the model dir `avengers[0]`
+TODO: add info from May 19 call
 
 ## Supported Data Types
 
@@ -187,11 +182,11 @@ Objects are serialized to disk with a directory and a file `_this.yaml` containi
 
 To point to the files storing complex data, we use the convention of enclosing the relative filepath in double parentheses `((` `))`. For objects, any underscores `_` are replaced with dot separator `.`. For example `stringname_txt` becomes `((stringname.txt))`.
 
-## List Element IDs
+## About List Element IDs
 
 To keep files stable, conflict-free, and diff-friendly in distributed environments, we generate IDs for list elements of complex data types using a seeded Xorshift Random Number Generator (RNG). This approach avoids issues that could arise from using traditional identifiers like UUIDs, GUIDs, short ids, or math.random() which could add "noise" into commits.
 
-### Why it works
+### Reasons for using List Element IDs
 
 1. **Deterministic reproducibility**: By using a seeded RNG, the sequence of random numbers is always the same. If you generate a list of 10 items, delete them all, and then re-add the exact same 10 items, the resulting directory IDs will be identical to the first run. Your local filesystem doesn't "drift" or accumulate entropy over time; it remains a stable, predictable reflection of the current data state.
 2. **Conflict-free merging**: By using a seeded RNG, the sequence of random numbers is the same across different environments. If two users independently add _identical_ data to a list, the resulting directory IDs remain consistent. When merging branches in Git, these "overlapping" files resolve naturally without manual intervention.
@@ -335,7 +330,7 @@ This section provides an explanation for each identified use case in the YAML Da
 
 TODO: wordsmith above
 
-<!-- include (test/spec/1.1_object_with_simple_data_types/README.md) -->
+<!-- include (test/spec/1.1_object_with_simple_data_types/default/README.md) -->
 ### Object with Simple Data Types
 This use case demonstrates the simplest pattern in YAML Datastore, an object where all properties are of simple data types. 
 #### The Model to Store
@@ -373,7 +368,7 @@ notes: ''
 ```
 <!-- /include -->
 
-<!-- include (test/spec/1.2.1_object_with_complex_string/README.md) -->
+<!-- include (test/spec/1.2.1_object_with_complex_string/default/README.md) -->
 ### Object with Complex String
 This use case demonstrates storing an object that contains a complex string.
 #### The Model to Store
@@ -412,7 +407,7 @@ The lamb was sure to go.
 ```
 <!-- /include -->
 
-<!-- include (test/spec/1.2.2_object_with_object_of_simple_data_types/README.md) -->
+<!-- include (test/spec/1.2.2_object_with_object_of_simple_data_types/default/README.md) -->
 ### Object with Object of Simple Data Types
 This use case demonstrates storing an object that contains an object that contains simple data types.
 #### The Model to Store
@@ -457,7 +452,7 @@ postalCode: '90265'
 This yaml file stores the object, and because the object only has simple data types, we can store it as a single file. 
 <!-- /include -->
 
-<!-- include (test/spec/1.2.3_object_with_object_of_complex_data_types/README.md) -->
+<!-- include (test/spec/1.2.3_object_with_object_of_complex_data_types/default/README.md) -->
 ### Object with Object of Complex Data Types
 This use case demonstrates storing an object that contains an object with complex data.
 #### The Model to Store
@@ -535,7 +530,7 @@ state: WA
 ```
 <!-- /include -->
 
-<!-- include (test/spec/1.2.4_object_with_list_of_simple_data_type/README.md) -->
+<!-- include (test/spec/1.2.4_object_with_list_of_simple_data_type/default/README.md) -->
 ### Object with List of Simple Data Type
 #### The Model to Store
 In this case, an object contains some simple data `companyName` and `foundedYear` and a list `employees` containing simple data. 
@@ -572,7 +567,7 @@ foundedYear: 1949
 ```
 <!-- /include -->
 
-<!-- include (test/spec/1.2.5_object_with_list_of_simple_data_types/README.md) -->
+<!-- include (test/spec/1.2.5_object_with_list_of_simple_data_types/default/README.md) -->
 ### Object with List of Simple Data Types
 #### The Model to Store
 In this case an object contains an object `personInfo` with a list of simple data. 
@@ -609,7 +604,7 @@ personInfo: ((personInfo.yaml))
 ```
 <!-- /include -->
 
-<!-- include (test/spec/1.2.6_object_with_list_of_complex_strings/README.md) -->
+<!-- include (test/spec/1.2.6_object_with_list_of_complex_strings/default/README.md) -->
 ### Object with List of Complex Strings
 #### The Model to Store
 In this case we have an object that contains a list `verses_txt` containing one string and three multi-line strings.
@@ -675,7 +670,7 @@ The lamb was sure to go.
 ```
 <!-- /include -->
 
-<!-- include (test/spec/1.2.7.1_object_with_list_of_objects_of_simple_data_types/README.md) -->
+<!-- include (test/spec/1.2.7.1_object_with_list_of_objects_of_simple_data_types/default/README.md) -->
 ### Object with List of Objects of Simple Data Types
 #### The Model to Store
 ```json
@@ -742,7 +737,7 @@ age: 94
 ```
 <!-- /include -->
 
-<!-- include (test/spec/1.2.7.2_object_with_list_of_list_of_simple_data_type/README.md) -->
+<!-- include (test/spec/1.2.7.2_object_with_list_of_list_of_simple_data_type/default/README.md) -->
 ### Object with List of List of Simple Data Type
 #### The Model to Store
 ```json
@@ -811,11 +806,12 @@ matrix: ((matrix.yaml))
 
 ## Classes
 
-- [LoadResult](classes/LoadResult.md)
-- [StoreResult](classes/StoreResult.md)
+- [YdsResult](classes/YdsResult.md)
 
 ## Functions
 
+- [clear](functions/clear.md)
+- [deleteElement](functions/deleteElement.md)
 - [generateIDs](functions/generateIDs.md)
 - [load](functions/load.md)
 - [store](functions/store.md)

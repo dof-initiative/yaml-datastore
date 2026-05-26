@@ -6,10 +6,10 @@
 function load(
    workingDirectoryPath: string, 
    elementPath: string, 
-   depth: number): LoadResult;
+   depth: number): YdsResult;
 ```
 
-Defined in: [load.ts:417](https://github.com/dof-initiative/yaml-datastore/blob/449889486eebf2c86801fdde0319aca7357c91c7/src/load.ts#L417)
+Defined in: [load.ts:77](https://github.com/dof-initiative/yaml-datastore/blob/22ef7937c3f864307ffb5957f11155c170d6d7c1/src/load.ts#L77)
 
 Returns a in-memory representation of the element in working directory specified by element path
 
@@ -35,6 +35,6 @@ integer from -1 to depth of element indicating how deep into element's hierachy 
 
 ## Returns
 
-[`LoadResult`](../classes/LoadResult.md)
+[`YdsResult`](../classes/YdsResult.md)
 
-a LoadResult containing the status and content of the load function
+a YdsResult containing the status and content of the load function
