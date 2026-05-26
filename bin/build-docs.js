@@ -32,10 +32,19 @@ const projectDirPath = sh.pwd().toString();
 
 console.log("Generating Example Tree Views and READMEs");
 specDirs.forEach((specDirPath) => {
-  // 1.1. generate all of the spec dir tree files
-  generateModelTreeFile(path.join(projectDirPath, SPEC_DIR, specDirPath));
-  // 1.2. generate all of the spec dir README.md files
-  generateReadmeFile(path.join(projectDirPath, SPEC_DIR, specDirPath));
+  let caseDirs = sh.ls(path.join(projectDirPath, SPEC_DIR, specDirPath));
+  caseDirs.forEach((caseDirPath) => {
+    if (!caseDirPath.endsWith(".json")) {
+      // 1.1. generate all of the spec dir tree files
+      generateModelTreeFile(
+        path.join(projectDirPath, SPEC_DIR, specDirPath, caseDirPath)
+      );
+      // 1.2. generate all of the spec dir README.md files
+      generateReadmeFile(
+        path.join(projectDirPath, SPEC_DIR, specDirPath, caseDirPath)
+      );
+    }
+  });
 });
 
 // 2.0. one time generations
