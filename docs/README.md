@@ -88,23 +88,13 @@ YAML Datastore defines two types of locations. The first type is the **file path
 
 A **file path** follows standard filesystem conventions, a hierarchy of directories plus a single terminal file, as seen in the example for the filepath to pi, `model/constants/_this.yaml`.
 
-An **element path** is an object path, expressed in dot and brackets notation, from the working directory to the element to be read into memory. As an example, if the working contains `top-element/sub-element/properties.yaml` then the element path `top-element.sub-element.properties[3]` refers to the value that index 3 in the list stored in `properties.yaml`.
+An **element path** is an object path, expressed in dot and brackets notation, from the working directory to the element to be read into memory. 
 
-Putting this all together,say we want to retrieve `Steve`. 
+For example, let's say we have a list of Avengers stored as objects that are a list of simple data types, i.e. their name and age.
 
-!include (test/spec/1.2.7.1_object_with_list_of_objects_of_simple_data_types/default/model.json)
+!include (test/spec/1.2.7.1_object_with_list_of_objects_of_simple_data_types/default/model/model.json)
 
-When the current working directory _contains_the model directory, use `model.avengers[0].firstName`. 
-
-When the current working directory _is_ the model directory, use `avengers[0].firstName`. 
-
-
-
-TODO Explain filepath The list contains objects ... the first item is Steve... may want to include after the tree view of _this.yaml with steve rogers
-
-
-
-See in this directory how the library maintains a mapping between element space and file system space based on the way it separates the content out into separate files.
+Say we want to retrieve `Steve`. When the current working directory _contains_the model directory, we'd use `model.avengers[0].firstName`. When the current working directory _is_ the model directory, we'd use `avengers[0].firstName`. 
 
 <!-- include (test/spec/1.2.7.1_object_with_list_of_objects_of_simple_data_types/default/.model_tree.txt) -->
 model
@@ -117,6 +107,8 @@ model
 ├── avengers.yaml
 └── _this.yaml
 <!-- /include -->
+
+See in this directory how the library maintains a mapping between element space and file system space based on the way it separates the content out into separate files.
 
 All API calls use element paths; the library handles translation to and from file paths internally.
 
