@@ -9,7 +9,7 @@ function deleteElement(
    depth: number): YdsResult;
 ```
 
-Defined in: [delete.ts:89](https://github.com/dof-initiative/yaml-datastore/blob/21cb6bf36b804d41f07afa3852b7f4d69f8b73e6/src/delete.ts#L89)
+Defined in: [delete.ts:89](https://github.com/dof-initiative/yaml-datastore/blob/e4cb9568e65c2de9f0787a1d964354ca1e4d46c1/src/delete.ts#L89)
 
 ## Parameters
 
