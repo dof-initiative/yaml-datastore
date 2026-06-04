@@ -9,9 +9,7 @@ YAML Datastore is a lightweight library that stores and manages data with struct
 
 - New to YAML Data Store? Get [introduced](#introduction)
 - Ready to install? Follow the [installation steps](#installation)
-- Find detailed explanations about data types and storage in [About YAML Datastore Library](#about-yaml-datastore-library)
-- Want to learn how YAML Datastore [CRUDs](#crud-operations) data? 
-- Curious about [use cases](#use-cases)? 
+- Learn how it works in [About YAML Datastore Library](#about-yaml-datastore-library)
 - Want to use the API? See [the API documentation](#api-v000)
 
 <br>
@@ -82,7 +80,7 @@ Install the library in the root directory of your project using npm or yarn.
 
 This section provides comprehensive details about how the YAML Datastore library organizes and stores data on disk.
 
-YAML Datastore implements the standard CRUD operations for transforming in-memory objects and lists into structured YAML files and back. We will describe the supported data types, how they map onto the file system, and provide a comprehensive list of example use cases.
+YAML Datastore implements the standard CRUD operations for transforming in-memory objects and lists into structured YAML files and back. We will describe how locations [map](#element-paths) onto the file system, the [supported data types](#supported-data-types), and provide a comprehensive list of example [use cases](#use-cases).
 
 ## Element Paths
 
