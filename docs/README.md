@@ -27,7 +27,9 @@ YAML Datastore is a lightweight library that stores and manages data with struct
 3.1.1\. [Simple Data Types](#simple-data-types) <br>
 3.1.2\. [Complex Data Types](#complex-data-types) <br>
 3.2\. [Element Paths](#element-paths) <br>
-3.2.1\. [Cases of Element Paths](#cases-of-element-paths) <br>
+3.2.1\. [Empty Element Paths](#empty-element-paths) <br>
+3.2.2\. [Short Element Paths](#short-element-paths) <br>
+3.2.3\. [Hiearchical Element Paths](#hiearchical-element-paths) <br>
 3.3\. [Mapping Complex Data Types to Files](#mapping-complex-data-types-to-files) <br>
 3.3.1\. [Complex Strings](#complex-strings) <br>
 3.3.2\. [Lists](#lists) <br>
@@ -154,15 +156,17 @@ model
 ```
 <!-- /include -->
 
- The above directory shows how the library maintains a mapping between element space and file system space, separating the content out into files.
+The above directory shows how the library maintains a mapping between element space and file system space, separating the content out into files.
 
- All API calls use element paths; the library handles translation to and from file paths internally.
-
-### Cases of Element Paths
+All API calls use element paths; the library handles translation to and from file paths internally.
 
 Element paths can be empty, short, or hierarchical. 
 
+### Empty Element Paths
+
 **Empty** element paths must refer to an *object* stored in the current working directory. Essentially, the current working directory must have a `\_this.yaml` in it, otherwise the element path is invalid. *This is the only valid case for an empty element path; it cannot point to any other data type.*
+
+### Short Element Paths
 
 **Short** element paths may refer to an object, a list, a complex string, or a simple value. They contain no hierarchy and use a single identifier with no dots or brackets (e.g. `model`, `avengers`, `firstName`). 
 These four examples will help clarify how short element paths are used based on the current working directory:
@@ -172,6 +176,8 @@ These four examples will help clarify how short element paths are used based on 
 * If it is an object and the object owns a property `Steve`, you would use short path `firstName`, or for `Rogers`, `lastName`. 
 
 Edge Case: When current working directory is `model/` and contains a list of complex data types, the data types can be accessed using a short path to the complex data. 
+
+### Hiearchical Element Paths
 
 **Hierarchical** element paths are multi-step and use dots for object properties and brackets for list indices (e.g. `model.avengers[0].firstName`). 
 Examples:

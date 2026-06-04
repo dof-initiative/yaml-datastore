@@ -9,7 +9,7 @@ function store(
    elementName: string): YdsResult;
 ```
 
-Defined in: [store.ts:299](https://github.com/dof-initiative/yaml-datastore/blob/591a7927b0aab6fb683cb62dbacd43bba4688aaf/src/store.ts#L299)
+Defined in: [store.ts:299](https://github.com/dof-initiative/yaml-datastore/blob/633e8b3b6d09c199014b2fe14ea977eaf96f20a9/src/store.ts#L299)
 
 Dumps in-memory representation of contents to on-disk representation
 
