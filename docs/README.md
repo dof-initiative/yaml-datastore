@@ -116,7 +116,7 @@ For example, let's say we have a list of Avengers stored as objects that are a l
 ```
 <!-- /include -->
 
-Say we want to retrieve `Steve`. When the current working directory _contains_ the model directory, we'd use `model.avengers[0].firstName`. When the current working directory _is_ the model directory, we'd use `avengers[0].firstName`. 
+Say we want to retrieve the first name of Captian America, `Steve`. When the current working directory _contains_ the model directory, we'd use `model.avengers[0].firstName`. When the current working directory _is_ the model directory, we'd use `avengers[0].firstName`. 
 
 <!-- include (test/spec/1.2.7.1_object_with_list_of_objects_of_simple_data_types/default/.model_tree.txt lang=txt) -->
 ```txt
@@ -144,8 +144,8 @@ Element paths can be empty, short, or hierarchical.
 
 **Short** element paths may refer to an object, a list, a complex string, or a simple value. They contain no hierarchy and use a single identifier with no dots or brackets (e.g. `model`, `avengers`, `firstName`). 
 These four examples will help clarify how short element paths are used based on the current working directory:
-* If it _contains_ `model/`, the short path to it is `model`. 
-* If it _is_ `model/`, the short path to the list of avengers is `avengers`. 
+* If it _contains_ `model/`, the short path to the element is `model`. 
+* If it _is_ `model/`, the short path to the list of Avengers is `avengers`. 
 * If it is `model/avengers_E16F4F/`, the short paths to individual fields are `firstName` or `lastName`. 
 * If it is an object and the object owns a property `Steve`, you would use short path `firstName`, or for `Rogers`, `lastName`. 
 
@@ -153,7 +153,7 @@ Edge Case: When current working directory is `model/` and contains a list of com
 
 **Hierarchical** element paths are multi-step and use dots for object properties and brackets for list indices (e.g. `model.avengers[0].firstName`). 
 Examples:
-* If it _contains_ `model/` and you want to access captain america's first name `Steve`, the hiearchial path is `model.avengers[0].firstName` 
+* If it _contains_ `model/` and you want to access `Steve`, the hiearchial path is `model.avengers[0].firstName` 
 * If it _is_ `model/`, the hierarchial path is `avengers[0].firstName`. Note: to access all information about captain america, the hiearchial path is `avengers[0]`
 
 ## Supported Data Types
