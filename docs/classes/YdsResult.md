@@ -2,7 +2,7 @@
 
 # Class: YdsResult
 
-Defined in: [result.ts:4](https://github.com/dof-initiative/yaml-datastore/blob/d5c310f4a30f5e4283b437adca16060fd8beb25d/src/result.ts#L4)
+Defined in: [result.ts:4](https://github.com/dof-initiative/yaml-datastore/blob/591a7927b0aab6fb683cb62dbacd43bba4688aaf/src/result.ts#L4)
 
 Represents results of a yaml-datastore operation
 
@@ -17,7 +17,7 @@ new YdsResult(
    message: string): YdsResult;
 ```
 
-Defined in: [result.ts:17](https://github.com/dof-initiative/yaml-datastore/blob/d5c310f4a30f5e4283b437adca16060fd8beb25d/src/result.ts#L17)
+Defined in: [result.ts:17](https://github.com/dof-initiative/yaml-datastore/blob/591a7927b0aab6fb683cb62dbacd43bba4688aaf/src/result.ts#L17)
 
 Default constructor for YdsResult
 
@@ -57,7 +57,7 @@ new YdsResult object
 get element(): any;
 ```
 
-Defined in: [result.ts:31](https://github.com/dof-initiative/yaml-datastore/blob/d5c310f4a30f5e4283b437adca16060fd8beb25d/src/result.ts#L31)
+Defined in: [result.ts:31](https://github.com/dof-initiative/yaml-datastore/blob/591a7927b0aab6fb683cb62dbacd43bba4688aaf/src/result.ts#L31)
 
 ##### Returns
 
@@ -75,7 +75,7 @@ element read into memory or stored on-disk per yaml-datastore operation.
 get message(): string;
 ```
 
-Defined in: [result.ts:35](https://github.com/dof-initiative/yaml-datastore/blob/d5c310f4a30f5e4283b437adca16060fd8beb25d/src/result.ts#L35)
+Defined in: [result.ts:35](https://github.com/dof-initiative/yaml-datastore/blob/591a7927b0aab6fb683cb62dbacd43bba4688aaf/src/result.ts#L35)
 
 ##### Returns
 
@@ -93,7 +93,7 @@ message describing success status of a yaml-datastore operation.
 get success(): boolean;
 ```
 
-Defined in: [result.ts:27](https://github.com/dof-initiative/yaml-datastore/blob/d5c310f4a30f5e4283b437adca16060fd8beb25d/src/result.ts#L27)
+Defined in: [result.ts:27](https://github.com/dof-initiative/yaml-datastore/blob/591a7927b0aab6fb683cb62dbacd43bba4688aaf/src/result.ts#L27)
 
 ##### Returns
 

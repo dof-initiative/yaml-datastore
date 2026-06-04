@@ -23,9 +23,11 @@ YAML Datastore is a lightweight library that stores and manages data with struct
 1.2\. [Purpose of YAML Datastore](#purpose-of-yaml-datastore) <br>
 2\. [Installation](#installation) <br>
 3\. [About YAML Datastore Library](#about-yaml-datastore-library) <br>
-3.1\. [Element Paths](#element-paths) <br>
-3.1.1\. [Cases of Element Paths](#cases-of-element-paths) <br>
-3.2\. [Supported Data Types](#supported-data-types) <br>
+3.1\. [Supported Data Types](#supported-data-types) <br>
+3.1.1\. [Simple Data Types](#simple-data-types) <br>
+3.1.2\. [Complex Data Types](#complex-data-types) <br>
+3.2\. [Element Paths](#element-paths) <br>
+3.2.1\. [Cases of Element Paths](#cases-of-element-paths) <br>
 3.3\. [Mapping Complex Data Types to Files](#mapping-complex-data-types-to-files) <br>
 3.3.1\. [Complex Strings](#complex-strings) <br>
 3.3.2\. [Lists](#lists) <br>
@@ -80,7 +82,27 @@ Install the library in the root directory of your project using npm or yarn.
 
 This section provides comprehensive details about how the YAML Datastore library organizes and stores data on disk.
 
-YAML Datastore implements the standard CRUD operations for transforming in-memory objects and lists into structured YAML files and back. We will describe how locations [map](#element-paths) onto the file system with file and element paths, the [supported data types](#supported-data-types), and provide a comprehensive list of example [use cases](#use-cases). The information about [list IDs](#about-list-element-ids) is particularly relevent for those who want to implement YAML Datastore using their tools of choice.
+YAML Datastore implements the standard CRUD operations for transforming in-memory objects and lists into structured YAML files and back. We will explain the [supported data types](#supported-data-types),  how locations [map](#element-paths) onto the file system with file and element paths, and provide a comprehensive list of example [use cases](#use-cases). The information about [list IDs](#about-list-element-ids) is particularly relevent for those who want to implement YAML Datastore using their tools of choice.
+
+## Supported Data Types
+
+YAML Datastore supports any data types that are supported in YAML (and JSON). YAML Datastore categorizes these data types as simple or complex based upon their representation inside of a YAML file containing that data before serialization. The element that this YAML file represents is referred to as the root element. A root element can either be an object (root object) or a list (root list).
+
+### Simple Data Types
+Simple data types can be represented as a single line in a YAML file. This includes all scalar types; scalar types in YAML are strings without newlines, numbers, booleans, or nulls. Empty lists and empty objects are also simple data types. Empty strings without new lines are a simple data type.
+
+### Complex Data Types
+Complex data types require more than one line to be represented as a YAML file. This includes complex strings and (non-empty) lists and objects. Empty strings with new lines are a complex data type. Complex data types are serialized into individual files. Lists and objects may have child elements that are simple or complex data types. How parent lists and objects reference complex data types will be covered in [Mapping Complex Data Types to Files](#mapping-complex-data-types-to-files).
+
+| Simple Data Types                   | Complex Data Types              |
+| ----------------------------------- | ------------------------------- |
+| String w/o Newline: `"Hello World"` | Complex String                  |
+| Number: `3.14`, `42`                | List                            |
+| Boolean: `true`, `false`            | Object                          |
+| Null: `null`                        |                                 |
+| Empty String: `''`                  | Empty String w/ Newline: `'\n'` |
+| Empty List: `[]`                    |                                 |
+| Empty Object: `{}`                  |                                 |
 
 ## Element Paths
 
@@ -90,7 +112,7 @@ A **file path** follows standard filesystem conventions, a hierarchy of director
 
 An **element path** is an object path, expressed in dot and brackets notation, from the working directory to the element to be read into memory. 
 
-For example, let's say we have a list of Avengers stored as objects that are a list of simple data types, i.e. their name and age.
+For example, let's say we have a list of Avengers stored as [objects](#objects) that are a [list](#lists) of [simple data types](#simple-data-types), i.e. their name and age.
 
 <!-- include (test/spec/1.2.7.1_object_with_list_of_objects_of_simple_data_types/model.json lang=json) -->
 ```json
@@ -116,7 +138,7 @@ For example, let's say we have a list of Avengers stored as objects that are a l
 ```
 <!-- /include -->
 
-Say we want to retrieve the first name of Captian America, `Steve`. When the current working directory _contains_ the model directory, we'd use `model.avengers[0].firstName`. When the current working directory _is_ the model directory, we'd use `avengers[0].firstName`. 
+Say we want to retrieve the first name of Captian America, `Steve`. When the current working directory _contains_ `model/`, we'd use `model.avengers[0].firstName`. When the current working directory _is_ `model/`, we'd use `avengers[0].firstName`. 
 
 <!-- include (test/spec/1.2.7.1_object_with_list_of_objects_of_simple_data_types/default/.model_tree.txt lang=txt) -->
 ```txt
@@ -155,24 +177,6 @@ Edge Case: When current working directory is `model/` and contains a list of com
 Examples:
 * If it _contains_ `model/` and you want to access `Steve`, the hiearchial path is `model.avengers[0].firstName` 
 * If it _is_ `model/`, the hierarchial path is `avengers[0].firstName`. Note: to access all information about captain america, the hiearchial path is `avengers[0]`
-
-## Supported Data Types
-
-YAML Datastore supports any data types that are supported in YAML (and JSON). YAML Datastore categorizes these data types as simple or complex based upon their representation inside of a YAML file containing that data before serialization. The element that this YAML file represents is referred to as the root element. A root element can either be an object (root object) or a list (root list).
-
-Simple data types can be represented as a single line in a YAML file. This includes all scalar types; scalar types in YAML are strings without newlines, numbers, booleans, or nulls. Empty lists and empty objects are also simple data types. Empty strings without new lines are a simple data type.
-
-Complex data types require more than one line to be represented as a YAML file. This includes complex strings and (non-empty) lists and objects. Empty strings with new lines are a complex data type. Complex data types are serialized into individual files. Lists and objects may have child elements that are simple or complex data types. How parent lists and objects reference complex data types will be covered in [Mapping Complex Data Types to Files](#mapping-complex-data-types-to-files).
-
-| Simple Data Types                   | Complex Data Types              |
-| ----------------------------------- | ------------------------------- |
-| String w/o Newline: `"Hello World"` | Complex String                  |
-| Number: `3.14`, `42`                | List                            |
-| Boolean: `true`, `false`            | Object                          |
-| Null: `null`                        |                                 |
-| Empty String: `''`                  | Empty String w/ Newline: `'\n'` |
-| Empty List: `[]`                    |                                 |
-| Empty Object: `{}`                  |                                 |
 
 ## Mapping Complex Data Types to Files
 
