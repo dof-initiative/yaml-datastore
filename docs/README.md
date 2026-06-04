@@ -34,9 +34,9 @@ YAML Datastore is a lightweight library that stores and manages data with struct
 3.3.1\. [Complex Strings](#complex-strings) <br>
 3.3.2\. [Lists](#lists) <br>
 3.3.3\. [Objects](#objects) <br>
-3.4\. [References to Subfiles](#references-to-subfiles) <br>
-3.5\. [About List Element IDs](#about-list-element-ids) <br>
-3.5.1\. [Reasons for using List Element IDs](#reasons-for-using-list-element-ids) <br>
+3.4\. [Referencing Subfiles](#referencing-subfiles) <br>
+3.5\. [Generating List Element IDs](#generating-list-element-ids) <br>
+3.5.1\. [Requirements](#requirements) <br>
 3.5.2\. [Implementation and Format](#implementation-and-format) <br>
 3.6\. [CRUD Operations](#crud-operations) <br>
 3.6.1\. [Store Function](#store-function) <br>
@@ -202,15 +202,15 @@ Lists are serialized to disk as yaml files. A root list file lives directly in t
 
 Objects are serialized to disk with a directory and a file `_this.yaml` containing the information. The root object's directory and file contents lives in the working directory. If the object is a child of a parent list or object, the object will require its own directory containing its own `_this.yaml` file, and the parent will [reference](#references-to-subfiles) the object using the convention described in the next section. When the object is the child of an object, the directory is nested in its parent object's directory and be named after the key\*. When the object is the child of a list, the object's directory will require a unique name which is generated using a process described in [List Element IDs](#list-element-ids).
 
-## References to Subfiles
+## Referencing Subfiles
 
 To point to the files storing complex data, we use the convention of enclosing the relative filepath in double parentheses `((` `))`. For objects, any underscores `_` are replaced with dot separator `.`. For example `stringname_txt` becomes `((stringname.txt))`.
 
-## About List Element IDs
+## Generating List Element IDs
 
 To keep files stable, conflict-free, and diff-friendly in distributed environments, we generate IDs for list elements of complex data types using a seeded Xorshift Random Number Generator (RNG). This approach avoids issues that could arise from using traditional identifiers like UUIDs, GUIDs, short ids, or math.random() which could add "noise" into commits.
 
-### Reasons for using List Element IDs
+### Requirements
 
 1. **Deterministic reproducibility**: By using a seeded RNG, the sequence of random numbers is always the same. If you generate a list of 10 items, delete them all, and then re-add the exact same 10 items, the resulting directory IDs will be identical to the first run. Your local filesystem doesn't "drift" or accumulate entropy over time; it remains a stable, predictable reflection of the current data state.
 2. **Conflict-free merging**: By using a seeded RNG, the sequence of random numbers is the same across different environments. If two users independently add _identical_ data to a list, the resulting directory IDs remain consistent. When merging branches in Git, these "overlapping" files resolve naturally without manual intervention.
