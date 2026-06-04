@@ -80,7 +80,7 @@ Install the library in the root directory of your project using npm or yarn.
 
 This section provides comprehensive details about how the YAML Datastore library organizes and stores data on disk.
 
-YAML Datastore implements the standard CRUD operations for transforming in-memory objects and lists into structured YAML files and back. We will describe how locations [map](#element-paths) onto the file system, the [supported data types](#supported-data-types), and provide a comprehensive list of example [use cases](#use-cases).
+YAML Datastore implements the standard CRUD operations for transforming in-memory objects and lists into structured YAML files and back. We will describe how locations [map](#element-paths) onto the file system with file and element paths, the [supported data types](#supported-data-types), and provide a comprehensive list of example [use cases](#use-cases). The information about [list IDs](#about-list-element-ids) is particularly relevent for those who want to implement YAML Datastore using their tools of choice.
 
 ## Element Paths
 
@@ -90,33 +90,33 @@ A **file path** follows standard filesystem conventions, a hierarchy of director
 
 An **element path** is an object path, expressed in dot and brackets notation, from the working directory to the element to be read into memory. As an example, if the working contains `top-element/sub-element/properties.yaml` then the element path `top-element.sub-element.properties[3]` refers to the value that index 3 in the list stored in `properties.yaml`.
 
-Putting this all together, to retrieve `Steve`, when the current working directory _contains_the model directory, use `model.avengers[0].firstName`. If the current working directory _is_ the model directory, then to get Steve use `avengers[0].firstName`. TODO Explain filepath The list contains objects ... the first item is Steve... may want to include after the tree view of _this.yaml with steve rogers
+Putting this all together,say we want to retrieve `Steve`. 
 
-<!-- include (test/spec/1.2.7.1_object_with_list_of_objects_of_simple_data_types/model.json) -->
-{
-  "avengers": [
-    {
-      "firstName": "Steve",
-      "lastName": "Rogers",
-      "age": 94
-    },
-    {
-      "firstName": "Tony",
-      "lastName": "Stark",
-      "age": 48
-    },
-    {
-      "firstName": "Thor",
-      "lastName": "Odinson",
-      "age": 1500
-    }    
-  ]
-}
-<!-- /include -->
+!include (test/spec/1.2.7.1_object_with_list_of_objects_of_simple_data_types/default/model.json)
+
+When the current working directory _contains_the model directory, use `model.avengers[0].firstName`. 
+
+When the current working directory _is_ the model directory, use `avengers[0].firstName`. 
+
+
+
+TODO Explain filepath The list contains objects ... the first item is Steve... may want to include after the tree view of _this.yaml with steve rogers
+
+
 
 See in this directory how the library maintains a mapping between element space and file system space based on the way it separates the content out into separate files.
 
-!include (test/spec/1.2.7.1_object_with_list_of_objects_of_simple_data_types/.model_tree.txt)
+<!-- include (test/spec/1.2.7.1_object_with_list_of_objects_of_simple_data_types/default/.model_tree.txt) -->
+model
+├── avengers_506E59
+│   └── _this.yaml
+├── avengers_A28836
+│   └── _this.yaml
+├── avengers_E16F4F
+│   └── _this.yaml
+├── avengers.yaml
+└── _this.yaml
+<!-- /include -->
 
 All API calls use element paths; the library handles translation to and from file paths internally.
 
