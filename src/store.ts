@@ -7,7 +7,7 @@ import { idRegex, complexStringKeyToFileName } from "../src/utils.js";
 
 export const INVALID_ELEMENT_NAME = "Error: Invalid element name";
 export const INVALID_PATH_ERROR = "Error: Invalid path";
-export const NONEMPTY_WORKINGDIR_PATH_ERROR =
+export const NONEMPTY_TARGETDIR_PATH_ERROR =
   "Error: Working directory path is non-empty";
 export const reserved_keywords = [
   "abstract",
@@ -301,12 +301,27 @@ export function store(
   workingDirectoryPath: string,
   elementName: string
 ): YdsResult {
+  // verify working directory path exists
   if (fs.existsSync(workingDirectoryPath)) {
-    if (fs.readdirSync(workingDirectoryPath).length > 0) {
+    // determine target directory (i.e., directory in which to store root YAML element)
+    let targetDirectoryPath;
+    if (Array.isArray(element)) {
+      // target directory is the list directory (i.e., working directory)
+      targetDirectoryPath = workingDirectoryPath;
+    } else {
+      // target directory is the object directory
+      targetDirectoryPath = path.join(workingDirectoryPath, elementName);
+    }
+
+    // error if target directory exists, but non-empty
+    if (
+      fs.existsSync(targetDirectoryPath) &&
+      fs.readdirSync(targetDirectoryPath).length > 0
+    ) {
       return new YdsResult(
         false,
         element,
-        NONEMPTY_WORKINGDIR_PATH_ERROR + " [" + workingDirectoryPath + "]"
+        NONEMPTY_TARGETDIR_PATH_ERROR + " [" + targetDirectoryPath + "]"
       );
     } else {
       if (validateElementName(elementName)) {
