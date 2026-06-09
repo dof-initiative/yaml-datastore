@@ -114,7 +114,7 @@ A **file path** follows standard filesystem conventions, a hierarchy of director
 
 An **element path** is an object path, expressed in dot and brackets notation, from the working directory to the element to be read into memory. 
 
-For example, let's say we have a list of Avengers stored as [objects](#objects) that are a [list](#lists) of [simple data types](#simple-data-types), i.e. their name and age.
+For example, information about a group of Avengers can be stored as [objects](#objects) that are a [list](#lists) of [simple data types](#simple-data-types), i.e. their name and age. You can retrieve the first name of Captian America, `Steve`.
 
 <!-- include (test/spec/1.2.7.1_object_with_list_of_objects_of_simple_data_types/model.json lang=json) -->
 ```json
@@ -140,7 +140,7 @@ For example, let's say we have a list of Avengers stored as [objects](#objects) 
 ```
 <!-- /include -->
 
-Say we want to retrieve the first name of Captian America, `Steve`. When the current working directory _contains_ `model/`, we'd use `model.avengers[0].firstName`. When the current working directory _is_ `model/`, we'd use `avengers[0].firstName`. 
+ When the current working directory (cwd) _contains_ `model/`, you would use `model.avengers[0].firstName`. When the cwd _is_ `model/`, you would use `avengers[0].firstName`. 
 
 <!-- include (test/spec/1.2.7.1_object_with_list_of_objects_of_simple_data_types/default/.model_tree.txt lang=txt) -->
 ```txt
@@ -164,25 +164,24 @@ Element paths can be empty, short, or hierarchical.
 
 ### Empty Element Paths
 
-**Empty** element paths must refer to an *object* stored in the current working directory. Essentially, the current working directory must have a `\_this.yaml` in it, otherwise the element path is invalid. *This is the only valid case for an empty element path; it cannot point to any other data type.*
+**Empty** element paths must refer to an *object* stored in the cwd. Essentially, the cwd must have a `\_this.yaml` in it, otherwise the element path is invalid. *This is the only valid case for an empty element path; it cannot point to any other data type.*
 
 ### Short Element Paths
 
 **Short** element paths may refer to an object, a list, a complex string, or a simple value. They contain no hierarchy and use a single identifier with no dots or brackets (e.g. `model`, `avengers`, `firstName`). 
-These four examples will help clarify how short element paths are used based on the current working directory:
-* If it _contains_ `model/`, the short path to the element is `model`. 
-* If it _is_ `model/`, the short path to the list of Avengers is `avengers`. 
-* If it is `model/avengers_E16F4F/`, the short paths to individual fields are `firstName` or `lastName`. 
-* If it is an object and the object owns a property `Steve`, you would use short path `firstName`, or for `Rogers`, `lastName`. 
+These examples will help clarify how short element paths are used based on the cwd:
+* If the cwd _contains_ `model/`, the short path to the object is `model`. 
+* If the cwd _is_ `model/`, the short path to the list of Avengers is `avengers`. 
+* If the cwd is `model/avengers_E16F4F/`, the short path to the first property is `firstName`. 
 
-Edge Case: When current working directory is `model/` and contains a list of complex data types, the data types can be accessed using a short path to the complex data. 
+Note to Developers: In edge cases, where the cwd is `model/` and contains a list of complex data types, the data types can be accessed using a short path to the complex data. 
 
 ### Hiearchical Element Paths
 
 **Hierarchical** element paths are multi-step and use dots for object properties and brackets for list indices (e.g. `model.avengers[0].firstName`). 
 Examples:
 * If it _contains_ `model/` and you want to access `Steve`, the hiearchial path is `model.avengers[0].firstName` 
-* If it _is_ `model/`, the hierarchial path is `avengers[0].firstName`. Note: to access all information about captain america, the hiearchial path is `avengers[0]`
+* If it _is_ `model/`, the hierarchial path is `avengers[0].firstName`. Note: to access all information about Captain America, the hiearchial path is `avengers[0]`
 
 ## Mapping Complex Data Types to Files
 
@@ -269,7 +268,7 @@ The Load function reconstructs disk data back into the in-memory data structure 
 
 #### Empty Element Path
 
-- Must point to an Object. An empty path indicates the root of the current working directory.
+- Must point to an Object. An empty path indicates the root of the cwd.
 - The function checks the working directory for a `_this.yaml` file.
 - If `_this.yaml` is missing, the function throws an error, as a directory without this file is not a valid object root in this spec.
 
