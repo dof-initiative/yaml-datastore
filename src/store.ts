@@ -9,6 +9,7 @@ export const INVALID_ELEMENT_NAME = "Error: Invalid element name";
 export const INVALID_PATH_ERROR = "Error: Invalid path";
 export const NONEMPTY_TARGETDIR_PATH_ERROR =
   "Error: Target directory path is non-empty";
+export const LIST_AlREADY_EXISTS_ERROR = "Error: List already exists";
 export const reserved_keywords = [
   "abstract",
   "arguments",
@@ -305,7 +306,8 @@ export function store(
   if (fs.existsSync(workingDirectoryPath)) {
     // determine target directory (i.e., directory in which to store root YAML element)
     let targetDirectoryPath;
-    if (Array.isArray(element)) {
+    const elementIsList = Array.isArray(element);
+    if (elementIsList) {
       // target directory is the list directory (i.e., working directory)
       targetDirectoryPath = workingDirectoryPath;
     } else {
@@ -313,26 +315,45 @@ export function store(
       targetDirectoryPath = path.join(workingDirectoryPath, elementName);
     }
 
-    // error if target directory exists, but non-empty
+    // check if target directory exists, but non-empty
     if (
       fs.existsSync(targetDirectoryPath) &&
       fs.readdirSync(targetDirectoryPath).length > 0
     ) {
-      return new YdsResult(
-        false,
-        element,
-        NONEMPTY_TARGETDIR_PATH_ERROR + " [" + targetDirectoryPath + "]"
-      );
-    } else {
-      if (validateElementName(elementName)) {
-        return storeYaml(element, workingDirectoryPath, elementName);
+      if (elementIsList) {
+        // iterate through target directory for case where element to store is a list
+        for (let file of fs.readdirSync(targetDirectoryPath)) {
+          // check if list file already exists
+          if (file.includes(".yaml")) {
+            // throw error if list file already exists
+            return new YdsResult(
+              false,
+              element,
+              LIST_AlREADY_EXISTS_ERROR + " [" + file + "]"
+            );
+          }
+        }
       } else {
+        // throw error for when target directory for case where element to store is an object
         return new YdsResult(
           false,
           element,
-          INVALID_ELEMENT_NAME + " [" + elementName + "]"
+          NONEMPTY_TARGETDIR_PATH_ERROR + " [" + targetDirectoryPath + "]"
         );
       }
+    }
+
+    // validate element name
+    if (validateElementName(elementName)) {
+      // if element name is valid, proceed with executing store function
+      return storeYaml(element, workingDirectoryPath, elementName);
+    } else {
+      // error for invalid element name
+      return new YdsResult(
+        false,
+        element,
+        INVALID_ELEMENT_NAME + " [" + elementName + "]"
+      );
     }
   }
   return new YdsResult(

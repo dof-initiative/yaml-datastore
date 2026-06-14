@@ -5,6 +5,7 @@ import {
   INVALID_ELEMENT_NAME,
   INVALID_PATH_ERROR,
   NONEMPTY_TARGETDIR_PATH_ERROR,
+  LIST_AlREADY_EXISTS_ERROR,
   reserved_keywords,
 } from "../src/store";
 import { expect } from "chai";
@@ -123,7 +124,7 @@ describe("Test basic store function", () => {
       .to.be.a("string")
       .and.satisfy((msg) => msg.startsWith(NONEMPTY_TARGETDIR_PATH_ERROR));
   });
-  it("shall error when target directory path for list exists, but non-empty", () => {
+  it("shall error when target directory path for list exists, but already contains a list file", () => {
     const element = [];
     const specCasePath = toSpecCasePath("2.1_list_of_simple_data_types");
     const workingDir = path.join(specCasePath, DEFAULT_SPEC_CASE_FOLDER);
@@ -132,7 +133,7 @@ describe("Test basic store function", () => {
     expect(result.success).to.equal(false);
     expect(result.message)
       .to.be.a("string")
-      .and.satisfy((msg) => msg.startsWith(NONEMPTY_TARGETDIR_PATH_ERROR));
+      .and.satisfy((msg) => msg.startsWith(LIST_AlREADY_EXISTS_ERROR));
   });
   it("shall error when element name starts with a digit", () => {
     const element = {};
