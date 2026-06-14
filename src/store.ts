@@ -8,7 +8,7 @@ import { idRegex, complexStringKeyToFileName } from "../src/utils.js";
 export const INVALID_ELEMENT_NAME = "Error: Invalid element name";
 export const INVALID_PATH_ERROR = "Error: Invalid path";
 export const NONEMPTY_TARGETDIR_PATH_ERROR =
-  "Error: Working directory path is non-empty";
+  "Error: Target directory path is non-empty";
 export const reserved_keywords = [
   "abstract",
   "arguments",
