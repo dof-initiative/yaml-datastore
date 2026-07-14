@@ -677,25 +677,23 @@ describe("Test advanced store function", () => {
       force: true,
     });
   });
-  it("shall store list when target directory path for list exists and is non-empty, but does not contain yaml files", () => {
-    //
-  });
-  it("shall store list when target directory path for list exists, but contains a yaml file that is not the target list file", async () => {
+  it("shall store list when target directory path for list exists and is non-empty, but does not contain yaml files", async () => {
     const specCaseName =
-      "2.1_list_of_simple_data_types/storeNewListWithExistingList";
+      "2.1_list_of_simple_data_types/storeNewListWithExistingReadme";
     // 1. select spec case
     const specCasePath = toSpecCasePath(specCaseName);
 
-    // 2.1 copy (before operation state) spec case files into TMP_WORKING_DIR_PATH
-    const defaultCasePath = path.join(specCasePath, DEFAULT_SPEC_CASE_PATH);
-    fs.cpSync(defaultCasePath, TMP_WORKING_DIR_PATH, { recursive: true });
+    // 2.1 write contents of readme into TMP_WORKING_DIR_PATH
+    const readmeContents = "# MyProject\n";
+    const readmeFilePath = path.join(TMP_WORKING_DIR_PATH, "README.md");
+    fs.writeFileSync(readmeFilePath, readmeContents, "utf-8");
 
     // 2.2 copy (after operation state) spec case files into TMP_SPEC_DIR_AFTER_OPERATION_PATH
     fs.cpSync(specCasePath, TMP_SPEC_DIR_AFTER_OPERATION_PATH, {
       recursive: true,
     });
 
-    // 3. Add empty list to working directory
+    // 2.3. Add empty list to working directory
     const element = [];
     const elementName = "myEmptyList";
 
@@ -719,7 +717,60 @@ describe("Test advanced store function", () => {
     );
     expect(resultContents).to.equal(expectedResultContents);
 
-    // 4. run basic load test with TMP_WORKING_DIR_PATH (i.e., path containing serialized content from store() function) as working directory path
+    const storeTestResult = new StoreTestResult(
+      specCasePath,
+      TMP_WORKING_DIR_PATH
+    );
+    const specCasePathHash = await hashElement(
+      storeTestResult.specCasePath,
+      options
+    );
+
+    const storePathHash = await hashElement(storeTestResult.storePath);
+
+    // verify that checksums of on-disk representation from spec case versus serialized content are identical
+    expect(toJsonString(storePathHash["children"])).to.equal(
+      toJsonString(specCasePathHash["children"])
+    );
+  });
+  it("shall store list when target directory path for list exists, but contains a yaml file that is not the target list file", async () => {
+    const specCaseName =
+      "2.1_list_of_simple_data_types/storeNewListWithExistingList";
+    // 1. select spec case
+    const specCasePath = toSpecCasePath(specCaseName);
+
+    // 2.1 copy (before operation state) spec case files into TMP_WORKING_DIR_PATH
+    const defaultCasePath = path.join(specCasePath, DEFAULT_SPEC_CASE_PATH);
+    fs.cpSync(defaultCasePath, TMP_WORKING_DIR_PATH, { recursive: true });
+
+    // 2.2 copy (after operation state) spec case files into TMP_SPEC_DIR_AFTER_OPERATION_PATH
+    fs.cpSync(specCasePath, TMP_SPEC_DIR_AFTER_OPERATION_PATH, {
+      recursive: true,
+    });
+
+    // 2.3. Add empty list to working directory
+    const element = [];
+    const elementName = "myEmptyList";
+
+    const specCaseDir = specCasePath;
+    const filename = elementName + ".yaml";
+    const expectedFilePath = path.join(TMP_WORKING_DIR_PATH, filename);
+    const specCaseFilePath = path.join(specCaseDir, filename);
+    const expectedResultContents = fs.readFileSync(
+      path.resolve(specCaseFilePath),
+      "utf-8"
+    );
+
+    // 3. store element in working directory
+    const result = store(element, TMP_WORKING_DIR_PATH, elementName);
+
+    expect(result.success).to.equal(true);
+    expect(result.message).to.equal(elementName);
+    const resultContents = fs.readFileSync(
+      path.resolve(expectedFilePath),
+      "utf-8"
+    );
+    expect(resultContents).to.equal(expectedResultContents);
 
     const storeTestResult = new StoreTestResult(
       specCasePath,
