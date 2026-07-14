@@ -6,9 +6,9 @@
 
 # Function: load()
 
-> **load**(`workingDirectoryPath`, `elementPath`, `depth`): [`LoadResult`](../classes/LoadResult.md)
+> **load**(`workingDirectoryPath`, `elementPath`, `depth`): [`YdsResult`](../classes/YdsResult.md)
 
-Defined in: [load.ts:420](https://github.com/Mach30/yaml-datastore/blob/418c20ab5ac220d9a8c99ddf0be28fa87954df85/src/load.ts#L420)
+Defined in: [load.ts:77](https://github.com/dof-initiative/yaml-datastore/blob/e2c93da4f89fcc48a05e5252b53db8d7c3b44710/src/load.ts#L77)
 
 Returns a in-memory representation of the element in working directory specified by element path
 
@@ -34,6 +34,6 @@ integer from -1 to depth of element indicating how deep into element's hierachy 
 
 ## Returns
 
-[`LoadResult`](../classes/LoadResult.md)
+[`YdsResult`](../classes/YdsResult.md)
 
-a LoadResult containing the status and content of the load function
+a YdsResult containing the status and content of the load function
