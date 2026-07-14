@@ -14,6 +14,8 @@ import path from "path";
 import { hashElement } from "folder-hash";
 import { DEFAULT_SPEC_CASE_FOLDER } from "./spec_constants";
 
+const DEFAULT_SPEC_CASE_PATH = "../" + DEFAULT_SPEC_CASE_FOLDER;
+const TMP_SPEC_DIR_AFTER_OPERATION_PATH = "/tmp/spec-project";
 const TMP_WORKING_DIR_PATH = "/tmp/my-project";
 let workingDir = "";
 
@@ -124,7 +126,7 @@ describe("Test basic store function", () => {
       .to.be.a("string")
       .and.satisfy((msg) => msg.startsWith(NONEMPTY_TARGETDIR_PATH_ERROR));
   });
-  it("shall error when target directory path for list exists, but already contains a list file", () => {
+  it("shall error when target directory path for list exists, but already contains the list file to store", () => {
     const element = [];
     const specCasePath = toSpecCasePath("2.1_list_of_simple_data_types");
     const workingDir = path.join(specCasePath, DEFAULT_SPEC_CASE_FOLDER);
@@ -589,7 +591,7 @@ describe("Test basic store function", () => {
       toJsonString(specCasePathHash["children"])
     );
   });
-  it("shall store list of list of of list simple data type", async () => {
+  it("shall store list of list of list simple data type", async () => {
     const storeTestResult = runBasicStoreTest(
       "2.2.7.2_list_of_list_of_list_of_simple_data_type"
     );
@@ -649,6 +651,80 @@ describe("Test basic store function", () => {
   });
   it("shall store legacy project", async () => {
     const storeTestResult = runBasicStoreTest("3.1_legacy_project");
+    const specCasePathHash = await hashElement(
+      storeTestResult.specCasePath,
+      options
+    );
+
+    const storePathHash = await hashElement(storeTestResult.storePath);
+
+    // verify that checksums of on-disk representation from spec case versus serialized content are identical
+    expect(toJsonString(storePathHash["children"])).to.equal(
+      toJsonString(specCasePathHash["children"])
+    );
+  });
+});
+
+describe("Test advanced store function", () => {
+  beforeEach(function () {
+    fs.mkdirSync(TMP_WORKING_DIR_PATH);
+    fs.mkdirSync(TMP_SPEC_DIR_AFTER_OPERATION_PATH);
+  });
+  afterEach(function () {
+    fs.rmSync(TMP_WORKING_DIR_PATH, { recursive: true, force: true });
+    fs.rmSync(TMP_SPEC_DIR_AFTER_OPERATION_PATH, {
+      recursive: true,
+      force: true,
+    });
+  });
+  it("shall store list when target directory path for list exists and is non-empty, but does not contain yaml files", () => {
+    //
+  });
+  it("shall store list when target directory path for list exists, but contains a yaml file that is not the target list file", async () => {
+    const specCaseName =
+      "2.1_list_of_simple_data_types/storeNewListWithExistingList";
+    // 1. select spec case
+    const specCasePath = toSpecCasePath(specCaseName);
+
+    // 2.1 copy (before operation state) spec case files into TMP_WORKING_DIR_PATH
+    const defaultCasePath = path.join(specCasePath, DEFAULT_SPEC_CASE_PATH);
+    fs.cpSync(defaultCasePath, TMP_WORKING_DIR_PATH, { recursive: true });
+
+    // 2.2 copy (after operation state) spec case files into TMP_SPEC_DIR_AFTER_OPERATION_PATH
+    fs.cpSync(specCasePath, TMP_SPEC_DIR_AFTER_OPERATION_PATH, {
+      recursive: true,
+    });
+
+    // 3. Add empty list to working directory
+    const element = [];
+    const elementName = "myEmptyList";
+
+    const specCaseDir = specCasePath;
+    const filename = elementName + ".yaml";
+    const expectedFilePath = path.join(TMP_WORKING_DIR_PATH, filename);
+    const specCaseFilePath = path.join(specCaseDir, filename);
+    const expectedResultContents = fs.readFileSync(
+      path.resolve(specCaseFilePath),
+      "utf-8"
+    );
+
+    // 3. store element in working directory
+    const result = store(element, TMP_WORKING_DIR_PATH, elementName);
+
+    expect(result.success).to.equal(true);
+    expect(result.message).to.equal(elementName);
+    const resultContents = fs.readFileSync(
+      path.resolve(expectedFilePath),
+      "utf-8"
+    );
+    expect(resultContents).to.equal(expectedResultContents);
+
+    // 4. run basic load test with TMP_WORKING_DIR_PATH (i.e., path containing serialized content from store() function) as working directory path
+
+    const storeTestResult = new StoreTestResult(
+      specCasePath,
+      TMP_WORKING_DIR_PATH
+    );
     const specCasePathHash = await hashElement(
       storeTestResult.specCasePath,
       options

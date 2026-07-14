@@ -321,17 +321,15 @@ export function store(
       fs.readdirSync(targetDirectoryPath).length > 0
     ) {
       if (elementIsList) {
-        // iterate through target directory for case where element to store is a list
-        for (let file of fs.readdirSync(targetDirectoryPath)) {
-          // check if list file already exists
-          if (file.includes(".yaml")) {
-            // throw error if list file already exists
-            return new YdsResult(
-              false,
-              element,
-              LIST_AlREADY_EXISTS_ERROR + " [" + file + "]"
-            );
-          }
+        // check if list file already exists
+        const listFileName = elementName + ".yaml";
+        if (fs.readdirSync(targetDirectoryPath).includes(listFileName)) {
+          // throw error if list file already exists
+          return new YdsResult(
+            false,
+            element,
+            LIST_AlREADY_EXISTS_ERROR + " [" + listFileName + "]"
+          );
         }
       } else {
         // throw error for when target directory for case where element to store is an object
