@@ -169,7 +169,7 @@ Element paths can be empty, short, or hierarchical.
 ### Short Element Paths
 
 **Short** element paths may refer to an object, a list, a complex string, or a simple value. They contain no hierarchy and use a single identifier with no dots or brackets (e.g. `model`, `avengers`, `firstName`). 
-These examples will help clarify how short element paths are used based on the cwd:
+For example:
 * If the cwd _contains_ `model/`, the short path to the object is `model`. 
 * If the cwd _is_ `model/`, the short path to the list of Avengers is `avengers`. 
 * If the cwd is `model/avengers_E16F4F/`, the short path to the first property is `firstName`. 
@@ -628,7 +628,7 @@ personInfo: ((personInfo.yaml))
 <!-- include (test/spec/1.2.6_object_with_list_of_complex_strings/default/README.md) -->
 ### Object with List of Complex Strings
 #### The Model to Store
-In this case we have an object that contains a list `verses_txt` containing one string and three multi-line strings.
+In this case, we have an object that contains a list `verses_txt` containing one string and three multi-line strings.
 ```json
 {
   "songTitle": "Mary Had a Little Lamb",
@@ -644,7 +644,7 @@ In this case we have an object that contains a list `verses_txt` containing one 
 ```
 #### Generated Directory Structure
 Because it is an object, the data structure for this example has a directory named `model` to represent the object above named "model" that contains a `_this.yaml` file to store the object's properties. Because this property is a list, `model/_this.yaml` references the relative filepath of the list using the double-parentheses convention `((verses_txt.yaml))`. 
-Because the list contains simple data and multi-line strings, the simple data can be included directly, but text files must be generated for each of multi-line strings To ensure proper storage, each text file receives a unique 6 digit ID. The relative filepath to these text files is stored in the yaml file using the double parentheses convention `((verses_E16F4F.txt))`, `((verses_506E59.txt))`, and `((verses_A28836.txt))`.
+Because the list contains simple data and multi-line strings, the simple data can be included directly, but text files must be generated for each of multi-line strings. To ensure proper storage, each text file receives a unique 6 digit ID. The relative filepath to these text files is stored in the yaml file using the double parentheses convention `((verses_E16F4F.txt))`, `((verses_506E59.txt))`, and `((verses_A28836.txt))`.
 ```txt
 model
 ├── _this.yaml
@@ -694,6 +694,7 @@ The lamb was sure to go.
 <!-- include (test/spec/1.2.7.1_object_with_list_of_objects_of_simple_data_types/default/README.md) -->
 ### Object with List of Objects of Simple Data Types
 #### The Model to Store
+In this case, we have an object that contains a list of objects (avengers) containing simple data types (their name and age).
 ```json
 {
   "avengers": [
@@ -716,6 +717,8 @@ The lamb was sure to go.
 }
 ```
 #### Generated Directory Structure
+Because it is an object, the data structure for this example has a directory named `model` to represent the object above named "model" that contains a `_this.yaml` file to store the object's properties. Because this property is a list, `model/_this.yaml` references the relative filepath of the list using the double-parentheses convention `((avengers.yaml))`. 
+Because the list contains objects, directories must be generated for each of the objects. To ensure proper storage, each directory receives a unique 6 digit ID. The releative filepath to these directories is stored in the yaml file using the double parentheses convention `((model/avengers_506E59))`, etc.  Because the objects contain simple data, it can be included directly in the each object's `_this.yaml` files.
 ```txt
 model
 ├── avengers_506E59
@@ -761,6 +764,7 @@ age: 94
 <!-- include (test/spec/1.2.7.2_object_with_list_of_list_of_simple_data_type/default/README.md) -->
 ### Object with List of List of Simple Data Type
 #### The Model to Store
+In this case, we have an object that contains a list of numbers that contains lists of numbers.
 ```json
 {
   "matrix": [
@@ -783,6 +787,8 @@ age: 94
 }
 ```
 #### Generated Directory Structure
+Because it is an object, the data structure for this example has a directory named `model` to represent the object above named "model" that contains a `_this.yaml` file to store the object's properties. Because this property is a list, `model/_this.yaml` references the relative filepath of the list using the double-parentheses convention `((matrix.yaml))`. 
+Because the list contains lists, yaml files must be generated for each list.  To ensure proper storage, each yaml file receives a unique 6 digit ID, e.g. `matrix_506E59.yaml`. Because the lists contain simple data, the simple data is included directly in each lists' yaml files.
 ```txt
 model
 ├── matrix_506E59.yaml
