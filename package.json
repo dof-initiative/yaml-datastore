@@ -15,7 +15,10 @@
     "dev": "tsup --watch",
     "test": "c8 mocha --forbid-only",
     "docs": "typedoc",
-    "lint": "eslint ./src/**/*.ts"
+    "lint": "eslint ./src/**/*.ts",
+    "preversion": "npm run test",
+    "version": "npm run build && git add docs",
+    "postversion": "git push && git push --tags"
   },
   "bin": {
     "yds-ids": "./bin/yds-ids.js",
