@@ -6,11 +6,12 @@
   "module": "dist/index.mjs",
   "types": "dist/index.d.ts",
   "files": [
-    "dist"
+    "dist",
+    "docs"
   ],
   "scripts": {
     "prepare": "npm run build",
-    "build": "tsup",
+    "build": "rm -rf ./dist && tsup",
     "dev": "tsup --watch",
     "test": "c8 mocha --forbid-only",
     "docs": "typedoc",
