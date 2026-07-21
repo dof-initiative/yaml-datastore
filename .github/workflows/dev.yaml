@@ -1,0 +1,60 @@
+# This workflow builds m30pm tarballs
+
+name: Development Build (on branch or pull request)
+
+# Controls when the workflow will run
+on:
+  # Triggers the workflow on push events
+  push:
+    paths-ignore:
+      - '.gitignore'
+      - 'LICENSE'
+    branches-ignore: [ main ]
+    tags-ignore: [ '*' ]
+  pull_request:
+    branches: [ main ]
+    paths-ignore:
+      - '.gitignore'
+      - 'LICENSE'
+
+  # Allows you to run this workflow manually from the Actions tab
+  workflow_dispatch:
+
+# A workflow run is made up of one or more jobs that can run sequentially or in parallel
+jobs:
+  # This workflow contains a single job called "build"
+  build:
+    if: "!contains(github.event.head_commit.message, 'skip ci')"
+    # The type of runner that the job will run on
+    runs-on: ubuntu-latest
+
+    # Steps represent a sequence of tasks that will be executed as part of the job
+    steps:
+
+      # Checks-out your repository under $GITHUB_WORKSPACE, so your job can access it
+      - name: Checkout github repo
+        uses: actions/checkout@v6
+        with:
+          fetch-depth: 0
+
+      - name: Install nodejs & npm
+        run: sudo apt install nodejs && sudo apt install npm
+
+      - name: Update npm
+        run: sudo npm install -g npm@11.16.0
+
+      - name: Install yaml-datastore dependencies
+        run: npm install
+
+      - name: Build yaml-datastore
+        run: npm run build
+
+      - name: Pack yaml-datastore
+        run: npm pack
+
+      - name: Upload build artifacts
+        uses: actions/upload-artifact@v6
+        with:
+          name: yds-tarball
+          path: yaml-datastore-*.tgz
+
