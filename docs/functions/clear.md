@@ -9,7 +9,7 @@ function clear(
    depth: number): YdsResult;
 ```
 
-Defined in: [clear.ts:22](https://github.com/dof-initiative/yaml-datastore/blob/8ff7f7ed3785c7cd2c04fc1ab78a5061cfbbd5ba/src/clear.ts#L22)
+Defined in: [clear.ts:22](https://github.com/dof-initiative/yaml-datastore/blob/6765af5a725a2d40db2494efaf76a7fa8788b62d/src/clear.ts#L22)
 
 ## Parameters
 
