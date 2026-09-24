@@ -1,6 +1,6 @@
 ### Object with Two Complex Strings
 #### The Model to Store
-In this case, we have an object that contains two complex strings. 
+In this case, we have an object representing the stanzas of Mary Had A Little Lamb, made up of two complex strings, the quatrains. 
 ```json
 {
   "verse1": "Mary had a little lamb,\nIt's fleece was white as snow;\nAnd everywhere that Mary went\nThe lamb was sure to go.",
