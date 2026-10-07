@@ -77,8 +77,10 @@ if (loadResult.success) {
   process.exit(1);
 }
 
-if (format === "yaml") {
-  const elementAsYaml = yaml.dump(element, {lineWidth: -1}).trimEnd();
+if (typeof element === "string") {
+  console.log(element);
+} else if (format === "yaml") {
+  const elementAsYaml = yaml.dump(element, { lineWidth: -1 }).trimEnd();
   console.log(elementAsYaml);
 } else if (format === "json") {
   const elementAsJson = JSON.stringify(element, null, 2);
