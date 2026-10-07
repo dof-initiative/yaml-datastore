@@ -468,10 +468,10 @@ export function getElementPathInfo(
       keyName = remainingElementEntries.slice(-1)[0];
 
       let currentElementAsJsObj = firstElementAsJsObj;
-      let filePath = path.dirname(firstElementPathInfo.data);
+      let currentElementFilePath = firstElementPathInfo.data;
       for (let i = 0; i < remainingElementEntries.length; i++) {
-        const elementPath = remainingElementEntries[i];
-        if (!(currentElementAsJsObj as any).hasOwnProperty(elementPath)) {
+        const currentElementKey = remainingElementEntries[i];
+        if (!(currentElementAsJsObj as any).hasOwnProperty(currentElementKey)) {
           return new ElementPathResult(
             ElementPathType.invalid,
             null,
@@ -480,39 +480,43 @@ export function getElementPathInfo(
             null
           );
         }
-        const rawData = (currentElementAsJsObj as any)[elementPath];
+        // rawData: simple data already loaded into memory or a file path to complex data enclosed in double-parentheses
+        const rawData = (currentElementAsJsObj as any)[currentElementKey];
         if (typeof rawData === "string") {
           if (doubleParenthesesRegEx.test(rawData)) {
             // got a file path
+            const shortElementFilePath = trimDoubleParentheses(rawData);
 
-            if (filePath.slice(-5) === ".yaml") {
-              filePath = path.join(
-                filePath.split("/").slice(0, -1).join("/"),
-                trimDoubleParentheses(rawData)
+            currentElementFilePath = path.join(
+              path.dirname(currentElementFilePath),
+              shortElementFilePath
+            );
+            if (shortElementFilePath.slice(-5) === ".yaml") {
+              // ((filepath)) references a YAML file
+              const currentElementContent = fs.readFileSync(
+                currentElementFilePath,
+                "utf-8"
               );
-            } else {
-              filePath = path.join(filePath, trimDoubleParentheses(rawData));
+              currentElementAsJsObj = yaml.load(currentElementContent);
             }
-            const currentElementContent = fs.readFileSync(filePath, "utf-8");
-            currentElementAsJsObj = yaml.load(currentElementContent);
             if (i === remainingElementEntries.length - 1) {
-              if (filePath.slice(-10) === "_this.yaml") {
+              if (currentElementFilePath.slice(-10) === "_this.yaml") {
                 // got a YAML object
 
                 const result = new ElementPathResult(
                   ElementPathType.hierarchicalToObject,
-                  filePath,
+                  currentElementFilePath,
                   parentElementPath,
                   parentFilePath,
                   keyName
                 );
                 return result;
-              } else if (filePath.slice(-5) === ".yaml") {
+              } else if (currentElementFilePath.slice(-5) === ".yaml") {
                 // got a YAML list
 
                 const result = new ElementPathResult(
                   ElementPathType.hierarchicalToList,
-                  filePath,
+                  currentElementFilePath,
                   parentElementPath,
                   parentFilePath,
                   keyName
@@ -523,7 +527,7 @@ export function getElementPathInfo(
 
                 return new ElementPathResult(
                   ElementPathType.hierarchicalToComplexString,
-                  filePath,
+                  currentElementFilePath,
                   parentElementPath,
                   parentFilePath,
                   keyName
