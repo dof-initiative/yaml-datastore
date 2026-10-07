@@ -613,6 +613,18 @@ describe("Test basic load function for hierarchical element path pointing to com
     expect(result.message).to.equal(elementPath);
     expect(toJsonString(result.element)).to.equal(toJsonString(expectedModel));
   });
+  it("shall load complex string containing colon for object property element path to complex string", () => {
+    const specCasePath = toSpecCasePath("1.2.1_object_with_complex_string");
+    const workingDir = path.join(specCasePath, DEFAULT_SPEC_CASE_FOLDER);
+    const elementPath = "model.description";
+    const expectedModel = JSON.parse(
+      fs.readFileSync(path.resolve(workingDir, "..", "model.json"), "utf8")
+    )["description"];
+    const result = load(workingDir, elementPath);
+    expect(result.success).to.equal(true);
+    expect(result.message).to.equal(elementPath);
+    expect(toJsonString(result.element)).to.equal(toJsonString(expectedModel));
+  });
   it("shall load complex string for list item of an object property element path to complex string", () => {
     const specCasePath = toSpecCasePath(
       "1.2.6_object_with_list_of_complex_strings"
